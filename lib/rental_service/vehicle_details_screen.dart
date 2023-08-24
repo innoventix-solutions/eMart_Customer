@@ -187,12 +187,12 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                             ),
                             onPressed: () {
                               print(widget.rentalOrderModel!.pickupLatLong!.toJson());
-                              push(
+                              /*push(
                                   context,
                                   RentalPaymentScreen(
                                     driverDetails: widget.driverDetails,
                                     rentalOrderModel: widget.rentalOrderModel,
-                                  ));
+                                  ));*/
                             },
                             child: Text(
                               'Continue'.tr().toUpperCase(),

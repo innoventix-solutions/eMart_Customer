@@ -55,7 +55,11 @@ class _MyHomePageState extends State<ParcelHomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text("Welcome!!".tr(), style: TextStyle(color: Color(COLOR_PRIMARY), fontSize: 19)),
-                  Text(MyAppState.currentUser != null ? "${MyAppState.currentUser!.firstName} ${MyAppState.currentUser!.lastName}" : "", style: const TextStyle(fontSize: 20)),
+                  Text(
+                      MyAppState.currentUser != null
+                          ? "${MyAppState.currentUser!.firstName} ${MyAppState.currentUser!.lastName}"
+                          : "",
+                      style: const TextStyle(fontSize: 20)),
                 ],
               ),
             ),
@@ -77,7 +81,11 @@ class _MyHomePageState extends State<ParcelHomeScreen> {
                 : Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: GridView.builder(
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, crossAxisSpacing: 10, mainAxisSpacing: 10, mainAxisExtent: 120),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            mainAxisExtent: 120),
                         itemCount: parcelCategory.length,
                         padding: const EdgeInsets.all(8),
                         shrinkWrap: true,
@@ -97,12 +105,12 @@ class _MyHomePageState extends State<ParcelHomeScreen> {
       splashColor: Color(COLOR_PRIMARY).withOpacity(0.5),
       onTap: () {
         if (MyAppState.currentUser != null) {
-          Navigator.push(
+          /*Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (context) => BookParcelScreen(
                         parcelCategory: item,
-                      )));
+                      )));*/
         } else {
           push(context, const AuthScreen());
         }
@@ -110,7 +118,9 @@ class _MyHomePageState extends State<ParcelHomeScreen> {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100, width: 1),
+          border: Border.all(
+              color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100,
+              width: 1),
           color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
           boxShadow: [
             isDarkMode(context)

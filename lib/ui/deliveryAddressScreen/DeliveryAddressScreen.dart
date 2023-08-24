@@ -85,7 +85,9 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
 
   @override
   Widget build(BuildContext context) {
-    MyAppState.currentUser!.shippingAddress.country != '' ? country = MyAppState.currentUser!.shippingAddress.country : null;
+    MyAppState.currentUser!.shippingAddress.country != ''
+        ? country = MyAppState.currentUser!.shippingAddress.country
+        : null;
     street.text = MyAppState.currentUser!.shippingAddress.line1;
     landmark.text = MyAppState.currentUser!.shippingAddress.line2;
     city.text = MyAppState.currentUser!.shippingAddress.city;
@@ -446,18 +448,23 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
                                   style: TextStyle(color: Color(COLOR_PRIMARY)),
                                 ),
                                 onTap: () async {
-                                  LocationResult result = await Navigator.of(context).push(MaterialPageRoute(builder: (context) => PlacePicker(GOOGLE_API_KEY)));
+                                  LocationResult result = await Navigator.of(context).push(
+                                      MaterialPageRoute(builder: (context) => PlacePicker(GOOGLE_API_KEY)));
 
                                   street1.text = result.name.toString();
-                                  landmark1.text = result.subLocalityLevel1!.name == null ? result.subLocalityLevel2!.name.toString() : result.subLocalityLevel1!.name.toString();
+                                  landmark1.text = result.subLocalityLevel1!.name == null
+                                      ? result.subLocalityLevel2!.name.toString()
+                                      : result.subLocalityLevel1!.name.toString();
                                   city1.text = result.city!.name.toString();
                                   cutries1.text = result.country!.name.toString();
                                   zipcode1.text = result.postalCode.toString();
                                   lat = result.latLng!.latitude;
                                   long = result.latLng!.longitude;
 
-                                  MyAppState.currentUser!.shippingAddress.location.latitude = result.latLng!.latitude;
-                                  MyAppState.currentUser!.shippingAddress.location.longitude = result.latLng!.longitude;
+                                  MyAppState.currentUser!.shippingAddress.location.latitude =
+                                      result.latLng!.latitude;
+                                  MyAppState.currentUser!.shippingAddress.location.longitude =
+                                      result.latLng!.longitude;
                                   getDeliveyData();
                                   setState(() {});
                                 })),
@@ -490,7 +497,10 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
           onPressed: () => validateForm(),
           child: Text(
             'Continue'.tr(),
-            style: TextStyle(color: isDarkMode(context) ? Colors.black : Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+            style: TextStyle(
+                color: isDarkMode(context) ? Colors.black : Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 18),
           ),
         ),
       ),
@@ -509,21 +519,24 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
         await FireStoreUtils().getVendorByVendorID(widget.products.first.vendorID).then((value) {
           vendorModel = value;
         });
-        num km = num.parse(getKm(Position.fromMap({'latitude': lat, 'longitude': long}), Position.fromMap({'latitude': vendorModel!.latitude, 'longitude': vendorModel!.longitude})));
+        num km = num.parse(getKm(Position.fromMap({'latitude': lat, 'longitude': long}),
+            Position.fromMap({'latitude': vendorModel!.latitude, 'longitude': vendorModel!.longitude})));
         await FireStoreUtils().getDeliveryCharges().then((value) {
           if (value != null) {
             DeliveryChargeModel deliveryChargeModel = value;
 
             if (!deliveryChargeModel.vendor_can_modify) {
               if (km > deliveryChargeModel.minimum_delivery_charges_within_km) {
-                deliveryCharges = (km * deliveryChargeModel.delivery_charges_per_km).toDouble().toStringAsFixed(decimal);
+                deliveryCharges =
+                    (km * deliveryChargeModel.delivery_charges_per_km).toDouble().toStringAsFixed(decimal);
                 if (widget.deliveryCharge != deliveryCharges) {
                   isLocationChange = true;
                   widget.deliveryCharge != deliveryCharges.toString();
                 }
                 setState(() {});
               } else {
-                deliveryCharges = deliveryChargeModel.minimum_delivery_charges.toDouble().toStringAsFixed(decimal);
+                deliveryCharges =
+                    deliveryChargeModel.minimum_delivery_charges.toDouble().toStringAsFixed(decimal);
                 if (widget.deliveryCharge != deliveryCharges) {
                   isLocationChange = true;
                   widget.deliveryCharge != deliveryCharges.toString();
@@ -533,14 +546,18 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
             } else {
               if (vendorModel != null && vendorModel!.DeliveryCharge != null) {
                 if (km > vendorModel!.DeliveryCharge!.minimum_delivery_charges_within_km) {
-                  deliveryCharges = (km * vendorModel!.DeliveryCharge!.delivery_charges_per_km).toDouble().toStringAsFixed(decimal);
+                  deliveryCharges = (km * vendorModel!.DeliveryCharge!.delivery_charges_per_km)
+                      .toDouble()
+                      .toStringAsFixed(decimal);
                   if (widget.deliveryCharge != deliveryCharges) {
                     isLocationChange = true;
                     widget.deliveryCharge != deliveryCharges.toString();
                   }
                   setState(() {});
                 } else {
-                  deliveryCharges = vendorModel!.DeliveryCharge!.minimum_delivery_charges.toDouble().toStringAsFixed(decimal);
+                  deliveryCharges = vendorModel!.DeliveryCharge!.minimum_delivery_charges
+                      .toDouble()
+                      .toStringAsFixed(decimal);
                   if (widget.deliveryCharge != deliveryCharges) {
                     isLocationChange = true;
                     widget.deliveryCharge != deliveryCharges.toString();
@@ -549,14 +566,16 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
                 }
               } else {
                 if (km > deliveryChargeModel.minimum_delivery_charges_within_km) {
-                  deliveryCharges = (km * deliveryChargeModel.delivery_charges_per_km).toDouble().toStringAsFixed(decimal);
+                  deliveryCharges =
+                      (km * deliveryChargeModel.delivery_charges_per_km).toDouble().toStringAsFixed(decimal);
                   if (widget.deliveryCharge != deliveryCharges) {
                     isLocationChange = true;
                     widget.deliveryCharge != deliveryCharges.toString();
                   }
                   setState(() {});
                 } else {
-                  deliveryCharges = deliveryChargeModel.minimum_delivery_charges.toDouble().toStringAsFixed(decimal);
+                  deliveryCharges =
+                      deliveryChargeModel.minimum_delivery_charges.toDouble().toStringAsFixed(decimal);
                   if (widget.deliveryCharge != deliveryCharges) {
                     isLocationChange = true;
                     widget.deliveryCharge != deliveryCharges.toString();
@@ -671,7 +690,7 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
         await FireStoreUtils.updateCurrentUserAddress(userAddress);
         hideProgress();
         print("------->Tax ${widget.taxModel!.toJson()}");
-        push(
+        /*push(
           context,
           PaymentScreen(
             total: isLocationChange ? ((widget.total - num.parse(widget.deliveryCharge!)) + num.parse(deliveryCharges)) : widget.total,
@@ -687,7 +706,7 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
             taxModel: widget.taxModel,
             specialDiscountMap: widget.specialDiscountMap,
           ),
-        );
+        );*/
       }
     } else {
       setState(() {

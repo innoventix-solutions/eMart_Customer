@@ -276,7 +276,7 @@ class _CartScreenState extends State<CartScreen> {
                         ),
                       );
                     } else {
-                      push(
+                      /* push(
                         context,
                         PaymentScreen(
                           total: grandtotal,
@@ -292,7 +292,7 @@ class _CartScreenState extends State<CartScreen> {
                           taxModel: taxModel,
                           specialDiscountMap: specialDiscountMap,
                         ),
-                      );
+                      );*/
                       // placeOrder();
                     }
                   },
