@@ -1866,6 +1866,7 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
     final flutterwave = Flutterwave(
       amount: getTotalAmount().toString().trim(),
       currency: currencyData!.code,
+      style: style,
       customer: Customer(
           name: MyAppState.currentUser!.firstName,
           phoneNumber: MyAppState.currentUser!.phoneNumber.trim(),
