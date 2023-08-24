@@ -42,7 +42,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_braintree/flutter_braintree.dart';
 import 'package:flutter_stripe/flutter_stripe.dart' as stripe1;
-import 'package:flutterwave_standard/flutterwave.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:mercadopago_sdk/mercadopago_sdk.dart';
@@ -274,10 +273,6 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
                 paymentType = 'paystack';
                 showLoadingAlert();
                 payStackPayment(context);
-              } else if (flutterWave) {
-                setRef();
-                paymentType = 'flutterwave';
-                _flutterWaveInitiatePayment(context);
               } else if (paypal) {
                 paymentType = 'paypal';
                 showLoadingAlert();
@@ -1884,57 +1879,7 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
     }
   }
 
-  _flutterWaveInitiatePayment(
-    BuildContext context,
-  ) async {
-    final style = FlutterwaveStyle(
-      appBarText: PAYID,
-      buttonColor: Color(COLOR_PRIMARY),
-      buttonTextStyle: const TextStyle(
-        color: Colors.white,
-        fontSize: 20,
-      ),
-      appBarColor: Color(COLOR_PRIMARY),
-      dialogCancelTextStyle: const TextStyle(
-        color: Colors.black,
-        fontSize: 18,
-      ),
-      dialogContinueTextStyle: TextStyle(
-        color: Color(COLOR_PRIMARY),
-        fontSize: 18,
-      ),
-      mainTextStyle: const TextStyle(color: Colors.black, fontSize: 19, letterSpacing: 2),
-      dialogBackgroundColor: Colors.white,
-      appBarTitleTextStyle: const TextStyle(
-        color: Colors.white,
-        fontSize: 18,
-      ),
-    );
-    final flutterwave = Flutterwave(
-      amount: getTotalAmount().toStringAsFixed(decimal),
-      currency: currencyData!.code,
-      style: style,
-      customer: Customer(name: MyAppState.currentUser!.firstName, phoneNumber: MyAppState.currentUser!.phoneNumber.trim(), email: MyAppState.currentUser!.email.trim()),
-      context: context,
-      publicKey: flutterWaveSettingData!.publicKey.trim(),
-      paymentOptions: "card, payattitude",
-      customization: Customization(title: PAYID),
-      txRef: _ref!,
-      isTestMode: flutterWaveSettingData!.isSandbox,
-      redirectUrl: '${GlobalURL}success',
-    );
-    final ChargeResponse response = await flutterwave.charge();
-    if (response.success!) {
-      placeParcelOrder();
-      ScaffoldMessenger.of(_globalKey.currentContext!).showSnackBar(SnackBar(
-        content: Text("Payment Successful!!\n".tr()),
-        backgroundColor: Colors.green,
-      ));
-    } else {
-      showLoading(message: response.status!);
-    }
-    print("${response.toJson()}");
-  }
+ 
 
   Future<void> showLoading({required String message, Color txtColor = Colors.black}) {
     return showDialog(

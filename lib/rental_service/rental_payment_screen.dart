@@ -43,7 +43,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_braintree/flutter_braintree.dart';
 import 'package:flutter_stripe/flutter_stripe.dart' as stripe1;
-import 'package:flutterwave_standard/flutterwave.dart';
 import 'package:http/http.dart' as http;
 import 'package:mercadopago_sdk/mercadopago_sdk.dart';
 import 'package:paytm_allinonesdk/paytm_allinonesdk.dart';
@@ -53,7 +52,8 @@ class RentalPaymentScreen extends StatefulWidget {
   User? driverDetails;
   RentalOrderModel? rentalOrderModel;
 
-  RentalPaymentScreen({Key? key, required this.driverDetails, this.rentalOrderModel}) : super(key: key);
+  RentalPaymentScreen({Key? key, required this.driverDetails, this.rentalOrderModel})
+      : super(key: key);
 
   @override
   State<RentalPaymentScreen> createState() => _RentalPaymentScreenState();
@@ -99,8 +99,8 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
   String offerCode = "";
 
   getTexDetails() async {
-    int day =
-        daysBetween(rentalOrderModel!.pickupDateTime!.toDate(), rentalOrderModel!.dropDateTime!.toDate());
+    int day = daysBetween(
+        rentalOrderModel!.pickupDateTime!.toDate(), rentalOrderModel!.dropDateTime!.toDate());
     print("------->" + day.toString());
     if (rentalOrderModel!.bookWithDriver == true) {
       double carRate = double.parse(driverDetails!.carRate) * day;
@@ -253,8 +253,9 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                      color:
-                          isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100,
+                      color: isDarkMode(context)
+                          ? const Color(DarkContainerBorderColor)
+                          : Colors.grey.shade100,
                       width: 1),
                   color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
                   boxShadow: [
@@ -319,8 +320,9 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                      color:
-                          isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100,
+                      color: isDarkMode(context)
+                          ? const Color(DarkContainerBorderColor)
+                          : Colors.grey.shade100,
                       width: 1),
                   color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
                   boxShadow: [
@@ -351,7 +353,8 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
                         ),
                         Expanded(
                           child: Text(
-                            DateFormat('yyyy-MM-dd hh:mm a').format(rentalOrderModel!.dropDateTime!.toDate()),
+                            DateFormat('yyyy-MM-dd hh:mm a')
+                                .format(rentalOrderModel!.dropDateTime!.toDate()),
                             style: TextStyle(letterSpacing: 1, fontWeight: FontWeight.w600),
                           ),
                         ),
@@ -401,10 +404,13 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
             if (razorPay) {
               paymentType = 'razorpay';
               showLoadingAlert();
-              RazorPayController().createOrderRazorPay(amount: getTotalAmount().toInt()).then((value) {
+              RazorPayController()
+                  .createOrderRazorPay(amount: getTotalAmount().toInt())
+                  .then((value) {
                 if (value == null) {
                   Navigator.pop(context);
-                  showAlert(_globalKey.currentContext!, response: "contact-admin".tr(), colors: Colors.red);
+                  showAlert(_globalKey.currentContext!,
+                      response: "contact-admin".tr(), colors: Colors.red);
                 } else {
                   CreateRazorPayOrderModel result = value;
                   openCheckout(
@@ -465,10 +471,6 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
               paymentType = 'paystack';
               showLoadingAlert();
               payStackPayment(context);
-            } else if (flutterWave) {
-              setRef();
-              paymentType = 'flutterwave';
-              _flutterWaveInitiatePayment(context);
             } else if (paypal) {
               paymentType = 'paypal';
               showLoadingAlert();
@@ -510,7 +512,8 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-            color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100,
+            color:
+                isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100,
             width: 1),
         color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
         boxShadow: [
@@ -530,7 +533,8 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: const [
-                  Text("Booking summary", style: TextStyle(letterSpacing: 1, fontWeight: FontWeight.w600)),
+                  Text("Booking summary",
+                      style: TextStyle(letterSpacing: 1, fontWeight: FontWeight.w600)),
                 ],
               )),
           const Divider(
@@ -549,7 +553,8 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
                   Text(
                     symbol + subTotal.toStringAsFixed(decimal),
                     style: TextStyle(
-                        color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333),
+                        color:
+                            isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333),
                         fontSize: 16),
                   ),
                 ],
@@ -566,7 +571,8 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
                   Text(
                     symbol + driverRate.toStringAsFixed(decimal),
                     style: TextStyle(
-                        color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333),
+                        color:
+                            isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333),
                         fontSize: 16),
                   ),
                 ],
@@ -587,7 +593,8 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
                   Text(
                     "(" + symbol + discountAmount.toStringAsFixed(decimal) + ")",
                     style: TextStyle(
-                        color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333),
+                        color:
+                            isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333),
                         fontSize: 16),
                   ),
                 ],
@@ -598,7 +605,8 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
               child: Text(
                 "Coupon code : $offerCode",
-                style: TextStyle(fontWeight: FontWeight.w600, color: Color(COLOR_PRIMARY), fontSize: 16),
+                style: TextStyle(
+                    fontWeight: FontWeight.w600, color: Color(COLOR_PRIMARY), fontSize: 16),
               ),
             ),
           ),
@@ -619,7 +627,8 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
                   Text(
                     symbol + getTaxAmount().toStringAsFixed(decimal),
                     style: TextStyle(
-                        color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333),
+                        color:
+                            isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333),
                         fontSize: 16),
                   ),
                 ],
@@ -640,13 +649,15 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
                   Text(
                     "Order Total".tr(),
                     style: TextStyle(
-                        color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333),
+                        color:
+                            isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333),
                         fontSize: 16),
                   ),
                   Text(
                     symbol + getTotalAmount().toStringAsFixed(decimal),
                     style: TextStyle(
-                        color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333),
+                        color:
+                            isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333),
                         fontSize: 16),
                   ),
                 ],
@@ -667,7 +678,9 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-              color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100,
+              color: isDarkMode(context)
+                  ? const Color(DarkContainerBorderColor)
+                  : Colors.grey.shade100,
               width: 1),
           color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
           boxShadow: [
@@ -691,7 +704,8 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
                     onTap: () {
                       if (couponList[index].discountTypeOffer == 'Percentage' ||
                           couponList[index].discountTypeOffer == 'Percent') {
-                        discountAmount = subTotal * double.parse(couponList[index].discountOffer!) / 100;
+                        discountAmount =
+                            subTotal * double.parse(couponList[index].discountOffer!) / 100;
                         discountType = couponList[index].discountTypeOffer.toString();
                         discountLable = couponList[index].discountOffer.toString();
                         offerCode = couponList[index].offerCode.toString();
@@ -753,7 +767,9 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
                         child: Text(
                           "${snapshot[index].discountTypeOffer == "Fix Price" ? symbol : ""}${snapshot[index].discountOffer}${snapshot[index].discountTypeOffer == "Percentage" ? "% OFF" : " OFF"}",
                           style: const TextStyle(
-                              color: Color(GREY_TEXT_COLOR), fontWeight: FontWeight.bold, letterSpacing: 0.7),
+                              color: Color(GREY_TEXT_COLOR),
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.7),
                         ),
                       ),
                     ],
@@ -780,7 +796,8 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
                         color: const Color(COUPON_DASH_COLOR),
                       ),
                       Text(
-                          "valid till ".tr() + getDate(snapshot[index].expireOfferDate!.toDate().toString())!,
+                          "valid till ".tr() +
+                              getDate(snapshot[index].expireOfferDate!.toDate().toString())!,
                           style: const TextStyle(letterSpacing: 0.5, color: Color(0Xff696A75)))
                     ],
                   ),
@@ -804,7 +821,9 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-              color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100,
+              color: isDarkMode(context)
+                  ? const Color(DarkContainerBorderColor)
+                  : Colors.grey.shade100,
               width: 1),
           color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
           boxShadow: [
@@ -870,9 +889,11 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
 
   sheet() {
     return Container(
-        padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.height / 4.3, left: 25, right: 25),
+        padding:
+            EdgeInsets.only(bottom: MediaQuery.of(context).size.height / 4.3, left: 25, right: 25),
         height: MediaQuery.of(context).size.height * 0.88,
-        decoration: BoxDecoration(color: Colors.transparent, border: Border.all(style: BorderStyle.none)),
+        decoration:
+            BoxDecoration(color: Colors.transparent, border: Border.all(style: BorderStyle.none)),
         child: FutureBuilder<List<OfferModel>>(
             future: coupon,
             initialData: const [],
@@ -911,7 +932,8 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
                 ),
                 Expanded(
                     child: Container(
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.white),
+                  decoration:
+                      BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.white),
                   alignment: Alignment.center,
                   child: SingleChildScrollView(
                     child: Column(
@@ -933,7 +955,8 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
                               padding: const EdgeInsets.only(top: 10, left: 22, right: 22),
                               child: const Text(
                                 "Voucher or Coupon code",
-                                style: TextStyle(color: Color(0XFF9091A4), letterSpacing: 0.5, height: 2),
+                                style: TextStyle(
+                                    color: Color(0XFF9091A4), letterSpacing: 0.5, height: 2),
                               ).tr()),
                         ),
                         Container(
@@ -947,8 +970,8 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
                                 child: ClipRRect(
                                     borderRadius: const BorderRadius.all(Radius.circular(12)),
                                     child: Container(
-                                        padding:
-                                            const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 20),
+                                        padding: const EdgeInsets.only(
+                                            left: 20, right: 20, top: 20, bottom: 20),
                                         color: const Color(0XFFF1F4F7),
                                         // height: 120,
                                         alignment: Alignment.center,
@@ -1007,7 +1030,8 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
                             child: Text(
                               "REDEEM NOW".tr(),
                               style: TextStyle(
-                                  color: isDarkMode(context) ? Colors.black : Colors.white, fontSize: 16),
+                                  color: isDarkMode(context) ? Colors.black : Colors.white,
+                                  fontSize: 16),
                             ),
                           ),
                         ),
@@ -1092,18 +1116,23 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
             margin: const EdgeInsets.only(left: 15),
             child: Text("Select Payment Method".tr(),
                 style: TextStyle(
-                    fontSize: 16, color: Colors.black, letterSpacing: 1, fontWeight: FontWeight.w600))),
+                    fontSize: 16,
+                    color: Colors.black,
+                    letterSpacing: 1,
+                    fontWeight: FontWeight.w600))),
         Visibility(
           visible: UserPreference.getWalletData() ?? false,
           child: Column(
             children: [
               StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
                   stream: userQuery,
-                  builder: (context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> asyncSnapshot) {
+                  builder: (context,
+                      AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> asyncSnapshot) {
                     if (asyncSnapshot.hasError) {
                       return const Text(
                         "error",
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
                       ).tr();
                     }
                     if (asyncSnapshot.connectionState == ConnectionState.waiting) {
@@ -1133,7 +1162,8 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
                             value: "Wallet",
                             childWidget: Text(
                               currencyData!.symbol +
-                                  double.parse(userData.wallet_amount.toString()).toStringAsFixed(decimal),
+                                  double.parse(userData.wallet_amount.toString())
+                                      .toStringAsFixed(decimal),
                               style: TextStyle(
                                 color: walletBalanceError ? Colors.red : Colors.green,
                                 fontWeight: FontWeight.w600,
@@ -1476,7 +1506,8 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
         'currency': currencyData!.code,
         'payment_method_types[]': 'card',
         "description": "${MyAppState.currentUser?.userID} Wallet Topup",
-        "shipping[name]": "${MyAppState.currentUser?.firstName} ${MyAppState.currentUser?.lastName}",
+        "shipping[name]":
+            "${MyAppState.currentUser?.firstName} ${MyAppState.currentUser?.lastName}",
         "shipping[address][line1]": "510 Townsend St",
         "shipping[address][postal_code]": "98140",
         "shipping[address][city]": "San Francisco",
@@ -1484,8 +1515,8 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
         "shipping[address][country]": "US",
       };
       print(body);
-      var response =
-          await http.post(Uri.parse('https://api.stripe.com/v1/payment_intents'), body: body, headers: {
+      var response = await http
+          .post(Uri.parse('https://api.stripe.com/v1/payment_intents'), body: body, headers: {
         'Authorization': 'Bearer ${stripeData?.stripeSecret}', //$_paymentIntentClientSecret',
         'Content-Type': 'application/x-www-form-urlencoded'
       });
@@ -1539,7 +1570,8 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
         final bool isDone = await Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => MercadoPagoScreen(initialURl: result['response']['init_point'])));
+                builder: (context) =>
+                    MercadoPagoScreen(initialURl: result['response']['init_point'])));
         print(isDone);
         print(result.toString());
         print(preferenceId);
@@ -1570,7 +1602,8 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
 
   ///PayPal payment function
   _makePaypalPayment({required amount}) async {
-    PayPalClientTokenGen.paypalClientToken(paypalSettingData: paypalSettingData!).then((value) async {
+    PayPalClientTokenGen.paypalClientToken(paypalSettingData: paypalSettingData!)
+        .then((value) async {
       final String tokenizationKey = paypalSettingData!.braintree_tokenizationKey;
 
       var request = BraintreePayPalRequest(
@@ -1667,19 +1700,21 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
     print(data);
     await verifyCheckSum(checkSum: data["code"], amount: amount, orderId: orderId).then((value) {
       initiatePayment(amount: amount, orderId: orderId).then((value) {
-        if (value != null) {
-          print(value);
-          GetPaymentTxtTokenModel result = value;
-          String callback = "";
-          if (paytmSettingData!.isSandboxEnabled) {
-            callback = callback + "https://securegw-stage.paytm.in/theia/paytmCallback?ORDER_ID=$orderId";
-          } else {
-            callback = callback + "https://securegw.paytm.in/theia/paytmCallback?ORDER_ID=$orderId";
-          }
-
-          _startTransaction(context,
-              txnTokenBy: result.body.txnToken, orderId: orderId, amount: amount, callBackURL: callback);
+        print(value);
+        GetPaymentTxtTokenModel result = value;
+        String callback = "";
+        if (paytmSettingData!.isSandboxEnabled) {
+          callback =
+              callback + "https://securegw-stage.paytm.in/theia/paytmCallback?ORDER_ID=$orderId";
+        } else {
+          callback = callback + "https://securegw.paytm.in/theia/paytmCallback?ORDER_ID=$orderId";
         }
+
+        _startTransaction(context,
+            txnTokenBy: result.body.txnToken,
+            orderId: orderId,
+            amount: amount,
+            callBackURL: callback);
       });
     });
   }
@@ -1709,7 +1744,8 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
           print(amount);
           placeParcelOrder();
           showAlert(context,
-              response: "Payment Successful!!\n".tr() + "${value['RESPMSG']}", colors: Colors.green);
+              response: "Payment Successful!!\n".tr() + "${value['RESPMSG']}",
+              colors: Colors.green);
         }
       }).catchError((onError) {
         if (onError is PlatformException) {
@@ -1718,7 +1754,8 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
 
           print("Error124 : $onError");
           result = onError.message.toString() + " \n  " + onError.code.toString();
-          showAlert(_globalKey.currentContext!, response: onError.message.toString(), colors: Colors.red);
+          showAlert(_globalKey.currentContext!,
+              response: onError.message.toString(), colors: Colors.red);
         } else {
           print("======>>2");
 
@@ -1735,7 +1772,8 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
     }
   }
 
-  Future<GetPaymentTxtTokenModel> initiatePayment({required double amount, required orderId}) async {
+  Future<GetPaymentTxtTokenModel> initiatePayment(
+      {required double amount, required orderId}) async {
     String initiateURL = "${GlobalURL}payments/initiatepaytmpayment";
 
     String callback = "";
@@ -1763,7 +1801,8 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
     return GetPaymentTxtTokenModel.fromJson(data);
   }
 
-  Future verifyCheckSum({required String checkSum, required double amount, required orderId}) async {
+  Future verifyCheckSum(
+      {required String checkSum, required double amount, required orderId}) async {
     String getChecksum = "${GlobalURL}payments/validatechecksum";
     final response = await http.post(
         Uri.parse(
@@ -1809,7 +1848,8 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
   void _handlePaymentError(PaymentFailureResponse response) {
     Navigator.pop(_globalKey.currentContext!);
     print(response.code);
-    RazorPayFailedModel lom = RazorPayFailedModel.fromJson(jsonDecode(response.message!.toString()));
+    RazorPayFailedModel lom =
+        RazorPayFailedModel.fromJson(jsonDecode(response.message!.toString()));
     ScaffoldMessenger.of(_globalKey.currentContext!).showSnackBar(SnackBar(
       content: Text(
         "Payment Failed!!\n".tr() + lom.error.description,
@@ -1835,61 +1875,6 @@ class _RentalPaymentScreenState extends State<RentalPaymentScreen> {
         _ref = "IOSRef$year$refNumber";
       });
     }
-  }
-
-  _flutterWaveInitiatePayment(
-    BuildContext context,
-  ) async {
-    final style = FlutterwaveStyle(
-      appBarText: PAYID,
-      buttonColor: Color(COLOR_PRIMARY),
-      buttonTextStyle: const TextStyle(
-        color: Colors.white,
-        fontSize: 20,
-      ),
-      appBarColor: Color(COLOR_PRIMARY),
-      dialogCancelTextStyle: const TextStyle(
-        color: Colors.black,
-        fontSize: 18,
-      ),
-      dialogContinueTextStyle: TextStyle(
-        color: Color(COLOR_PRIMARY),
-        fontSize: 18,
-      ),
-      mainTextStyle: const TextStyle(color: Colors.black, fontSize: 19, letterSpacing: 2),
-      dialogBackgroundColor: Colors.white,
-      appBarTitleTextStyle: const TextStyle(
-        color: Colors.white,
-        fontSize: 18,
-      ),
-    );
-    final flutterwave = Flutterwave(
-      amount: getTotalAmount().toString().trim(),
-      currency: currencyData!.code,
-      style: style,
-      customer: Customer(
-          name: MyAppState.currentUser!.firstName,
-          phoneNumber: MyAppState.currentUser!.phoneNumber.trim(),
-          email: MyAppState.currentUser!.email.trim()),
-      context: context,
-      publicKey: flutterWaveSettingData!.publicKey.trim(),
-      paymentOptions: "card, payattitude",
-      customization: Customization(title: PAYID),
-      txRef: _ref!,
-      isTestMode: flutterWaveSettingData!.isSandbox,
-      redirectUrl: '${GlobalURL}success',
-    );
-    final ChargeResponse response = await flutterwave.charge();
-    if (response.success!) {
-      placeParcelOrder();
-      ScaffoldMessenger.of(_globalKey.currentContext!).showSnackBar(SnackBar(
-        content: Text("Payment Successful!!\n".tr()),
-        backgroundColor: Colors.green,
-      ));
-    } else {
-      showLoading(message: response.status!);
-    }
-    print("${response.toJson()}");
   }
 
   Future<void> showLoading({required String message, Color txtColor = Colors.black}) {
