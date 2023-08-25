@@ -1,3 +1,4 @@
+/*
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
@@ -32,7 +33,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_braintree/flutter_braintree.dart';
 import 'package:flutter_stripe/flutter_stripe.dart' as stripe1;
-import 'package:flutterwave_standard/flutterwave.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:mercadopago_sdk/mercadopago_sdk.dart';
@@ -636,8 +636,7 @@ class PaymentScreenState extends State<PaymentScreen> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.all(20),
-              primary: Color(COLOR_PRIMARY),
+              padding: const EdgeInsets.all(20), backgroundColor: Color(COLOR_PRIMARY),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -718,10 +717,7 @@ class PaymentScreenState extends State<PaymentScreen> {
               } else if (mercadoPago) {
                 paymentType = 'mercadoPago';
                 mercadoPagoMakePayment();
-              } else if (flutterWave) {
-                paymentType = 'flutterwave';
-                _flutterWaveInitiatePayment(context);
-              } else if (paypal) {
+              }  else if (paypal) {
                 paymentType = 'paypal';
                 showLoadingAlert();
                 _makePaypalPayment(amount: widget.total.toString());
@@ -992,7 +988,7 @@ class PaymentScreenState extends State<PaymentScreen> {
       BraintreePaymentMethodNonce? resultData;
       try {
         resultData = await Braintree.requestPaypalNonce(tokenizationKey, request);
-      } on Exception catch (ex) {
+      } on Exception {
         print("Stripe error");
         showAlert(_scaffoldKey.currentContext!, response: "Something went wrong, please contact admin.".tr(), colors: Colors.red);
       }
@@ -1358,61 +1354,7 @@ class PaymentScreenState extends State<PaymentScreen> {
     }
   }
 
-  _flutterWaveInitiatePayment(
-    BuildContext context,
-  ) async {
-    final style = FlutterwaveStyle(
-      appBarText: "FlutterWave",
-      buttonColor: Color(COLOR_PRIMARY),
-      buttonTextStyle: const TextStyle(
-        color: Colors.white,
-        fontSize: 20,
-      ),
-      appBarColor: Color(COLOR_PRIMARY),
-      dialogCancelTextStyle: const TextStyle(
-        color: Colors.black,
-        fontSize: 18,
-      ),
-      dialogContinueTextStyle: TextStyle(
-        color: Color(COLOR_PRIMARY),
-        fontSize: 18,
-      ),
-      mainTextStyle: const TextStyle(color: Colors.black, fontSize: 19, letterSpacing: 2),
-      dialogBackgroundColor: Colors.white,
-      appBarTitleTextStyle: const TextStyle(
-        color: Colors.white,
-        fontSize: 18,
-      ),
-    );
-    final flutterwave = Flutterwave(
-      amount: widget.total.toString().trim(),
-      currency: currencyData!.code,
-      style: style,
-      customer: Customer(name: MyAppState.currentUser!.firstName, phoneNumber: MyAppState.currentUser!.phoneNumber.trim(), email: MyAppState.currentUser!.email.trim()),
-      context: context,
-      publicKey: flutterWaveSettingData!.publicKey.trim(),
-      paymentOptions: "card, payattitude",
-      customization: Customization(title: "Flutterwave"),
-      txRef: _ref!,
-      isTestMode: flutterWaveSettingData!.isSandbox,
-      redirectUrl: '${GlobalURL}success',
-    );
-    final ChargeResponse response = await flutterwave.charge();
-    if (response.success!) {
-      ScaffoldMessenger.of(_scaffoldKey.currentContext!).showSnackBar(SnackBar(
-        content: Text("Payment Successful!!".tr() + "\n"),
-        backgroundColor: Colors.green,
-      ));
-      if (widget.take_away!) {
-        placeOrder(_scaffoldKey.currentContext!);
-      } else {
-        toCheckOutScreen(true, _scaffoldKey.currentContext!);
-      }
-    } else {
-      showLoading(message: response.status!);
-    }
-    print("${response.toJson()}");
-  }
+ 
 
   Future<void> showLoading({required String message, Color txtColor = Colors.black}) {
     return showDialog(
@@ -1545,3 +1487,4 @@ class PaymentScreenState extends State<PaymentScreen> {
     );
   }
 }
+*/
