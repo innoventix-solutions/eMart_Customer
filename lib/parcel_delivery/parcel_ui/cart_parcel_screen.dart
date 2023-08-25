@@ -1,3 +1,4 @@
+/*
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
@@ -242,9 +243,9 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
                 PayStackURLGen.getPayHTML(payFastSettingData: payFastSettingData!, amount: getTotalAmount().toStringAsFixed(decimal)).then((value) async {
                   bool isDone = await Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => PayFastScreen(
-                            htmlData: value,
-                            payFastSettingData: payFastSettingData!,
-                          )));
+                        htmlData: value,
+                        payFastSettingData: payFastSettingData!,
+                      )));
 
                   print(isDone);
                   if (isDone) {
@@ -325,9 +326,9 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
           isDarkMode(context)
               ? const BoxShadow()
               : BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  blurRadius: 5,
-                ),
+            color: Colors.grey.withOpacity(0.5),
+            blurRadius: 5,
+          ),
         ],
       ),
       child: Padding(
@@ -499,9 +500,9 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
             isDarkMode(context)
                 ? const BoxShadow()
                 : BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    blurRadius: 5,
-                  ),
+              color: Colors.grey.withOpacity(0.5),
+              blurRadius: 5,
+            ),
           ],
         ),
         child: Padding(
@@ -549,9 +550,9 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
             isDarkMode(context)
                 ? const BoxShadow()
                 : BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    blurRadius: 5,
-                  ),
+              color: Colors.grey.withOpacity(0.5),
+              blurRadius: 5,
+            ),
           ],
         ),
         child: Padding(
@@ -712,101 +713,101 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
                 ),
                 Expanded(
                     child: Container(
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.white),
-                  alignment: Alignment.center,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Container(
-                            padding: const EdgeInsets.only(top: 30),
-                            child: const Image(
-                              image: AssetImage('assets/images/redeem_coupon.png'),
-                              width: 100,
-                            )),
-                        Container(
-                            padding: const EdgeInsets.only(top: 20),
-                            child: Text(
-                              'Redeem Your Coupons'.tr(),
-                              style: const TextStyle(color: Color(0XFF2A2A2A), fontSize: 16),
-                            )),
-                        Center(
-                          child: Container(
-                              padding: const EdgeInsets.only(top: 10, left: 22, right: 22),
-                              child: const Text(
-                                "Voucher or Coupon code",
-                                style: TextStyle(color: Color(0XFF9091A4), letterSpacing: 0.5, height: 2),
-                              ).tr()),
-                        ),
-                        Container(
-                            padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
-                            // height: 120,
-                            child: DottedBorder(
-                                borderType: BorderType.RRect,
-                                radius: const Radius.circular(12),
-                                dashPattern: const [4, 2],
-                                color: const Color(0XFFB7B7B7),
-                                child: ClipRRect(
-                                    borderRadius: const BorderRadius.all(Radius.circular(12)),
-                                    child: Container(
-                                        padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 20),
-                                        color: const Color(0XFFF1F4F7),
-                                        // height: 120,
-                                        alignment: Alignment.center,
-                                        child: TextFormField(
-                                          textAlign: TextAlign.center,
-                                          controller: txt,
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.white),
+                      alignment: Alignment.center,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            Container(
+                                padding: const EdgeInsets.only(top: 30),
+                                child: const Image(
+                                  image: AssetImage('assets/images/redeem_coupon.png'),
+                                  width: 100,
+                                )),
+                            Container(
+                                padding: const EdgeInsets.only(top: 20),
+                                child: Text(
+                                  'Redeem Your Coupons'.tr(),
+                                  style: const TextStyle(color: Color(0XFF2A2A2A), fontSize: 16),
+                                )),
+                            Center(
+                              child: Container(
+                                  padding: const EdgeInsets.only(top: 10, left: 22, right: 22),
+                                  child: const Text(
+                                    "Voucher or Coupon code",
+                                    style: TextStyle(color: Color(0XFF9091A4), letterSpacing: 0.5, height: 2),
+                                  ).tr()),
+                            ),
+                            Container(
+                                padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
+                                // height: 120,
+                                child: DottedBorder(
+                                    borderType: BorderType.RRect,
+                                    radius: const Radius.circular(12),
+                                    dashPattern: const [4, 2],
+                                    color: const Color(0XFFB7B7B7),
+                                    child: ClipRRect(
+                                        borderRadius: const BorderRadius.all(Radius.circular(12)),
+                                        child: Container(
+                                            padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 20),
+                                            color: const Color(0XFFF1F4F7),
+                                            // height: 120,
+                                            alignment: Alignment.center,
+                                            child: TextFormField(
+                                              textAlign: TextAlign.center,
+                                              controller: txt,
 
-                                          // textAlignVertical: TextAlignVertical.center,
-                                          decoration: InputDecoration(
-                                            border: InputBorder.none,
-                                            hintText: "Write Coupon Code".tr(),
-                                            hintStyle: const TextStyle(color: Color(0XFF9091A4)),
-                                            labelStyle: const TextStyle(color: Color(0XFF333333)),
-                                            //  hintTextDirection: TextDecoration.lineThrough
-                                            // contentPadding: EdgeInsets.only(left: 80,right: 30),
-                                          ),
-                                        ))))),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 30, bottom: 30),
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 15),
-                              backgroundColor: Color(COLOR_PRIMARY),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
+                                              // textAlignVertical: TextAlignVertical.center,
+                                              decoration: InputDecoration(
+                                                border: InputBorder.none,
+                                                hintText: "Write Coupon Code".tr(),
+                                                hintStyle: const TextStyle(color: Color(0XFF9091A4)),
+                                                labelStyle: const TextStyle(color: Color(0XFF333333)),
+                                                //  hintTextDirection: TextDecoration.lineThrough
+                                                // contentPadding: EdgeInsets.only(left: 80,right: 30),
+                                              ),
+                                            ))))),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 30, bottom: 30),
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 15),
+                                  backgroundColor: Color(COLOR_PRIMARY),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    for (int a = 0; a < snapshot.data!.length; a++) {
+                                      OfferModel couponModel = snapshot.data![a];
+                                      if (txt.text.toString() == couponModel.offerCode!.toString()) {
+                                        if (couponModel.discountTypeOffer == 'Percentage' || couponModel.discountTypeOffer == 'Percent') {
+                                          discountAmount = subTotal * double.parse(couponModel.discountOffer!) / 100;
+                                          discountType = couponModel.discountTypeOffer.toString();
+                                          discountLable = couponModel.discountOffer.toString();
+                                          break;
+                                        } else {
+                                          discountAmount = double.parse(couponModel.discountOffer!);
+                                          discountType = couponModel.discountTypeOffer.toString();
+                                          discountLable = couponModel.discountOffer.toString();
+                                        }
+                                      }
+                                    }
+                                  });
+
+                                  Navigator.pop(context);
+                                },
+                                child: Text(
+                                  "REDEEM NOW".tr(),
+                                  style: TextStyle(color: isDarkMode(context) ? Colors.black : Colors.white, fontSize: 16),
+                                ),
                               ),
                             ),
-                            onPressed: () {
-                              setState(() {
-                                for (int a = 0; a < snapshot.data!.length; a++) {
-                                  OfferModel couponModel = snapshot.data![a];
-                                  if (txt.text.toString() == couponModel.offerCode!.toString()) {
-                                    if (couponModel.discountTypeOffer == 'Percentage' || couponModel.discountTypeOffer == 'Percent') {
-                                      discountAmount = subTotal * double.parse(couponModel.discountOffer!) / 100;
-                                      discountType = couponModel.discountTypeOffer.toString();
-                                      discountLable = couponModel.discountOffer.toString();
-                                      break;
-                                    } else {
-                                      discountAmount = double.parse(couponModel.discountOffer!);
-                                      discountType = couponModel.discountTypeOffer.toString();
-                                      discountLable = couponModel.discountOffer.toString();
-                                    }
-                                  }
-                                }
-                              });
-
-                              Navigator.pop(context);
-                            },
-                            child: Text(
-                              "REDEEM NOW".tr(),
-                              style: TextStyle(color: isDarkMode(context) ? Colors.black : Colors.white, fontSize: 16),
-                            ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                )),
+                      ),
+                    )),
                 //buildcouponItem(snapshot)
                 //  listData(snapshot)
               ]);
@@ -827,9 +828,9 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
               isDarkMode(context)
                   ? const BoxShadow()
                   : BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      blurRadius: 5,
-                    ),
+                color: Colors.grey.withOpacity(0.5),
+                blurRadius: 5,
+              ),
             ],
           ),
           child: Column(
@@ -963,9 +964,9 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
             isDarkMode(context)
                 ? const BoxShadow()
                 : BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    blurRadius: 5,
-                  ),
+              color: Colors.grey.withOpacity(0.5),
+              blurRadius: 5,
+            ),
           ],
         ),
         child: Padding(
@@ -1268,13 +1269,13 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
                                   padding: const EdgeInsets.only(right: 0.0),
                                   child: walletBalanceError
                                       ? Text(
-                                          "Your wallet doesn't have sufficient balance".tr(),
-                                          style: const TextStyle(fontSize: 14, color: Colors.red),
-                                        )
+                                    "Your wallet doesn't have sufficient balance".tr(),
+                                    style: const TextStyle(fontSize: 14, color: Colors.red),
+                                  )
                                       : Text(
-                                          'Sufficient Balance'.tr(),
-                                          style: const TextStyle(fontSize: 14, color: Colors.green),
-                                        ),
+                                    'Sufficient Balance'.tr(),
+                                    style: const TextStyle(fontSize: 14, color: Colors.green),
+                                  ),
                                 ),
                               ),
                             ],
@@ -1421,12 +1422,12 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
             groupValue: selectedRadioTile,
             onChanged: walletError != true
                 ? (String? value) {
-                    setState(() {
-                      setAllFalse(value: value!);
-                      selectedPayment = true;
-                      selectedRadioTile = value;
-                    });
-                  }
+              setState(() {
+                setAllFalse(value: value!);
+                selectedPayment = true;
+                selectedRadioTile = value;
+              });
+            }
                 : (String? value) {},
             selected: selectedPayment,
             contentPadding: const EdgeInsets.symmetric(
@@ -1515,7 +1516,7 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
       } else {
         await stripe1.Stripe.instance
             .initPaymentSheet(
-                paymentSheetParameters: stripe1.SetupPaymentSheetParameters(
+            paymentSheetParameters: stripe1.SetupPaymentSheetParameters(
               paymentIntentClientSecret: paymentIntentData!['client_secret'],
               applePay: const stripe1.PaymentSheetApplePay(
                 merchantCountryCode: 'US',
@@ -1562,8 +1563,8 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
         showDialog(
             context: _globalKey.currentContext!,
             builder: (_) => AlertDialog(
-                  content: Text(lom.error.message),
-                ));
+              content: Text(lom.error.message),
+            ));
       });
     } on stripe1.StripeException catch (e) {
       Navigator.pop(_globalKey.currentContext!);
@@ -1573,8 +1574,8 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
       showDialog(
           context: _globalKey.currentContext!,
           builder: (_) => AlertDialog(
-                content: Text(lom.error.message),
-              ));
+            content: Text(lom.error.message),
+          ));
     } catch (e) {
       print('$e');
       Navigator.pop(_globalKey.currentContext!);
@@ -1587,8 +1588,8 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
   }
 
   createStripeIntent(
-    String amount,
-  ) async {
+      String amount,
+      ) async {
     try {
       Map<String, dynamic> body = {
         'amount': calculateAmount(amount),
@@ -1653,10 +1654,10 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
                 content: Text(
                   "Status".tr() +
                       " : ${settleResult.data.transaction.status}\n"
-                              "Transaction id"
+                          "Transaction id"
                           .tr() +
                       " : ${settleResult.data.transaction.id}\n"
-                              "Amount"
+                          "Amount"
                           .tr() +
                       " : ${settleResult.data.transaction.amount}",
                 ),
@@ -1696,9 +1697,9 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
 
   ///Paytm payment function
   getPaytmCheckSum(
-    context, {
-    required double amount,
-  }) async {
+      context, {
+        required double amount,
+      }) async {
     final String orderId = await UserPreference.getPaymentId();
     print(orderId);
     print('here order ID');
@@ -1733,12 +1734,12 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
   }
 
   Future<void> _startTransaction(
-    context, {
-    required String txnTokenBy,
-    required orderId,
-    required double amount,
-    required callBackURL,
-  }) async {
+      context, {
+        required String txnTokenBy,
+        required orderId,
+        required double amount,
+        required callBackURL,
+      }) async {
     try {
       var response = AllInOneSdk.startTransaction(
         paytmSettingData!.PaytmMID,
@@ -1885,8 +1886,8 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
   }
 
   _flutterWaveInitiatePayment(
-    BuildContext context,
-  ) async {
+      BuildContext context,
+      ) async {
     final style = FlutterwaveStyle(
       appBarText: PAYID,
       buttonColor: Color(COLOR_PRIMARY),
@@ -2021,12 +2022,12 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
         PayStackUrlModel _payStackModel = value;
         bool isDone = await Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => PayStackScreen(
-                  secretKey: payStackSettingData!.secretKey,
-                  callBackUrl: payStackSettingData!.callbackURL,
-                  initialURl: _payStackModel.data.authorizationUrl,
-                  amount: getTotalAmount().toString(),
-                  reference: _payStackModel.data.reference,
-                )));
+              secretKey: payStackSettingData!.secretKey,
+              callBackUrl: payStackSettingData!.callbackURL,
+              initialURl: _payStackModel.data.authorizationUrl,
+              amount: getTotalAmount().toString(),
+              reference: _payStackModel.data.reference,
+            )));
         //Navigator.pop(_globalKey.currentContext!);
 
         if (isDone) {
@@ -2086,3 +2087,4 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
     );
   }
 }
+*/
