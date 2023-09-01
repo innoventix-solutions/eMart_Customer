@@ -56,7 +56,8 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
   late Future<List<VendorCategoryModel>>? cuisinesFuture;
 
   late Future<List<ProductModel>> productsFuture;
-  final PageController _controller = PageController(viewportFraction: 0.8, keepPage: true);
+  final PageController _controller =
+      PageController(viewportFraction: 0.8, keepPage: true);
   List<VendorModel> vendors = [];
   List<VendorModel> popularRestaurantLst = [];
   List<VendorModel> newArrivalLst = [];
@@ -76,9 +77,11 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
 
   _getLocation() async {
     islocationGet = true;
-    if (MyAppState.selectedPosition.longitude == 0 && MyAppState.selectedPosition.latitude == 0) {
-      Position position =
-          await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high).whenComplete(() {});
+    if (MyAppState.selectedPosition.longitude == 0 &&
+        MyAppState.selectedPosition.latitude == 0) {
+      Position position = await Geolocator.getCurrentPosition(
+              desiredAccuracy: LocationAccuracy.high)
+          .whenComplete(() {});
       MyAppState.selectedPosition = position;
       islocationGet = false;
     }
@@ -86,7 +89,8 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
     debugPrint('location: ${MyAppState.selectedPosition.latitude}');
 
     List<Placemark> placemarks = await placemarkFromCoordinates(
-            MyAppState.selectedPosition.latitude, MyAppState.selectedPosition.longitude)
+            MyAppState.selectedPosition.latitude,
+            MyAppState.selectedPosition.longitude)
         .catchError((error) {
       print("error in location $error");
       return Future.error(error);
@@ -111,7 +115,10 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
     if (MyAppState.currentUser != null) {
       if (MyAppState.currentUser!.location.longitude == 0.01 &&
           MyAppState.currentUser!.location.longitude == 0.01) {
-        await FirebaseFirestore.instance.collection(USERS).doc(MyAppState.currentUser!.userID).update(
+        await FirebaseFirestore.instance
+            .collection(USERS)
+            .doc(MyAppState.currentUser!.userID)
+            .update(
           {
             "location": UserLocation(
                     latitude: MyAppState.selectedPosition.latitude,
@@ -121,11 +128,14 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
         );
       }
       MyAppState.currentUser!.location = UserLocation(
-          latitude: MyAppState.selectedPosition.latitude, longitude: MyAppState.selectedPosition.longitude);
+          latitude: MyAppState.selectedPosition.latitude,
+          longitude: MyAppState.selectedPosition.longitude);
       AddressModel userAddress = AddressModel(
           name: MyAppState.currentUser!.fullName(),
           postalCode: placeMark.postalCode.toString(),
-          line1: placeMark.name.toString() + ", " + placeMark.subLocality.toString(),
+          line1: placeMark.name.toString() +
+              ", " +
+              placeMark.subLocality.toString(),
           line2: placeMark.administrativeArea.toString(),
           country: placeMark.country.toString(),
           city: placeMark.locality.toString(),
@@ -134,7 +144,9 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
       MyAppState.currentUser!.shippingAddress = userAddress;
       await FireStoreUtils.updateCurrentUserAddress(userAddress);
     }
-    print(currentLocation.toString() + "======={}{}{}{}{}{{" + placeMark.country.toString());
+    print(currentLocation.toString() +
+        "======={}{}{}{}{}{{" +
+        placeMark.country.toString());
   }
 
   bool isLocationPermissionAllowed = false;
@@ -236,7 +248,7 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
   bool isHomeBannerMiddleLoading = true;
 
   getBanner() async {
-    print("-------->");
+    print("---erfed----->");
     await fireStoreUtils.getHomeTopBanner().then((value) {
       setState(() {
         print(value);
@@ -256,20 +268,26 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    bool isLocationAvail =
-        (MyAppState.selectedPosition.latitude == 0 && MyAppState.selectedPosition.longitude == 0);
+    bool isLocationAvail = (MyAppState.selectedPosition.latitude == 0 &&
+        MyAppState.selectedPosition.longitude == 0);
     return Scaffold(
-        backgroundColor: isDarkMode(context) ? const Color(DARK_BG_COLOR) : const Color(0xffFFFFFF),
+        backgroundColor: isDarkMode(context)
+            ? const Color(DARK_BG_COLOR)
+            : const Color(0xffFFFFFF),
         body: isLocationAvail
-            ? showEmptyState("We don't have your location.".tr(), context, action: () async {
+            ? showEmptyState("We don't have your location.".tr(), context,
+                action: () async {
                 if (islocationGet) {
                 } else {
-                  LocationResult result = await Navigator.of(context)
-                      .push(MaterialPageRoute(builder: (context) => PlacePicker(GOOGLE_API_KEY)));
+                  LocationResult result = await Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (context) => PlacePicker(GOOGLE_API_KEY)));
 
                   setState(() {
-                    MyAppState.selectedPosition = Position.fromMap(
-                        {'latitude': result.latLng!.latitude, 'longitude': result.latLng!.longitude});
+                    MyAppState.selectedPosition = Position.fromMap({
+                      'latitude': result.latLng!.latitude,
+                      'longitude': result.latLng!.longitude
+                    });
 
                     currentLocation = result.formattedAddress;
                     getData();
@@ -278,28 +296,36 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
               }, buttonTitle: 'Select'.tr())
             : SingleChildScrollView(
                 child: Container(
-                  color: isDarkMode(context) ? Colors.black : const Color(0xffFFFFFF),
+                  color: isDarkMode(context)
+                      ? Colors.black
+                      : const Color(0xffFFFFFF),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Visibility(
                         visible: bannerTopHome.isNotEmpty,
                         child: Container(
-                            color: isDarkMode(context) ? Colors.black : const Color(0xffFFFFFF),
+                            color: isDarkMode(context)
+                                ? Colors.black
+                                : const Color(0xffFFFFFF),
                             padding: const EdgeInsets.only(bottom: 10),
                             child: isHomeBannerLoading
-                                ? const Center(child: CircularProgressIndicator())
+                                ? const Center(
+                                    child: CircularProgressIndicator())
                                 : SizedBox(
-                                    height: MediaQuery.of(context).size.height * 0.23,
+                                    height: MediaQuery.of(context).size.height *
+                                        0.23,
                                     child: Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
                                       child: PageView.builder(
                                           padEnds: false,
                                           itemCount: bannerTopHome.length,
                                           scrollDirection: Axis.horizontal,
                                           controller: _controller,
                                           itemBuilder: (context, index) =>
-                                              buildBestDealPage(bannerTopHome[index])),
+                                              buildBestDealPage(
+                                                  bannerTopHome[index])),
                                     ))),
                       ),
                       buildTitleRow(
@@ -314,20 +340,26 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                         },
                       ),
                       Container(
-                        color: isDarkMode(context) ? Colors.black : const Color(0xffFFFFFF),
+                        color: isDarkMode(context)
+                            ? Colors.black
+                            : const Color(0xffFFFFFF),
                         child: FutureBuilder<List<VendorCategoryModel>>(
                             future: cuisinesFuture,
                             initialData: [],
                             builder: (context, snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
                                 return Center(
                                   child: CircularProgressIndicator.adaptive(
-                                    valueColor: AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
+                                    valueColor: AlwaysStoppedAnimation(
+                                        Color(COLOR_PRIMARY)),
                                   ),
                                 );
                               }
 
-                              if ((snapshot.hasData || (snapshot.data?.isNotEmpty ?? false)) && mounted) {
+                              if ((snapshot.hasData ||
+                                      (snapshot.data?.isNotEmpty ?? false)) &&
+                                  mounted) {
                                 return Container(
                                     padding: const EdgeInsets.only(left: 10),
                                     child: GridView.count(
@@ -336,13 +368,18 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                                       mainAxisSpacing: 0,
                                       shrinkWrap: true,
                                       padding: EdgeInsets.zero,
-                                      physics: const NeverScrollableScrollPhysics(),
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
                                       children: List.generate(
-                                          snapshot.data!.length >= 8 ? 8 : snapshot.data!.length,
-                                          (index) => buildCategoryItem(snapshot.data![index])),
+                                          snapshot.data!.length >= 8
+                                              ? 8
+                                              : snapshot.data!.length,
+                                          (index) => buildCategoryItem(
+                                              snapshot.data![index])),
                                     ));
                               } else {
-                                return showEmptyState('No Categories'.tr(), context);
+                                return showEmptyState(
+                                    'No Categories'.tr(), context);
                               }
                             }),
                       ),
@@ -350,15 +387,19 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                           stream: lstNewArrivalRestaurant,
                           initialData: [],
                           builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
                               return Center(
                                 child: CircularProgressIndicator.adaptive(
-                                  valueColor: AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
+                                  valueColor: AlwaysStoppedAnimation(
+                                      Color(COLOR_PRIMARY)),
                                 ),
                               );
                             }
 
-                            if ((snapshot.hasData || (snapshot.data?.isNotEmpty ?? false)) && mounted) {
+                            if ((snapshot.hasData ||
+                                    (snapshot.data?.isNotEmpty ?? false)) &&
+                                mounted) {
                               newArrivalLst = snapshot.data!;
 
                               return newArrivalLst.isEmpty
@@ -375,18 +416,31 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                                           },
                                         ),
                                         SizedBox(
-                                            height: MediaQuery.of(context).size.height * 0.12,
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.12,
                                             child: Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 10),
                                               child: ListView.builder(
                                                   shrinkWrap: true,
                                                   padding: EdgeInsets.zero,
-                                                  scrollDirection: Axis.horizontal,
-                                                  physics: const BouncingScrollPhysics(),
+                                                  scrollDirection:
+                                                      Axis.horizontal,
+                                                  physics:
+                                                      const BouncingScrollPhysics(),
                                                   itemCount:
-                                                      newArrivalLst.length >= 15 ? 15 : newArrivalLst.length,
-                                                  itemBuilder: (context, index) =>
-                                                      buildNewArrivalItem(newArrivalLst[index])),
+                                                      newArrivalLst.length >= 15
+                                                          ? 15
+                                                          : newArrivalLst
+                                                              .length,
+                                                  itemBuilder: (context,
+                                                          index) =>
+                                                      buildNewArrivalItem(
+                                                          newArrivalLst[
+                                                              index])),
                                             )),
                                       ],
                                     );
@@ -401,7 +455,9 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                             Padding(
                               padding: const EdgeInsets.only(top: 10),
                               child: buildTitleRow(
-                                titleValue: "Popular".tr() + " $SELECTED_SECTION_NAME " + "Store".tr(),
+                                titleValue: "Popular".tr() +
+                                    " $SELECTED_SECTION_NAME " +
+                                    "Store".tr(),
                                 onClick: () {
                                   push(
                                     context,
@@ -411,22 +467,28 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                               ),
                             ),
                             popularRestaurantLst.isEmpty
-                                ? showEmptyState('No Popular Store'.tr(), context)
+                                ? showEmptyState(
+                                    'No Popular Store'.tr(), context)
                                 : SizedBox(
                                     width: MediaQuery.of(context).size.width,
-                                    height: MediaQuery.of(context).size.height * 0.28,
+                                    height: MediaQuery.of(context).size.height *
+                                        0.28,
                                     child: Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
                                       child: ListView.builder(
                                           shrinkWrap: true,
                                           scrollDirection: Axis.horizontal,
                                           padding: EdgeInsets.zero,
-                                          physics: const BouncingScrollPhysics(),
-                                          itemCount: popularRestaurantLst.length >= 5
-                                              ? 5
-                                              : popularRestaurantLst.length,
+                                          physics:
+                                              const BouncingScrollPhysics(),
+                                          itemCount:
+                                              popularRestaurantLst.length >= 5
+                                                  ? 5
+                                                  : popularRestaurantLst.length,
                                           itemBuilder: (context, index) =>
-                                              buildPopularsItem(popularRestaurantLst[index])),
+                                              buildPopularsItem(
+                                                  popularRestaurantLst[index])),
                                     )),
                           ],
                         ),
@@ -449,34 +511,53 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                             physics: const BouncingScrollPhysics(),
                             itemBuilder: (context, index) {
                               return Container(
-                                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                margin: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 8),
                                 child: GestureDetector(
                                   onTap: () async {
-                                    push(context,
-                                        ViewAllBrandProductScreen(brandModel: brandModelList[index]));
+                                    push(
+                                        context,
+                                        ViewAllBrandProductScreen(
+                                            brandModel: brandModelList[index]));
                                   },
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       CircleAvatar(
                                         radius: 40,
                                         child: CachedNetworkImage(
-                                          imageUrl: getImageValidUrl(brandModelList[index].photo.toString()),
-                                          imageBuilder: (context, imageProvider) => Container(
+                                          imageUrl: getImageValidUrl(
+                                              brandModelList[index]
+                                                  .photo
+                                                  .toString()),
+                                          imageBuilder:
+                                              (context, imageProvider) =>
+                                                  Container(
                                             decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(60),
-                                              image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+                                              borderRadius:
+                                                  BorderRadius.circular(60),
+                                              image: DecorationImage(
+                                                  image: imageProvider,
+                                                  fit: BoxFit.cover),
                                             ),
                                           ),
                                           placeholder: (context, url) => Center(
-                                              child: CircularProgressIndicator.adaptive(
-                                            valueColor: AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
+                                              child: CircularProgressIndicator
+                                                  .adaptive(
+                                            valueColor: AlwaysStoppedAnimation(
+                                                Color(COLOR_PRIMARY)),
                                           )),
-                                          errorWidget: (context, url, error) => ClipRRect(
-                                            borderRadius: BorderRadius.circular(60),
+                                          errorWidget: (context, url, error) =>
+                                              ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(60),
                                             child: Image.network(
                                               AppGlobal.placeHolderImage!,
-                                              width: MediaQuery.of(context).size.width * 0.75,
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.75,
                                               fit: BoxFit.fitHeight,
                                             ),
                                           ),
@@ -484,13 +565,17 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                                         ),
                                       ),
                                       const SizedBox(height: 8),
-                                      Text(brandModelList[index].title.toString(),
+                                      Text(
+                                          brandModelList[index]
+                                              .title
+                                              .toString(),
                                           maxLines: 1,
                                           style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w500,
-                                            color:
-                                                isDarkMode(context) ? Colors.white : const Color(0xff000000),
+                                            color: isDarkMode(context)
+                                                ? Colors.white
+                                                : const Color(0xff000000),
                                           )).tr(),
                                     ],
                                   ),
@@ -503,21 +588,27 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                       Visibility(
                         visible: bannerMiddleHome.isNotEmpty,
                         child: Container(
-                            color: isDarkMode(context) ? Colors.black : const Color(0xffFFFFFF),
+                            color: isDarkMode(context)
+                                ? Colors.black
+                                : const Color(0xffFFFFFF),
                             padding: const EdgeInsets.only(bottom: 10, top: 10),
                             child: isHomeBannerMiddleLoading
-                                ? const Center(child: CircularProgressIndicator())
+                                ? const Center(
+                                    child: CircularProgressIndicator())
                                 : SizedBox(
-                                    height: MediaQuery.of(context).size.height * 0.23,
+                                    height: MediaQuery.of(context).size.height *
+                                        0.23,
                                     child: Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
                                       child: PageView.builder(
                                           padEnds: false,
                                           itemCount: bannerMiddleHome.length,
                                           scrollDirection: Axis.horizontal,
                                           controller: _controller,
                                           itemBuilder: (context, index) =>
-                                              buildBestDealPage(bannerMiddleHome[index])),
+                                              buildBestDealPage(
+                                                  bannerMiddleHome[index])),
                                     ))),
                       ),
                       ListView.builder(
@@ -530,128 +621,203 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                             future: FireStoreUtils.getProductListByCategoryId(
                                 categoryWiseProductList[index].id.toString()),
                             builder: (context, snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
                                 return Center(
                                   child: CircularProgressIndicator.adaptive(
-                                    valueColor: AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
+                                    valueColor: AlwaysStoppedAnimation(
+                                        Color(COLOR_PRIMARY)),
                                   ),
                                 );
                               }
-                              if ((snapshot.hasData || (snapshot.data?.isNotEmpty ?? false)) && mounted) {
+                              if ((snapshot.hasData ||
+                                      (snapshot.data?.isNotEmpty ?? false)) &&
+                                  mounted) {
                                 return snapshot.data!.isEmpty
                                     ? Container()
                                     : Column(
                                         children: [
                                           buildTitleRow(
-                                            titleValue: categoryWiseProductList[index].title.toString(),
+                                            titleValue:
+                                                categoryWiseProductList[index]
+                                                    .title
+                                                    .toString(),
                                             onClick: () {
                                               push(
                                                 context,
                                                 ViewAllCategoryProductScreen(
-                                                  vendorCategoryModel: categoryWiseProductList[index],
+                                                  vendorCategoryModel:
+                                                      categoryWiseProductList[
+                                                          index],
                                                 ),
                                               );
                                             },
                                             isViewAll: false,
                                           ),
                                           SizedBox(
-                                              width: MediaQuery.of(context).size.width,
-                                              height: MediaQuery.of(context).size.height * 0.28,
+                                              width: MediaQuery.of(context)
+                                                  .size
+                                                  .width,
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.28,
                                               child: Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal: 10),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 10),
                                                 child: ListView.builder(
                                                   shrinkWrap: true,
-                                                  scrollDirection: Axis.horizontal,
-                                                  physics: const BouncingScrollPhysics(),
+                                                  scrollDirection:
+                                                      Axis.horizontal,
+                                                  physics:
+                                                      const BouncingScrollPhysics(),
                                                   padding: EdgeInsets.zero,
-                                                  itemCount: snapshot.data!.length,
-                                                  itemBuilder: (context, index) {
-                                                    ProductModel productModel = snapshot.data![index];
+                                                  itemCount:
+                                                      snapshot.data!.length,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    ProductModel productModel =
+                                                        snapshot.data![index];
                                                     return Container(
-                                                      margin: const EdgeInsets.symmetric(
-                                                          horizontal: 10, vertical: 8),
+                                                      margin: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 10,
+                                                          vertical: 8),
                                                       child: GestureDetector(
                                                         onTap: () async {
-                                                          VendorModel? vendorModel =
-                                                              await FireStoreUtils.getVendor(
-                                                                  productModel.vendorID);
-                                                          if (vendorModel != null) {
+                                                          VendorModel?
+                                                              vendorModel =
+                                                              await FireStoreUtils
+                                                                  .getVendor(
+                                                                      productModel
+                                                                          .vendorID);
+                                                          if (vendorModel !=
+                                                              null) {
                                                             push(
                                                               context,
                                                               ProductDetailsScreen(
-                                                                vendorModel: vendorModel,
-                                                                productModel: productModel,
+                                                                vendorModel:
+                                                                    vendorModel,
+                                                                productModel:
+                                                                    productModel,
                                                               ),
                                                             );
                                                           }
                                                         },
                                                         child: SizedBox(
-                                                          width: MediaQuery.of(context).size.width * 0.38,
+                                                          width: MediaQuery.of(
+                                                                      context)
+                                                                  .size
+                                                                  .width *
+                                                              0.38,
                                                           child: Container(
-                                                            decoration: BoxDecoration(
-                                                              borderRadius: BorderRadius.circular(10),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10),
                                                               border: Border.all(
                                                                   color: isDarkMode(context)
-                                                                      ? const Color(DarkContainerBorderColor)
-                                                                      : Colors.grey.shade100,
+                                                                      ? const Color(
+                                                                          DarkContainerBorderColor)
+                                                                      : Colors
+                                                                          .grey
+                                                                          .shade100,
                                                                   width: 1),
-                                                              color: isDarkMode(context)
-                                                                  ? const Color(DarkContainerColor)
-                                                                  : Colors.white,
+                                                              color: isDarkMode(
+                                                                      context)
+                                                                  ? const Color(
+                                                                      DarkContainerColor)
+                                                                  : Colors
+                                                                      .white,
                                                               boxShadow: [
-                                                                isDarkMode(context)
+                                                                isDarkMode(
+                                                                        context)
                                                                     ? const BoxShadow()
                                                                     : BoxShadow(
-                                                                        color: Colors.grey.withOpacity(0.5),
-                                                                        blurRadius: 5,
+                                                                        color: Colors
+                                                                            .grey
+                                                                            .withOpacity(0.5),
+                                                                        blurRadius:
+                                                                            5,
                                                                       ),
                                                               ],
                                                             ),
                                                             child: Padding(
-                                                              padding: const EdgeInsets.all(8.0),
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(8.0),
                                                               child: Column(
-                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
                                                                 children: [
                                                                   Expanded(
-                                                                      child: CachedNetworkImage(
-                                                                    imageUrl:
-                                                                        getImageValidUrl(productModel.photo),
-                                                                    imageBuilder: (context, imageProvider) =>
-                                                                        Container(
-                                                                      decoration: BoxDecoration(
+                                                                      child:
+                                                                          CachedNetworkImage(
+                                                                    imageUrl: getImageValidUrl(
+                                                                        productModel
+                                                                            .photo),
+                                                                    imageBuilder:
+                                                                        (context,
+                                                                                imageProvider) =>
+                                                                            Container(
+                                                                      decoration:
+                                                                          BoxDecoration(
                                                                         borderRadius:
                                                                             BorderRadius.circular(10),
                                                                         image: DecorationImage(
-                                                                            image: imageProvider,
-                                                                            fit: BoxFit.cover),
+                                                                            image:
+                                                                                imageProvider,
+                                                                            fit:
+                                                                                BoxFit.cover),
                                                                       ),
                                                                     ),
-                                                                    placeholder: (context, url) => Center(
-                                                                        child: CircularProgressIndicator
-                                                                            .adaptive(
-                                                                      valueColor: AlwaysStoppedAnimation(
-                                                                          Color(COLOR_PRIMARY)),
+                                                                    placeholder: (context,
+                                                                            url) =>
+                                                                        Center(
+                                                                            child:
+                                                                                CircularProgressIndicator.adaptive(
+                                                                      valueColor:
+                                                                          AlwaysStoppedAnimation(
+                                                                              Color(COLOR_PRIMARY)),
                                                                     )),
-                                                                    errorWidget: (context, url, error) =>
+                                                                    errorWidget: (context,
+                                                                            url,
+                                                                            error) =>
                                                                         ClipRRect(
-                                                                      borderRadius: BorderRadius.circular(10),
-                                                                      child: Image.network(
-                                                                        AppGlobal.placeHolderImage!,
-                                                                        width: MediaQuery.of(context)
-                                                                                .size
-                                                                                .width *
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              10),
+                                                                      child: Image
+                                                                          .network(
+                                                                        AppGlobal
+                                                                            .placeHolderImage!,
+                                                                        width: MediaQuery.of(context).size.width *
                                                                             0.75,
-                                                                        fit: BoxFit.fitHeight,
+                                                                        fit: BoxFit
+                                                                            .fitHeight,
                                                                       ),
                                                                     ),
-                                                                    fit: BoxFit.cover,
+                                                                    fit: BoxFit
+                                                                        .cover,
                                                                   )),
-                                                                  const SizedBox(height: 8),
-                                                                  Text(productModel.name,
-                                                                      maxLines: 1,
-                                                                      style: TextStyle(
-                                                                        fontSize: 16,
-                                                                        fontWeight: FontWeight.w600,
+                                                                  const SizedBox(
+                                                                      height:
+                                                                          8),
+                                                                  Text(
+                                                                      productModel
+                                                                          .name,
+                                                                      maxLines:
+                                                                          1,
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontSize:
+                                                                            16,
+                                                                        fontWeight:
+                                                                            FontWeight.w600,
                                                                         color: isDarkMode(context)
                                                                             ? Colors.white
                                                                             : const Color(0xff000000),
@@ -661,29 +827,29 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                                                                   ),
                                                                   Row(
                                                                     mainAxisAlignment:
-                                                                        MainAxisAlignment.spaceBetween,
+                                                                        MainAxisAlignment
+                                                                            .spaceBetween,
                                                                     children: [
                                                                       Container(
-                                                                        decoration: BoxDecoration(
-                                                                          color: Colors.green,
+                                                                        decoration:
+                                                                            BoxDecoration(
+                                                                          color:
+                                                                              Colors.green,
                                                                           borderRadius:
                                                                               BorderRadius.circular(5),
                                                                         ),
-                                                                        child: Padding(
-                                                                          padding: const EdgeInsets.symmetric(
-                                                                              horizontal: 5, vertical: 2),
-                                                                          child: Row(
-                                                                            mainAxisSize: MainAxisSize.min,
+                                                                        child:
+                                                                            Padding(
+                                                                          padding: const EdgeInsets
+                                                                              .symmetric(
+                                                                              horizontal: 5,
+                                                                              vertical: 2),
+                                                                          child:
+                                                                              Row(
+                                                                            mainAxisSize:
+                                                                                MainAxisSize.min,
                                                                             children: [
-                                                                              Text(
-                                                                                  productModel.reviewsCount !=
-                                                                                          0
-                                                                                      ? (productModel
-                                                                                                  .reviewsSum /
-                                                                                              productModel
-                                                                                                  .reviewsCount)
-                                                                                          .toStringAsFixed(1)
-                                                                                      : 0.toString(),
+                                                                              Text(productModel.reviewsCount != 0 ? (productModel.reviewsSum / productModel.reviewsCount).toStringAsFixed(1) : 0.toString(),
                                                                                   style: const TextStyle(
                                                                                     letterSpacing: 0.5,
                                                                                     fontSize: 12,
@@ -714,23 +880,14 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                                                                                 Text(
                                                                                   "$symbol${double.parse(productModel.disPrice.toString()).toStringAsFixed(decimal)}",
                                                                                   style: TextStyle(
-                                                                                    fontWeight:
-                                                                                        FontWeight.bold,
+                                                                                    fontWeight: FontWeight.bold,
                                                                                     fontSize: 14,
-                                                                                    color:
-                                                                                        Color(COLOR_PRIMARY),
+                                                                                    color: Color(COLOR_PRIMARY),
                                                                                   ),
                                                                                 ),
                                                                                 Text(
                                                                                   '$symbol${double.parse(productModel.price).toStringAsFixed(decimal)}',
-                                                                                  style: const TextStyle(
-                                                                                      fontWeight:
-                                                                                          FontWeight.bold,
-                                                                                      fontSize: 12,
-                                                                                      color: Colors.grey,
-                                                                                      decoration:
-                                                                                          TextDecoration
-                                                                                              .lineThrough),
+                                                                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey, decoration: TextDecoration.lineThrough),
                                                                                 ),
                                                                               ],
                                                                             ),
@@ -749,7 +906,8 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                                         ],
                                       );
                               } else {
-                                return showEmptyState('No Categories'.tr(), context);
+                                return showEmptyState(
+                                    'No Categories'.tr(), context);
                               }
                             },
                           );
@@ -763,7 +921,8 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                       vendors.isEmpty
                           ? showEmptyState('No Store Found'.tr(), context)
                           : Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
                               child: SizedBox(
                                 width: MediaQuery.of(context).size.width,
                                 child: ListView.builder(
@@ -771,7 +930,8 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                                   scrollDirection: Axis.vertical,
                                   padding: EdgeInsets.zero,
                                   physics: const BouncingScrollPhysics(),
-                                  itemCount: vendors.length > 15 ? 15 : vendors.length,
+                                  itemCount:
+                                      vendors.length > 15 ? 15 : vendors.length,
                                   itemBuilder: (context, index) {
                                     VendorModel vendorModel = vendors[index];
                                     return buildAllRestaurantsData(vendorModel);
@@ -781,7 +941,8 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                             ),
                       Center(
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 10),
                           child: SizedBox(
                             width: MediaQuery.of(context).size.width,
                             height: MediaQuery.of(context).size.height * 0.06,
@@ -797,8 +958,10 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                               ),
                               child: const Text(
                                 'See All store around you',
-                                style:
-                                    TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: Colors.white),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                    color: Colors.white),
                               ).tr(),
                               onPressed: () {
                                 push(
@@ -824,9 +987,13 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-            color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100,
+            color: isDarkMode(context)
+                ? const Color(DarkContainerBorderColor)
+                : Colors.grey.shade100,
             width: 1),
-        color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
+        color: isDarkMode(context)
+            ? const Color(DarkContainerColor)
+            : Colors.white,
         boxShadow: [
           isDarkMode(context)
               ? const BoxShadow()
@@ -852,7 +1019,8 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
               imageBuilder: (context, imageProvider) => Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
-                  image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+                  image:
+                      DecorationImage(image: imageProvider, fit: BoxFit.cover),
                 ),
               ),
               placeholder: (context, url) => Center(
@@ -922,11 +1090,15 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
     List<OfferModel> tempList = [];
     List<double> discountAmountTempList = [];
     offerList.forEach((element) {
-      print("---------->${vendorModel.id} || ${element.storeId} || ${vendorModel.id == element.storeId}");
-      print("---------->${element.expireOfferDate!.toDate()} || ${DateTime.now()}");
-      if (vendorModel.id == element.storeId && element.expireOfferDate!.toDate().isAfter(DateTime.now())) {
+      print(
+          "-----df----->${vendorModel.id} || ${element.storeId} || ${vendorModel.id == element.storeId}");
+      print(
+          "-----dfd----->${element.expireOfferDate!.toDate()} || ${DateTime.now()}");
+      if (vendorModel.id == element.storeId &&
+          element.expireOfferDate!.toDate().isAfter(DateTime.now())) {
         tempList.add(element);
-        discountAmountTempList.add(double.parse(element.discountOffer.toString()));
+        discountAmountTempList
+            .add(double.parse(element.discountOffer.toString()));
         print("---------->${discountAmountTempList.length}");
       }
     });
@@ -941,9 +1113,13 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
-                color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100,
+                color: isDarkMode(context)
+                    ? const Color(DarkContainerBorderColor)
+                    : Colors.grey.shade100,
                 width: 1),
-            color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
+            color: isDarkMode(context)
+                ? const Color(DarkContainerColor)
+                : Colors.white,
             boxShadow: [
               isDarkMode(context)
                   ? const BoxShadow()
@@ -966,12 +1142,14 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                       imageBuilder: (context, imageProvider) => Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
-                          image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+                          image: DecorationImage(
+                              image: imageProvider, fit: BoxFit.cover),
                         ),
                       ),
                       placeholder: (context, url) => Center(
                           child: CircularProgressIndicator.adaptive(
-                        valueColor: AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
+                        valueColor:
+                            AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
                       )),
                       errorWidget: (context, url, error) => ClipRRect(
                           borderRadius: BorderRadius.circular(10),
@@ -989,12 +1167,19 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                         left: -1,
                         child: Container(
                           decoration: const BoxDecoration(
-                              image: DecorationImage(image: AssetImage('assets/images/offer_badge.png'))),
+                              image: DecorationImage(
+                                  image: AssetImage(
+                                      'assets/images/offer_badge.png'))),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
-                              discountAmountTempList.reduce(min).toStringAsFixed(decimal) + "% off",
-                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                              discountAmountTempList
+                                      .reduce(min)
+                                      .toStringAsFixed(decimal) +
+                                  "% off",
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
                             ),
                           ),
                         ),
@@ -1016,7 +1201,9 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600,
-                                color: isDarkMode(context) ? Colors.white : Colors.black,
+                                color: isDarkMode(context)
+                                    ? Colors.white
+                                    : Colors.black,
                               ),
                               maxLines: 1,
                             ),
@@ -1078,7 +1265,9 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                               vendorModel.location,
                               maxLines: 1,
                               style: TextStyle(
-                                color: isDarkMode(context) ? Colors.white70 : const Color(0xff9091A4),
+                                color: isDarkMode(context)
+                                    ? Colors.white70
+                                    : const Color(0xff9091A4),
                               ),
                             ),
                           ),
@@ -1101,13 +1290,18 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                                   : 0.toString(),
                               style: TextStyle(
                                 letterSpacing: 0.5,
-                                color: isDarkMode(context) ? Colors.white : const Color(0xff000000),
+                                color: isDarkMode(context)
+                                    ? Colors.white
+                                    : const Color(0xff000000),
                               )),
                           const SizedBox(width: 3),
-                          Text('(${vendorModel.reviewsCount.toStringAsFixed(1)})',
+                          Text(
+                              '(${vendorModel.reviewsCount.toStringAsFixed(1)})',
                               style: TextStyle(
                                 letterSpacing: 0.5,
-                                color: isDarkMode(context) ? Colors.white60 : const Color(0xff666666),
+                                color: isDarkMode(context)
+                                    ? Colors.white60
+                                    : const Color(0xff666666),
                               )),
                           const SizedBox(width: 5),
                         ],
@@ -1144,9 +1338,13 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                    color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100,
+                    color: isDarkMode(context)
+                        ? const Color(DarkContainerBorderColor)
+                        : Colors.grey.shade100,
                     width: 1),
-                color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
+                color: isDarkMode(context)
+                    ? const Color(DarkContainerColor)
+                    : Colors.white,
                 boxShadow: [
                   isDarkMode(context)
                       ? const BoxShadow()
@@ -1197,7 +1395,9 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
             child: Center(
                 child: Text(model.title.toString(),
                         style: TextStyle(
-                            color: isDarkMode(context) ? Colors.white : const Color(0xFF000000),
+                            color: isDarkMode(context)
+                                ? Colors.white
+                                : const Color(0xFF000000),
                             fontSize: 12))
                     .tr()),
           )
@@ -1224,15 +1424,17 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
     return InkWell(
       onTap: () async {
         if (categoriesModel.redirect_type == "store") {
-          VendorModel? vendorModel = await FireStoreUtils.getVendor(categoriesModel.redirect_id.toString());
+          VendorModel? vendorModel = await FireStoreUtils.getVendor(
+              categoriesModel.redirect_id.toString());
           push(
             context,
             NewVendorProductsScreen(vendorModel: vendorModel!),
           );
         } else if (categoriesModel.redirect_type == "product") {
-          ProductModel? productModel =
-              await fireStoreUtils.getProductByProductID(categoriesModel.redirect_id.toString());
-          VendorModel? vendorModel = await FireStoreUtils.getVendor(productModel.vendorID);
+          ProductModel? productModel = await fireStoreUtils
+              .getProductByProductID(categoriesModel.redirect_id.toString());
+          VendorModel? vendorModel =
+              await FireStoreUtils.getVendor(productModel.vendorID);
 
           if (vendorModel != null) {
             push(
@@ -1284,11 +1486,15 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
     List<OfferModel> tempList = [];
     List<double> discountAmountTempList = [];
     offerList.forEach((element) {
-      print("---------->${vendorModel.id} || ${element.storeId} || ${vendorModel.id == element.storeId}");
-      print("---------->${element.expireOfferDate!.toDate()} || ${DateTime.now()}");
-      if (vendorModel.id == element.storeId && element.expireOfferDate!.toDate().isAfter(DateTime.now())) {
+      print(
+          "---------->${vendorModel.id} || ${element.storeId} || ${vendorModel.id == element.storeId}");
+      print(
+          "---------->${element.expireOfferDate!.toDate()} || ${DateTime.now()}");
+      if (vendorModel.id == element.storeId &&
+          element.expireOfferDate!.toDate().isAfter(DateTime.now())) {
         tempList.add(element);
-        discountAmountTempList.add(double.parse(element.discountOffer.toString()));
+        discountAmountTempList
+            .add(double.parse(element.discountOffer.toString()));
         print("---------->${discountAmountTempList.length}");
       }
     });
@@ -1305,9 +1511,13 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(60),
               border: Border.all(
-                  color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100,
+                  color: isDarkMode(context)
+                      ? const Color(DarkContainerBorderColor)
+                      : Colors.grey.shade100,
                   width: 1),
-              color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
+              color: isDarkMode(context)
+                  ? const Color(DarkContainerColor)
+                  : Colors.white,
               boxShadow: [
                 isDarkMode(context)
                     ? const BoxShadow()
@@ -1328,7 +1538,8 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                     imageBuilder: (context, imageProvider) => Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(50),
-                        image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+                        image: DecorationImage(
+                            image: imageProvider, fit: BoxFit.cover),
                       ),
                     ),
                     placeholder: (context, url) => Center(
@@ -1356,7 +1567,9 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                                 letterSpacing: 0.5,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
-                                color: isDarkMode(context) ? Colors.white : Colors.black,
+                                color: isDarkMode(context)
+                                    ? Colors.white
+                                    : Colors.black,
                               )).tr(),
                           const SizedBox(
                             height: 5,
@@ -1375,13 +1588,18 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                                       : 0.toString(),
                                   style: TextStyle(
                                     letterSpacing: 0.5,
-                                    color: isDarkMode(context) ? Colors.white : const Color(0xff000000),
+                                    color: isDarkMode(context)
+                                        ? Colors.white
+                                        : const Color(0xff000000),
                                   )),
                               const SizedBox(width: 3),
-                              Text('(${vendorModel.reviewsCount.toStringAsFixed(1)})',
+                              Text(
+                                  '(${vendorModel.reviewsCount.toStringAsFixed(1)})',
                                   style: TextStyle(
                                     letterSpacing: 0.5,
-                                    color: isDarkMode(context) ? Colors.white60 : const Color(0xff666666),
+                                    color: isDarkMode(context)
+                                        ? Colors.white60
+                                        : const Color(0xff666666),
                                   )),
                               const SizedBox(width: 5),
                             ],
@@ -1403,11 +1621,15 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
     List<OfferModel> tempList = [];
     List<double> discountAmountTempList = [];
     offerList.forEach((element) {
-      print("---------->${vendorModel.id} || ${element.storeId} || ${vendorModel.id == element.storeId}");
-      print("---------->${element.expireOfferDate!.toDate()} || ${DateTime.now()}");
-      if (vendorModel.id == element.storeId && element.expireOfferDate!.toDate().isAfter(DateTime.now())) {
+      print(
+          "---------->${vendorModel.id} || ${element.storeId} || ${vendorModel.id == element.storeId}");
+      print(
+          "---------->${element.expireOfferDate!.toDate()} || ${DateTime.now()}");
+      if (vendorModel.id == element.storeId &&
+          element.expireOfferDate!.toDate().isAfter(DateTime.now())) {
         tempList.add(element);
-        discountAmountTempList.add(double.parse(element.discountOffer.toString()));
+        discountAmountTempList
+            .add(double.parse(element.discountOffer.toString()));
         print("---------->${discountAmountTempList.length}");
       }
     });
@@ -1424,9 +1646,13 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                  color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100,
+                  color: isDarkMode(context)
+                      ? const Color(DarkContainerBorderColor)
+                      : Colors.grey.shade100,
                   width: 1),
-              color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
+              color: isDarkMode(context)
+                  ? const Color(DarkContainerColor)
+                  : Colors.white,
               boxShadow: [
                 isDarkMode(context)
                     ? const BoxShadow()
@@ -1449,12 +1675,14 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                         imageBuilder: (context, imageProvider) => Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
-                            image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+                            image: DecorationImage(
+                                image: imageProvider, fit: BoxFit.cover),
                           ),
                         ),
                         placeholder: (context, url) => Center(
                             child: CircularProgressIndicator.adaptive(
-                          valueColor: AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
+                          valueColor:
+                              AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
                         )),
                         errorWidget: (context, url, error) => ClipRRect(
                           borderRadius: BorderRadius.circular(10),
@@ -1472,7 +1700,9 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                           left: -1,
                           child: Container(
                             decoration: const BoxDecoration(
-                                image: DecorationImage(image: AssetImage('assets/images/offer_badge.png'))),
+                                image: DecorationImage(
+                                    image: AssetImage(
+                                        'assets/images/offer_badge.png'))),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Center(
@@ -1480,10 +1710,14 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                                   padding: const EdgeInsets.only(bottom: 5),
                                   child: Text(
                                     discountAmountTempList.isNotEmpty
-                                        ? discountAmountTempList.reduce(min).toStringAsFixed(decimal) +
+                                        ? discountAmountTempList
+                                                .reduce(min)
+                                                .toStringAsFixed(decimal) +
                                             "% off"
                                         : "0",
-                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),
@@ -1498,7 +1732,9 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: isDarkMode(context) ? Colors.white : const Color(0xff000000),
+                        color: isDarkMode(context)
+                            ? Colors.white
+                            : const Color(0xff000000),
                       )).tr(),
                   Row(
                     children: [
@@ -1514,13 +1750,17 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                               : 0.toString(),
                           style: TextStyle(
                             letterSpacing: 0.5,
-                            color: isDarkMode(context) ? Colors.white : const Color(0xff000000),
+                            color: isDarkMode(context)
+                                ? Colors.white
+                                : const Color(0xff000000),
                           )),
                       const SizedBox(width: 3),
                       Text('(${vendorModel.reviewsCount.toStringAsFixed(1)})',
                           style: TextStyle(
                             letterSpacing: 0.5,
-                            color: isDarkMode(context) ? Colors.white60 : const Color(0xff666666),
+                            color: isDarkMode(context)
+                                ? Colors.white60
+                                : const Color(0xff666666),
                           )),
                       const SizedBox(width: 5),
                     ],
@@ -1543,9 +1783,10 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
     SharedPreferences sp = await SharedPreferences.getInstance();
     if (mounted) {
       setState(() {
-        selctedOrderTypeValue = sp.getString("foodType") == "" || sp.getString("foodType") == null
-            ? "Delivery"
-            : sp.getString("foodType");
+        selctedOrderTypeValue =
+            sp.getString("foodType") == "" || sp.getString("foodType") == null
+                ? "Delivery"
+                : sp.getString("foodType");
       });
     }
     if (selctedOrderTypeValue == "Takeaway") {
@@ -1562,11 +1803,13 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
     }
     fireStoreUtils.getStoreNearBy().whenComplete(() {
       lstAllRestaurant = fireStoreUtils.getAllStores().asBroadcastStream();
-      lstNewArrivalRestaurant = fireStoreUtils.getVendorsForNewArrival().asBroadcastStream();
+      lstNewArrivalRestaurant =
+          fireStoreUtils.getVendorsForNewArrival().asBroadcastStream();
 
       getFoodType();
       if (MyAppState.currentUser != null) {
-        lstFavourites = fireStoreUtils.getFavouriteStore(MyAppState.currentUser!.userID);
+        lstFavourites =
+            fireStoreUtils.getFavouriteStore(MyAppState.currentUser!.userID);
         lstFavourites.then((event) {
           lstFav.clear();
           for (int a = 0; a < event.length; a++) {
@@ -1586,36 +1829,62 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
         popularRestaurantLst.addAll(event);
 
         List<VendorModel> temp5 = popularRestaurantLst
-            .where((element) => num.parse((element.reviewsSum / element.reviewsCount).toString()) == 5)
+            .where((element) =>
+                num.parse(
+                    (element.reviewsSum / element.reviewsCount).toString()) ==
+                5)
             .toList();
         List<VendorModel> temp5_ = popularRestaurantLst
             .where((element) =>
-                num.parse((element.reviewsSum / element.reviewsCount).toString()) > 4 &&
-                num.parse((element.reviewsSum / element.reviewsCount).toString()) < 5)
+                num.parse((element.reviewsSum / element.reviewsCount)
+                        .toString()) >
+                    4 &&
+                num.parse((element.reviewsSum / element.reviewsCount)
+                        .toString()) <
+                    5)
             .toList();
         List<VendorModel> temp4 = popularRestaurantLst
             .where((element) =>
-                num.parse((element.reviewsSum / element.reviewsCount).toString()) > 3 &&
-                num.parse((element.reviewsSum / element.reviewsCount).toString()) < 4)
+                num.parse((element.reviewsSum / element.reviewsCount)
+                        .toString()) >
+                    3 &&
+                num.parse((element.reviewsSum / element.reviewsCount)
+                        .toString()) <
+                    4)
             .toList();
         List<VendorModel> temp3 = popularRestaurantLst
             .where((element) =>
-                num.parse((element.reviewsSum / element.reviewsCount).toString()) > 2 &&
-                num.parse((element.reviewsSum / element.reviewsCount).toString()) < 3)
+                num.parse((element.reviewsSum / element.reviewsCount)
+                        .toString()) >
+                    2 &&
+                num.parse((element.reviewsSum / element.reviewsCount)
+                        .toString()) <
+                    3)
             .toList();
         List<VendorModel> temp2 = popularRestaurantLst
             .where((element) =>
-                num.parse((element.reviewsSum / element.reviewsCount).toString()) > 1 &&
-                num.parse((element.reviewsSum / element.reviewsCount).toString()) < 2)
+                num.parse((element.reviewsSum / element.reviewsCount)
+                        .toString()) >
+                    1 &&
+                num.parse((element.reviewsSum / element.reviewsCount)
+                        .toString()) <
+                    2)
             .toList();
         List<VendorModel> temp1 = popularRestaurantLst
-            .where((element) => num.parse((element.reviewsSum / element.reviewsCount).toString()) == 1)
+            .where((element) =>
+                num.parse(
+                    (element.reviewsSum / element.reviewsCount).toString()) ==
+                1)
             .toList();
         List<VendorModel> temp0 = popularRestaurantLst
-            .where((element) => num.parse((element.reviewsSum / element.reviewsCount).toString()) == 0)
+            .where((element) =>
+                num.parse(
+                    (element.reviewsSum / element.reviewsCount).toString()) ==
+                0)
             .toList();
         List<VendorModel> temp0_ = popularRestaurantLst
-            .where((element) => element.reviewsSum == 0 && element.reviewsCount == 0)
+            .where((element) =>
+                element.reviewsSum == 0 && element.reviewsCount == 0)
             .toList();
 
         popularRestaurantLst.clear();
@@ -1653,7 +1922,8 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
         MyAppState.selectedPosition.longitude != 0 &&
         MyAppState.selectedPosition.latitude != 0) {
       List<Placemark> placemarks = await placemarkFromCoordinates(
-              MyAppState.selectedPosition.latitude, MyAppState.selectedPosition.longitude)
+              MyAppState.selectedPosition.latitude,
+              MyAppState.selectedPosition.longitude)
           .catchError((error) {
         print("error in location $error");
         return Future.error(error);
@@ -1677,13 +1947,15 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
       getData();
     }
     if (MyAppState.currentUser != null) {
-      if (MyAppState.currentUser!.location.latitude != 0 && MyAppState.currentUser!.location.longitude != 0) {
+      if (MyAppState.currentUser!.location.latitude != 0 &&
+          MyAppState.currentUser!.location.longitude != 0) {
         MyAppState.selectedPosition = Position.fromMap({
           'latitude': MyAppState.currentUser!.location.latitude,
           'longitude': MyAppState.currentUser!.location.longitude
         });
         List<Placemark> placemarks = await placemarkFromCoordinates(
-                MyAppState.selectedPosition.latitude, MyAppState.selectedPosition.longitude)
+                MyAppState.selectedPosition.latitude,
+                MyAppState.selectedPosition.longitude)
             .catchError((error) {
           print("error in location $error");
           return Future.error(error);
@@ -1732,20 +2004,25 @@ class buildTitleRow extends StatelessWidget {
       child: Align(
         alignment: Alignment.topLeft,
         child: Padding(
-          padding: const EdgeInsets.only(left: 20, right: 20, top: 15, bottom: 8),
+          padding:
+              const EdgeInsets.only(left: 20, right: 20, top: 15, bottom: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(titleValue.tr(),
                   style: TextStyle(
-                      color: isDarkMode(context) ? Colors.white : const Color(0xFF000000), fontSize: 18)),
+                      color: isDarkMode(context)
+                          ? Colors.white
+                          : const Color(0xFF000000),
+                      fontSize: 18)),
               isViewAll!
                   ? Container()
                   : GestureDetector(
                       onTap: () {
                         onClick!.call();
                       },
-                      child: Text('See All'.tr(), style: TextStyle(color: Color(COLOR_PRIMARY))),
+                      child: Text('See All'.tr(),
+                          style: TextStyle(color: Color(COLOR_PRIMARY))),
                     ),
             ],
           ),

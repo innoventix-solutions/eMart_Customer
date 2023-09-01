@@ -420,9 +420,10 @@ class StoreSelectionState extends State<StoreSelection> {
                   push(context, DashBoardCabService(user: user));
                 } else if (sectionModel.serviceTypeFlag == "rental-service") {
                   push(context, RentalServiceDashBoard(user: user));
-                } else if (sectionModel.serviceTypeFlag == "parcel_delivery") {
+                } /* else if (sectionModel.serviceTypeFlag == "parcel_delivery") {
                   push(context, ParcelDahBoard(user: user));
-                } else {
+                } */
+                else {
                   await Provider.of<CartDatabase>(context, listen: false)
                       .allCartProducts
                       .then((value) {
@@ -453,9 +454,10 @@ class StoreSelectionState extends State<StoreSelection> {
                   push(context, DashBoardCabService(user: null));
                 } else if (sectionModel.serviceTypeFlag == "rental-service") {
                   push(context, RentalServiceDashBoard(user: null));
-                } else if (sectionModel.serviceTypeFlag == "parcel_delivery") {
+                } /* else if (sectionModel.serviceTypeFlag == "parcel_delivery") {
                   push(context, ParcelDahBoard(user: null));
-                } else {
+                }*/
+                else {
                   push(context, ContainerScreen(user: null));
                 }
               } else {

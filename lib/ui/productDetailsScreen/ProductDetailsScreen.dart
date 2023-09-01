@@ -2000,7 +2000,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       }
     }
     List<CartProduct> cartProducts = await cartDatabase.allCartProducts;
-    print("------------>${isIncerementQuantity}");
+    print("@-------->${isIncerementQuantity}");
     if (productQnt > 1) {
       var joinTitleString = "";
       String mainPrice = "";
@@ -2035,7 +2035,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         joinTitleString = lstAddOnsTemp.join(",");
       }
 
-      print("------------>${productQnt}");
+      print("---@-------->${productQnt}");
 
       final bool _productIsInList = cartProducts.any((product) => product.id == productModel.id + "~" + (productModel.variant_info != null ? productModel.variant_info!.variant_id.toString() : ""));
       if (_productIsInList) {
@@ -2149,7 +2149,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 (variants!.where((element) => element.variant_sku == selectedVariants.join('-')).isNotEmpty
                     ? variants!.where((element) => element.variant_sku == selectedVariants.join('-')).first.variant_id.toString()
                     : ""));
-        print("------------>${element.quantity}");
+        print("----#------->${element.quantity}");
         await cartDatabase.updateProduct(CartProduct(
             id: element.id,
             name: element.name,
