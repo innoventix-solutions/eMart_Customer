@@ -72,6 +72,7 @@ class _ViewAllBrandProductScreenState extends State<ViewAllBrandProductScreen> {
       onTap: () async {
         VendorModel? vendorModel = await FireStoreUtils.getVendor(productModel.vendorID);
         if (vendorModel != null) {
+
           push(
             context,
             ProductDetailsScreen(
@@ -145,13 +146,13 @@ class _ViewAllBrandProductScreenState extends State<ViewAllBrandProductScreen> {
                     ),
                     productModel.disPrice == "" || productModel.disPrice == "0"
                         ? Text(
-                            symbol + double.parse(productModel.price).toStringAsFixed(decimal),
+                            amountShow(amount: productModel.price.toString()),
                             style: TextStyle(fontSize: 16, letterSpacing: 0.5, color: Color(COLOR_PRIMARY)),
                           )
                         : Row(
                             children: [
                               Text(
-                                "$symbol${double.parse(productModel.disPrice.toString()).toStringAsFixed(decimal)}",
+                                amountShow(amount: productModel.disPrice.toString()),
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -162,7 +163,7 @@ class _ViewAllBrandProductScreenState extends State<ViewAllBrandProductScreen> {
                                 width: 10,
                               ),
                               Text(
-                                '$symbol${double.parse(productModel.price).toStringAsFixed(decimal)}',
+                                amountShow(amount: productModel.price.toString()),
                                 style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey, decoration: TextDecoration.lineThrough),
                               ),
                             ],

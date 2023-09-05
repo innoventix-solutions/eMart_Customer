@@ -47,97 +47,95 @@ class _LanguageChooceScreenState extends State<LanguageChooseScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: ListView.builder(
-            itemCount: languageList.length,
-            shrinkWrap: true,
-            itemBuilder: (context, index) {
-              return InkWell(
-                onTap: () {
-                  setState(() {
-                    selectedLanguage = languageList[index].slug.toString();
-                  });
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: Container(
-                    decoration: languageList[index].slug == selectedLanguage
-                        ? BoxDecoration(
-                            border: Border.all(color: Color(COLOR_PRIMARY)),
-                            borderRadius: const BorderRadius.all(Radius.circular(5.0) //                 <--- border radius here
-                                ),
-                          )
-                        : null,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Row(
-                        children: [
-                          languageList[index].flag != null
-                              ? Image.network(
-                                  languageList[index].flag.toString(),
-                                  height: 60,
-                                  width: 60,
-                                )
-                              : CachedNetworkImage(
-                                  imageUrl: placeholderImage,
-                                  height: 60,
-                                  width: 60,
-                                ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 10, right: 10),
-                            child: Text(languageList[index].title.toString(), style: const TextStyle(fontSize: 16)),
-                          )
-                        ],
-                      ),
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: ListView.builder(
+          itemCount: languageList.length,
+          shrinkWrap: true,
+          itemBuilder: (context, index) {
+            return InkWell(
+              onTap: () {
+                setState(() {
+                  selectedLanguage = languageList[index].slug.toString();
+                });
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Container(
+                  decoration: languageList[index].slug == selectedLanguage
+                      ? BoxDecoration(
+                          border: Border.all(color: Color(COLOR_PRIMARY)),
+                          borderRadius: const BorderRadius.all(Radius.circular(5.0) //                 <--- border radius here
+                              ),
+                        )
+                      : null,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Row(
+                      children: [
+                        languageList[index].flag != null
+                            ? Image.network(
+                                languageList[index].flag.toString(),
+                                height: 60,
+                                width: 60,
+                              )
+                            : CachedNetworkImage(
+                                imageUrl: placeholderImage,
+                                height: 60,
+                                width: 60,
+                              ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10, right: 10),
+                          child: Text(languageList[index].title.toString(), style: const TextStyle(fontSize: 16)),
+                        )
+                      ],
                     ),
                   ),
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
-        bottomNavigationBar: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Color(COLOR_PRIMARY),
-              padding: const EdgeInsets.only(top: 8, bottom: 8),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                side: BorderSide(
-                  color: Color(COLOR_PRIMARY),
-                ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Color(COLOR_PRIMARY),
+            padding: const EdgeInsets.only(top: 8, bottom: 8),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              side: BorderSide(
+                color: Color(COLOR_PRIMARY),
               ),
             ),
-            onPressed: () async {
-              SharedPreferences sp = await SharedPreferences.getInstance();
-              sp.setString("languageCode", selectedLanguage);
-              context.setLocale(Locale(selectedLanguage));
+          ),
+          onPressed: () async {
+            SharedPreferences sp = await SharedPreferences.getInstance();
+            sp.setString("languageCode", selectedLanguage);
+            context.setLocale(Locale(selectedLanguage));
 
-              if (widget.isContainer) {
-                SnackBar snack = SnackBar(
-                  content: Text(
-                    'Language change successfully'.tr(),
-                    style: const TextStyle(color: Colors.white),
-                  ).tr(),
-                  duration: const Duration(seconds: 2),
-                  backgroundColor: Colors.black,
-                );
-                ScaffoldMessenger.of(context).showSnackBar(snack);
-              } else {
-                Navigator.pop(context);
-              }
-            },
-            child: Text(
-              'Save'.tr(),
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: isDarkMode(context) ? Colors.black : Colors.white,
-              ),
+            if (widget.isContainer) {
+              SnackBar snack = SnackBar(
+                content: Text(
+                  'Language change successfully'.tr(),
+                  style: const TextStyle(color: Colors.white),
+                ).tr(),
+                duration: const Duration(seconds: 2),
+                backgroundColor: Colors.black,
+              );
+              ScaffoldMessenger.of(context).showSnackBar(snack);
+            } else {
+              Navigator.pop(context);
+            }
+          },
+          child: Text(
+            'Save'.tr(),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: isDarkMode(context) ? Colors.black : Colors.white,
             ),
           ),
         ),

@@ -1,14 +1,14 @@
 class SectionModel {
   String? referralAmount;
   String? serviceType;
-  String? taxAmount;
+  //String? taxAmount;
   String? color;
-  String? taxType;
+ // String? taxType;
   String? name;
-  String? taxLable;
+  //String? taxLable;
   String? sectionImage;
   String? id;
-  bool? taxActive;
+ // bool? taxActive;
   bool? isActive;
   bool? dineInActive;
   String? serviceTypeFlag;
@@ -21,14 +21,14 @@ class SectionModel {
       {
         this.referralAmount,
         this.serviceType,
-      this.taxAmount,
+      //this.taxAmount,
       this.color,
-      this.taxType,
+     // this.taxType,
       this.name,
-      this.taxLable,
+    //  this.taxLable,
       this.sectionImage,
       this.id,
-      this.taxActive,
+      //this.taxActive,
       this.isActive,
       this.commissionAmount,
       this.commissionType,
@@ -40,14 +40,14 @@ class SectionModel {
   SectionModel.fromJson(Map<String, dynamic> json) {
     referralAmount = json['referralAmount'] ?? '';
     serviceType = json['serviceType'] ?? '';
-    taxAmount = json['tax_amount'];
+   // taxAmount = json['tax_amount'];
     color = json['color'];
-    taxType = json['tax_type'];
+   // taxType = json['tax_type'];
     name = json['name'];
-    taxLable = json['tax_lable'];
+   // taxLable = json['tax_lable'];
     sectionImage = json['sectionImage'];
     id = json['id'];
-    taxActive = json['tax_active'];
+   // taxActive = json['tax_active'];
     commissionAmount = json['commissionAmount'].toString();
     commissionType = json['commissionType'] ?? '';
     isEnableCommission = json['isEnableCommission'] ?? false;
@@ -61,17 +61,17 @@ class SectionModel {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['referralAmount'] = referralAmount;
     data['serviceType'] = serviceType;
-    data['tax_amount'] = taxAmount;
+    //data['tax_amount'] = taxAmount;
     data['color'] = color;
-    data['tax_type'] = taxType;
+   // data['tax_type'] = taxType;
     data['name'] = name;
-    data['tax_lable'] = taxLable;
+   // data['tax_lable'] = taxLable;
     data['sectionImage'] = sectionImage;
     data['commissionAmount'] = commissionAmount;
     data['commissionType'] = commissionType;
     data['isEnableCommission'] = isEnableCommission;
     data['id'] = id;
-    data['tax_active'] = taxActive;
+   // data['tax_active'] = taxActive;
     data['isActive'] = isActive;
     data['dine_in_active'] = dineInActive;
     data['serviceTypeFlag'] = serviceTypeFlag;

@@ -32,11 +32,21 @@ class CabPaymentSelectionScreen extends StatefulWidget {
   String? duration;
 
   CabPaymentSelectionScreen(
-      {Key? key, this.departureLatLong, this.destinationLatLong, this.departureName, this.destinationName, this.subTotal, this.vehicleType, this.vehicleId, this.distance, this.duration})
+      {Key? key,
+      this.departureLatLong,
+      this.destinationLatLong,
+      this.departureName,
+      this.destinationName,
+      this.subTotal,
+      this.vehicleType,
+      this.vehicleId,
+      this.distance,
+      this.duration})
       : super(key: key);
 
   @override
-  State<CabPaymentSelectionScreen> createState() => _CabPaymentSelectionScreenState();
+  State<CabPaymentSelectionScreen> createState() =>
+      _CabPaymentSelectionScreenState();
 }
 
 class _CabPaymentSelectionScreenState extends State<CabPaymentSelectionScreen> {
@@ -83,7 +93,8 @@ class _CabPaymentSelectionScreenState extends State<CabPaymentSelectionScreen> {
     isLoading = false;
   }
 
-  showAlert(BuildContext context123, {required String response, required Color colors}) {
+  showAlert(BuildContext context123,
+      {required String response, required Color colors}) {
     return ScaffoldMessenger.of(context123).showSnackBar(SnackBar(
       content: Text(response),
       backgroundColor: colors,
@@ -130,67 +141,80 @@ class _CabPaymentSelectionScreenState extends State<CabPaymentSelectionScreen> {
               physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.all(16),
               children: [
-                const Text("Select Payment Method"),
+                Text("Select Payment Method".tr()),
                 buildPaymentTile(
                   isVisible: UserPreference.getWalletData() ?? false,
                   selectedPayment: wallet,
                   image: "assets/images/wallet_icon.png",
-                  value: "Wallet",
+                  value: "Wallet".tr(),
                 ),
 
                 buildPaymentTile(
                   isVisible: UserPreference.getWalletData() ?? false,
                   selectedPayment: codPay,
                   image: "assets/images/cash.png",
-                  value: "Cash",
+                  value: "Cash".tr(),
                 ),
                 buildPaymentTile(
-                  isVisible: (stripeData == null) ? false : stripeData!.isEnabled,
+                  isVisible:
+                      (stripeData == null) ? false : stripeData!.isEnabled,
                   selectedPayment: stripe,
-                  value: "Stripe",
+                  value: "Stripe".tr(),
                 ),
                 buildPaymentTile(
                   isVisible: razorPayData!.isEnabled,
                   selectedPayment: razorPay,
                   image: "assets/images/razorpay_@3x.png",
-                  value: "RazorPay",
+                  value: "RazorPay".tr(),
                 ),
                 buildPaymentTile(
-                  isVisible: (paytmSettingData == null) ? false : paytmSettingData!.isEnabled,
+                  isVisible: (paytmSettingData == null)
+                      ? false
+                      : paytmSettingData!.isEnabled,
                   selectedPayment: payTm,
                   image: "assets/images/paytm_@3x.png",
-                  value: "PayTm",
+                  value: "PayTm".tr(),
                 ),
                 buildPaymentTile(
-                  isVisible: (paypalSettingData == null) ? false : paypalSettingData!.isEnabled,
+                  isVisible: (paypalSettingData == null)
+                      ? false
+                      : paypalSettingData!.isEnabled,
                   selectedPayment: paypal,
                   image: "assets/images/paypal_@3x.png",
-                  value: "PayPal",
+                  value: "PayPal".tr(),
                 ),
 
                 buildPaymentTile(
-                  isVisible: (payFastSettingData == null) ? false : payFastSettingData!.isEnable,
+                  isVisible: (payFastSettingData == null)
+                      ? false
+                      : payFastSettingData!.isEnable,
                   selectedPayment: payFast,
                   image: "assets/images/payfast.png",
-                  value: "PayFast",
+                  value: "PayFast".tr(),
                 ),
                 buildPaymentTile(
-                  isVisible: (payStackSettingData == null) ? false : payStackSettingData!.isEnabled,
+                  isVisible: (payStackSettingData == null)
+                      ? false
+                      : payStackSettingData!.isEnabled,
                   selectedPayment: payStack,
                   image: "assets/images/paystack.png",
-                  value: "PayStack",
+                  value: "PayStack".tr(),
                 ),
                 buildPaymentTile(
-                  isVisible: (flutterWaveSettingData == null) ? false : flutterWaveSettingData!.isEnable,
+                  isVisible: (flutterWaveSettingData == null)
+                      ? false
+                      : flutterWaveSettingData!.isEnable,
                   selectedPayment: paypal,
                   image: "assets/images/flutterwave.png",
-                  value: "FlutterWave",
+                  value: "FlutterWave".tr(),
                 ),
                 buildPaymentTile(
-                  isVisible: (mercadoPagoSettingData == null) ? false : mercadoPagoSettingData!.isEnabled,
+                  isVisible: (mercadoPagoSettingData == null)
+                      ? false
+                      : mercadoPagoSettingData!.isEnabled,
                   selectedPayment: mercadoPago,
                   image: "assets/images/mercadopago.png",
-                  value: "Mercado Pago",
+                  value: "Mercado Pago".tr(),
                 ),
 
                 // Container(
@@ -559,7 +583,8 @@ class _CabPaymentSelectionScreenState extends State<CabPaymentSelectionScreen> {
                     },
                     child: Text(
                       "Continue".tr(),
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -640,7 +665,9 @@ class _CabPaymentSelectionScreenState extends State<CabPaymentSelectionScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
-          color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
+          color: isDarkMode(context)
+              ? const Color(DarkContainerColor)
+              : Colors.white,
           elevation: selectedRadioTile == value ? 0.5 : 1.2,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -675,12 +702,14 @@ class _CabPaymentSelectionScreenState extends State<CabPaymentSelectionScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 10),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 4.0, horizontal: 10),
                             child: SizedBox(
                               width: 60,
                               height: 35,
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 6.0),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 6.0),
                                 child: Image.asset(image),
                               ),
                             ),
@@ -690,7 +719,9 @@ class _CabPaymentSelectionScreenState extends State<CabPaymentSelectionScreen> {
                       ),
                       Text(value,
                           style: TextStyle(
-                            color: isDarkMode(context) ? const Color(0xffFFFFFF) : Colors.black,
+                            color: isDarkMode(context)
+                                ? const Color(0xffFFFFFF)
+                                : Colors.black,
                           )),
                     ],
                   ),
@@ -731,12 +762,13 @@ class _CabPaymentSelectionScreenState extends State<CabPaymentSelectionScreen> {
         destinationLocationName: widget.destinationName.toString(),
         sourceLocationName: widget.departureName.toString(),
         sourceLocation: sourceLocation,
-        sectionId: SELECTED_CATEGORY,
+        sectionId: sectionConstantModel!.id,
         rideType: "ride",
         scheduleDateTime: Timestamp.now(),
         scheduleReturnDateTime: Timestamp.now());
 
     await FireStoreUtils().cabOrderPlace(orderModel, false);
+
     Navigator.pop(context, true);
   }
 

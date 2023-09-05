@@ -265,7 +265,7 @@ class _ParcelReviewScreenState extends State<ParcelReviewScreen> with TickerProv
                       createdAt: Timestamp.now(),
                     );
                     await FireStoreUtils.updateReviewbyId(ratingproduct);
-                    await updateProgress("Review Update Successful");
+                    await updateProgress("Review Update Successful".tr());
                     await hideProgress();
                     String? errorMessage = await FireStoreUtils.firebaseCreateNewReview(ratingproduct);
 

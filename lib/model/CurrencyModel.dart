@@ -1,6 +1,8 @@
 class CurrencyModel {
   String code;
 
+  int decimal;
+
   String id;
 
   bool isactive;
@@ -15,6 +17,7 @@ class CurrencyModel {
 
   CurrencyModel({
     this.code = '',
+    this.decimal = 0,
     this.isactive = false,
     this.id = '',
     this.name = '',
@@ -26,6 +29,7 @@ class CurrencyModel {
   factory CurrencyModel.fromJson(Map<String, dynamic> parsedJson) {
     return CurrencyModel(
       code: parsedJson['code'] ?? '',
+      decimal: parsedJson['decimal_degits'] ?? 0,
       isactive: parsedJson['isActive'] ?? '',
       id: parsedJson['id'] ?? '',
       name: parsedJson['name'] ?? '',
@@ -38,6 +42,7 @@ class CurrencyModel {
   Map<String, dynamic> toJson() {
     return {
       'code': code,
+      'decimal_degits': this.decimal,
       'isActive': isactive,
       'rounding': rounding,
       'id': id,

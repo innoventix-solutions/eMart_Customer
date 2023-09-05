@@ -253,7 +253,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           },
                           allowImplicitScrolling: true,
                           itemBuilder: (context, index) => CachedNetworkImage(
-                                imageUrl: getImageValidUrl(productImage[index]),
+                                imageUrl: getImageVAlidUrl(productImage[index]),
                                 imageBuilder: (context, imageProvider) => Container(
                                   decoration: BoxDecoration(
                                     image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
@@ -280,7 +280,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   ],
                 )),
             Positioned(
-                top: MediaQuery.of(context).size.height * 0.033,
+                top: MediaQuery.of(context).size.height * 0.036,
                 left: MediaQuery.of(context).size.width * 0.03,
                 child: CircleAvatar(
                     backgroundColor: Colors.black54,
@@ -306,12 +306,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
                       if (contain.isNotEmpty) {
                         FavouriteItemModel favouriteModel =
-                            FavouriteItemModel(product_id: widget.productModel.id, section_id: SELECTED_CATEGORY, store_id: widget.vendorModel.id, user_id: MyAppState.currentUser!.userID);
+                            FavouriteItemModel(product_id: widget.productModel.id, section_id: sectionConstantModel!.id, store_id: widget.vendorModel.id, user_id: MyAppState.currentUser!.userID);
                         lstFav.removeWhere((item) => item.product_id == widget.productModel.id);
                         FireStoreUtils().removeFavouriteItem(favouriteModel);
                       } else {
                         FavouriteItemModel favouriteModel =
-                            FavouriteItemModel(product_id: widget.productModel.id, section_id: SELECTED_CATEGORY, store_id: widget.vendorModel.id, user_id: MyAppState.currentUser!.userID);
+                            FavouriteItemModel(product_id: widget.productModel.id, section_id: sectionConstantModel!.id, store_id: widget.vendorModel.id, user_id: MyAppState.currentUser!.userID);
                         FireStoreUtils().setFavouriteStoreItem(favouriteModel);
                         lstFav.add(favouriteModel);
                       }
@@ -353,13 +353,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             ),
                             widget.productModel.disPrice == "" || widget.productModel.disPrice == "0"
                                 ? Text(
-                              "$symbol${double.parse(widget.productModel.price).toStringAsFixed(decimal)}",
-                                    style: TextStyle(letterSpacing: 0.5, color: Color(COLOR_PRIMARY)),
+                              "${amountShow(amount: widget.productModel.price)}",
+                              style: TextStyle(letterSpacing: 0.5, color: Color(COLOR_PRIMARY)),
                                   )
                                 : Row(
                                     children: [
                                       Text(
-                                        "$symbol${double.parse(widget.productModel.disPrice.toString()).toStringAsFixed(decimal)}",
+                                        "${amountShow(amount: widget.productModel.disPrice)}",
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Color(COLOR_PRIMARY),
@@ -369,7 +369,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                         width: 2,
                                       ),
                                       Text(
-                                        '$symbol${double.parse(widget.productModel.price).toStringAsFixed(decimal)}',
+                                        "${amountShow(amount: widget.productModel.price)}",
                                         style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey, decoration: TextDecoration.lineThrough),
                                       ),
                                     ],
@@ -416,13 +416,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                     width: 10,
                                   ),
                                   Text(
-                                    "${widget.productModel.reviewsCount} Review",
+                                    "${widget.productModel.reviewsCount}" "Review".tr(),
                                     style: TextStyle(),
                                   ),
                                 ],
                               ),
                             ),
-                            serviceTypeFlag == "ecommerce-service"
+                            sectionConstantModel!.serviceTypeFlag == "ecommerce-service"
                                 ? productQnt == 0
                                     ? TextButton.icon(
                                         onPressed: () {
@@ -761,7 +761,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                     child: CachedNetworkImage(
                                       height: 40,
                                       width: 40,
-                                      imageUrl: getImageValidUrl(widget.vendorModel.photo),
+                                      imageUrl: getImageVAlidUrl(widget.vendorModel.photo),
                                       imageBuilder: (context, imageProvider) => Container(
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(10),
@@ -805,7 +805,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                           child: CachedNetworkImage(
                                             height: 40,
                                             width: 40,
-                                            imageUrl: getImageValidUrl(brandModel!.photo.toString()),
+                                            imageUrl: getImageVAlidUrl(brandModel!.photo.toString()),
                                             imageBuilder: (context, imageProvider) => Container(
                                               decoration: BoxDecoration(
                                                 borderRadius: BorderRadius.circular(10),
@@ -868,7 +868,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     ),
                   ),
                   Visibility(
-                    visible: isDineEnable,
+                    visible: sectionConstantModel!.dineInActive!,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                       child: Card(
@@ -1147,11 +1147,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               padding: const EdgeInsets.symmetric(horizontal: 15),
                               child: Text(
                                 "Addons".tr(),
-                                style: TextStyle(fontSize: 16),
+                                style: TextStyle(fontFamily: "Poppinsm", fontSize: 16, color: isDarkMode(context) ? const Color(0xffffffff) : const Color(0xff000000)),
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                              padding: const EdgeInsets.symmetric(horizontal: 15),
                               child: ListView.builder(
                                   itemCount: lstAddAddonsCustom.length,
                                   physics: const NeverScrollableScrollPhysics(),
@@ -1168,7 +1168,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                           ),
                                           const Expanded(child: SizedBox()),
                                           Text(
-                                            symbol + double.parse(lstAddAddonsCustom[index].price!).toStringAsFixed(decimal),
+                                            amountShow(amount: lstAddAddonsCustom[index].price!),
                                             style: TextStyle(fontWeight: FontWeight.bold, color: Color(COLOR_PRIMARY)),
                                           ),
                                           GestureDetector(
@@ -1238,385 +1238,403 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         ),
                   Visibility(
                     visible: widget.productModel.specification.isNotEmpty,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                          child: Text(
-                            "Specification".tr(),
-                            style: TextStyle(fontSize: 20, color: isDarkMode(context) ? const Color(0xffffffff) : const Color(0xff000000)),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(
+                            height: 10,
                           ),
-                        ),
-                        widget.productModel.specification.isNotEmpty
-                            ? ListView.builder(
-                                itemCount: widget.productModel.specification.length,
-                                shrinkWrap: true,
-                                padding: EdgeInsets.zero,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemBuilder: (context, index) {
-                                  return Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      children: [
-                                        Text(widget.productModel.specification.keys.elementAt(index) + " : ",
-                                            style: TextStyle(color: Colors.black.withOpacity(0.60), fontWeight: FontWeight.w500, letterSpacing: 0.5, fontSize: 14)),
-                                        Text(widget.productModel.specification.values.elementAt(index),
-                                            style: TextStyle(color: Colors.black.withOpacity(0.90), fontWeight: FontWeight.w500, letterSpacing: 0.5, fontSize: 14)),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              )
-                            : Container(),
-                      ],
+
+                          Visibility(
+                            visible: widget.productModel.specification.isNotEmpty,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    "Specification".tr(),
+                                    style: TextStyle(fontFamily: "Poppinsm", fontSize: 20, color: isDarkMode(context) ? const Color(0xffffffff) : const Color(0xff000000)),
+                                  ),
+                                ),
+                                widget.productModel.specification.isNotEmpty
+                                    ? ListView.builder(
+                                  itemCount: widget.productModel.specification.length,
+                                  shrinkWrap: true,
+                                  padding: EdgeInsets.zero,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemBuilder: (context, index) {
+                                    return Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        children: [
+                                          Text(widget.productModel.specification.keys.elementAt(index) + " : ",
+                                              style: TextStyle(color: Colors.black.withOpacity(0.60), fontWeight: FontWeight.w500, letterSpacing: 0.5, fontSize: 14)),
+                                          Text(widget.productModel.specification.values.elementAt(index),
+                                              style: TextStyle(color: Colors.black.withOpacity(0.90), fontWeight: FontWeight.w500, letterSpacing: 0.5, fontSize: 14)),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                )
+                                    : Container(),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   Visibility(
                       visible: storeProductList.isNotEmpty,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    "More from the Store".tr(),
-                                    style: TextStyle(fontSize: 16, color: isDarkMode(context) ? const Color(0xffffffff) : const Color(0xff000000)),
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: Text(
-                                    "Sell All".tr(),
-                                    style: TextStyle(fontSize: 16, color: isDarkMode(context) ? const Color(0xffffffff) : Color(COLOR_PRIMARY)),
-                                  ),
-                                ),
-                              ],
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(
+                              height: 10,
                             ),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          SizedBox(
-                              width: MediaQuery.of(context).size.width,
-                              height: MediaQuery.of(context).size.height * 0.28,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 10),
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  scrollDirection: Axis.horizontal,
-                                  physics: const BouncingScrollPhysics(),
-                                  itemCount: storeProductList.length > 6 ? 6 : storeProductList.length,
-                                  itemBuilder: (context, index) {
-                                    ProductModel productModel = storeProductList[index];
-                                    return Container(
-                                      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                      child: GestureDetector(
-                                        onTap: () async {
-                                          VendorModel? vendorModel = await FireStoreUtils.getVendor(storeProductList[index].vendorID);
-                                          if (vendorModel != null) {
-                                            push(
-                                              context,
-                                              ProductDetailsScreen(
-                                                vendorModel: vendorModel,
-                                                productModel: productModel,
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      "More from the Store".tr(),
+                                      style: TextStyle(fontSize: 16, color: isDarkMode(context) ? const Color(0xffffffff) : const Color(0xff000000)),
+                                    ),
+                                  ),
+                                  InkWell(
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: Text(
+                                      "See All".tr(),
+                                      style: TextStyle(fontSize: 16, color: isDarkMode(context) ? const Color(0xffffffff) : Color(COLOR_PRIMARY)),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            SizedBox(
+                                width: MediaQuery.of(context).size.width,
+                                height: MediaQuery.of(context).size.height * 0.28,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                                  child: ListView.builder(
+                                    shrinkWrap: true,
+                                    scrollDirection: Axis.horizontal,
+                                    physics: const BouncingScrollPhysics(),
+                                    itemCount: storeProductList.length > 6 ? 6 : storeProductList.length,
+                                    itemBuilder: (context, index) {
+                                      ProductModel productModel = storeProductList[index];
+                                      return Container(
+                                        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                        child: GestureDetector(
+                                          onTap: () async {
+                                            VendorModel? vendorModel = await FireStoreUtils.getVendor(storeProductList[index].vendorID);
+                                            if (vendorModel != null) {
+                                              push(
+                                                context,
+                                                ProductDetailsScreen(
+                                                  vendorModel: vendorModel,
+                                                  productModel: productModel,
+                                                ),
+                                              );
+                                            }
+                                          },
+                                          child: SizedBox(
+                                            width: MediaQuery.of(context).size.width * 0.38,
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(10),
+                                                border: Border.all(color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100, width: 1),
+                                                color: isDarkMode(context) ? Color(DarkContainerColor) : Colors.white,
+                                                boxShadow: [
+                                                  isDarkMode(context)
+                                                      ? const BoxShadow()
+                                                      : BoxShadow(
+                                                          color: Colors.grey.withOpacity(0.5),
+                                                          blurRadius: 5,
+                                                        ),
+                                                ],
                                               ),
-                                            );
-                                          }
-                                        },
-                                        child: SizedBox(
-                                          width: MediaQuery.of(context).size.width * 0.38,
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(10),
-                                              border: Border.all(color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100, width: 1),
-                                              color: isDarkMode(context) ? Color(DarkContainerColor) : Colors.white,
-                                              boxShadow: [
-                                                isDarkMode(context)
-                                                    ? const BoxShadow()
-                                                    : BoxShadow(
-                                                        color: Colors.grey.withOpacity(0.5),
-                                                        blurRadius: 5,
-                                                      ),
-                                              ],
-                                            ),
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(8.0),
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Expanded(
-                                                      child: CachedNetworkImage(
-                                                    imageUrl: getImageValidUrl(productModel.photo),
-                                                    imageBuilder: (context, imageProvider) => Container(
-                                                      decoration: BoxDecoration(
-                                                        borderRadius: BorderRadius.circular(20),
-                                                        image: DecorationImage(image: imageProvider, fit: BoxFit.contain),
-                                                      ),
-                                                    ),
-                                                    placeholder: (context, url) => Center(
-                                                        child: CircularProgressIndicator.adaptive(
-                                                      valueColor: AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
-                                                    )),
-                                                    errorWidget: (context, url, error) => ClipRRect(
-                                                      borderRadius: BorderRadius.circular(20),
-                                                      child: Image.network(
-                                                        AppGlobal.placeHolderImage!,
-                                                        width: MediaQuery.of(context).size.width * 0.75,
-                                                        fit: BoxFit.fitHeight,
-                                                      ),
-                                                    ),
-                                                    fit: BoxFit.contain,
-                                                  )),
-                                                  const SizedBox(height: 8),
-                                                  Text(productModel.name,
-                                                      maxLines: 1,
-                                                      style: const TextStyle(
-                                                        letterSpacing: 0.5,
-                                                        fontSize: 16,
-                                                        fontWeight: FontWeight.w600,
-                                                      )).tr(),
-                                                  const SizedBox(
-                                                    height: 5,
-                                                  ),
-                                                  Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                    children: [
-                                                      Container(
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(8.0),
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Expanded(
+                                                        child: CachedNetworkImage(
+                                                      imageUrl: getImageVAlidUrl(productModel.photo),
+                                                      imageBuilder: (context, imageProvider) => Container(
                                                         decoration: BoxDecoration(
-                                                          color: Colors.green,
-                                                          borderRadius: BorderRadius.circular(5),
-                                                        ),
-                                                        child: Padding(
-                                                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                                                          child: Row(
-                                                            mainAxisSize: MainAxisSize.min,
-                                                            children: [
-                                                              Text(productModel.reviewsCount != 0 ? (productModel.reviewsSum / productModel.reviewsCount).toStringAsFixed(1) : 0.toString(),
-                                                                  style: const TextStyle(
-                                                                    letterSpacing: 0.5,
-                                                                    color: Colors.white,
-                                                                  )),
-                                                              const SizedBox(width: 3),
-                                                              const Icon(
-                                                                Icons.star,
-                                                                size: 16,
-                                                                color: Colors.white,
-                                                              ),
-                                                            ],
-                                                          ),
+                                                          borderRadius: BorderRadius.circular(20),
+                                                          image: DecorationImage(image: imageProvider, fit: BoxFit.contain),
                                                         ),
                                                       ),
-                                                      productModel.disPrice == "" || productModel.disPrice == "0"
-                                                          ? Text(
-                                                        "$symbol${double.parse(productModel.price).toStringAsFixed(decimal)}",
-                                                              style: TextStyle(letterSpacing: 0.5, color: Color(COLOR_PRIMARY)),
-                                                            )
-                                                          : Column(
+                                                      placeholder: (context, url) => Center(
+                                                          child: CircularProgressIndicator.adaptive(
+                                                        valueColor: AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
+                                                      )),
+                                                      errorWidget: (context, url, error) => ClipRRect(
+                                                        borderRadius: BorderRadius.circular(20),
+                                                        child: Image.network(
+                                                          AppGlobal.placeHolderImage!,
+                                                          width: MediaQuery.of(context).size.width * 0.75,
+                                                          fit: BoxFit.fitHeight,
+                                                        ),
+                                                      ),
+                                                      fit: BoxFit.contain,
+                                                    )),
+                                                    const SizedBox(height: 8),
+                                                    Text(productModel.name,
+                                                        maxLines: 1,
+                                                        style: const TextStyle(
+                                                          letterSpacing: 0.5,
+                                                          fontSize: 16,
+                                                          fontWeight: FontWeight.w600,
+                                                        )).tr(),
+                                                    const SizedBox(
+                                                      height: 5,
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      children: [
+                                                        Container(
+                                                          decoration: BoxDecoration(
+                                                            color: Colors.green,
+                                                            borderRadius: BorderRadius.circular(5),
+                                                          ),
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                                                            child: Row(
+                                                              mainAxisSize: MainAxisSize.min,
                                                               children: [
-                                                                Text(
-                                                                  "$symbol${double.parse(productModel.disPrice.toString()).toStringAsFixed(decimal)}",
-                                                                  style: TextStyle(
-                                                                    fontWeight: FontWeight.bold,
-                                                                    fontSize: 14,
-                                                                    color: Color(COLOR_PRIMARY),
-                                                                  ),
-                                                                ),
-                                                                Text(
-                                                                  '$symbol${double.parse(productModel.price).toStringAsFixed(decimal)}',
-                                                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey, decoration: TextDecoration.lineThrough),
+                                                                Text(productModel.reviewsCount != 0 ? (productModel.reviewsSum / productModel.reviewsCount).toStringAsFixed(1) : 0.toString(),
+                                                                    style: const TextStyle(
+                                                                      letterSpacing: 0.5,
+                                                                      color: Colors.white,
+                                                                    )),
+                                                                const SizedBox(width: 3),
+                                                                const Icon(
+                                                                  Icons.star,
+                                                                  size: 16,
+                                                                  color: Colors.white,
                                                                 ),
                                                               ],
                                                             ),
-                                                    ],
-                                                  ),
-                                                ],
+                                                          ),
+                                                        ),
+                                                        productModel.disPrice == "" || productModel.disPrice == "0"
+                                                            ? Text(
+                                                          "${amountShow(amount: productModel.price)}",
+                                                          style: TextStyle(letterSpacing: 0.5, color: Color(COLOR_PRIMARY)),
+                                                              )
+                                                            : Column(
+                                                                children: [
+                                                                  Text(
+                                                                    "${amountShow(amount: productModel.disPrice)}",
+                                                                    style: TextStyle(
+                                                                      fontWeight: FontWeight.bold,
+                                                                      fontSize: 14,
+                                                                      color: Color(COLOR_PRIMARY),
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    '${amountShow(amount: productModel.price)}',
+                                                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey, decoration: TextDecoration.lineThrough),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ))
-                        ],
+                                      );
+                                    },
+                                  ),
+                                ))
+                          ],
+                        ),
                       )),
                   Visibility(
                       visible: productList.isNotEmpty,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: Text(
-                              "Related Products".tr(),
-                              style: TextStyle(fontSize: 16, color: isDarkMode(context) ? const Color(0xffffffff) : const Color(0xff000000)),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(
+                              height: 10,
                             ),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          SizedBox(
-                              width: MediaQuery.of(context).size.width,
-                              height: MediaQuery.of(context).size.height * 0.28,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 10),
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  scrollDirection: Axis.horizontal,
-                                  physics: const BouncingScrollPhysics(),
-                                  itemCount: productList.length > 6 ? 6 : productList.length,
-                                  itemBuilder: (context, index) {
-                                    ProductModel productModel = productList[index];
-                                    return Container(
-                                      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                      child: GestureDetector(
-                                        onTap: () async {
-                                          VendorModel? vendorModel = await FireStoreUtils.getVendor(productModel.vendorID);
-                                          if (vendorModel != null) {
-                                            push(
-                                              context,
-                                              ProductDetailsScreen(
-                                                vendorModel: vendorModel,
-                                                productModel: productModel,
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                              child: Text(
+                                "Related Products".tr(),
+                                style: TextStyle(fontSize: 16, color: isDarkMode(context) ? const Color(0xffffffff) : const Color(0xff000000)),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            SizedBox(
+                                width: MediaQuery.of(context).size.width,
+                                height: MediaQuery.of(context).size.height * 0.28,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                                  child: ListView.builder(
+                                    shrinkWrap: true,
+                                    scrollDirection: Axis.horizontal,
+                                    physics: const BouncingScrollPhysics(),
+                                    itemCount: productList.length > 6 ? 6 : productList.length,
+                                    itemBuilder: (context, index) {
+                                      ProductModel productModel = productList[index];
+                                      return Container(
+                                        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                        child: GestureDetector(
+                                          onTap: () async {
+                                            VendorModel? vendorModel = await FireStoreUtils.getVendor(productModel.vendorID);
+                                            if (vendorModel != null) {
+                                              push(
+                                                context,
+                                                ProductDetailsScreen(
+                                                  vendorModel: vendorModel,
+                                                  productModel: productModel,
+                                                ),
+                                              );
+                                            }
+                                          },
+                                          child: SizedBox(
+                                            width: MediaQuery.of(context).size.width * 0.38,
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(10),
+                                                border: Border.all(color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100, width: 1),
+                                                color: isDarkMode(context) ? Color(DarkContainerColor) : Colors.white,
+                                                boxShadow: [
+                                                  isDarkMode(context)
+                                                      ? const BoxShadow()
+                                                      : BoxShadow(
+                                                          color: Colors.grey.withOpacity(0.5),
+                                                          blurRadius: 5,
+                                                        ),
+                                                ],
                                               ),
-                                            );
-                                          }
-                                        },
-                                        child: SizedBox(
-                                          width: MediaQuery.of(context).size.width * 0.38,
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(10),
-                                              border: Border.all(color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100, width: 1),
-                                              color: isDarkMode(context) ? Color(DarkContainerColor) : Colors.white,
-                                              boxShadow: [
-                                                isDarkMode(context)
-                                                    ? const BoxShadow()
-                                                    : BoxShadow(
-                                                        color: Colors.grey.withOpacity(0.5),
-                                                        blurRadius: 5,
-                                                      ),
-                                              ],
-                                            ),
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(8.0),
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Expanded(
-                                                      child: CachedNetworkImage(
-                                                    imageUrl: getImageValidUrl(productModel.photo),
-                                                    imageBuilder: (context, imageProvider) => Container(
-                                                      decoration: BoxDecoration(
-                                                        borderRadius: BorderRadius.circular(20),
-                                                        image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
-                                                      ),
-                                                    ),
-                                                    placeholder: (context, url) => Center(
-                                                        child: CircularProgressIndicator.adaptive(
-                                                      valueColor: AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
-                                                    )),
-                                                    errorWidget: (context, url, error) => ClipRRect(
-                                                      borderRadius: BorderRadius.circular(20),
-                                                      child: Image.network(
-                                                        AppGlobal.placeHolderImage!,
-                                                        width: MediaQuery.of(context).size.width * 0.75,
-                                                        fit: BoxFit.fitHeight,
-                                                      ),
-                                                    ),
-                                                    fit: BoxFit.cover,
-                                                  )),
-                                                  const SizedBox(height: 8),
-                                                  Text(productModel.name,
-                                                      maxLines: 1,
-                                                      style: const TextStyle(
-                                                        letterSpacing: 0.5,
-                                                        fontSize: 16,
-                                                        fontWeight: FontWeight.w600,
-                                                      )).tr(),
-                                                  const SizedBox(
-                                                    height: 5,
-                                                  ),
-                                                  Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                    children: [
-                                                      Container(
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(8.0),
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Expanded(
+                                                        child: CachedNetworkImage(
+                                                      imageUrl: getImageVAlidUrl(productModel.photo),
+                                                      imageBuilder: (context, imageProvider) => Container(
                                                         decoration: BoxDecoration(
-                                                          color: Colors.green,
-                                                          borderRadius: BorderRadius.circular(5),
-                                                        ),
-                                                        child: Padding(
-                                                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                                                          child: Row(
-                                                            mainAxisSize: MainAxisSize.min,
-                                                            children: [
-                                                              Text(productModel.reviewsCount != 0 ? (productModel.reviewsSum / productModel.reviewsCount).toStringAsFixed(1) : 0.toString(),
-                                                                  style: const TextStyle(
-                                                                    letterSpacing: 0.5,
-                                                                    color: Colors.white,
-                                                                  )),
-                                                              const SizedBox(width: 3),
-                                                              const Icon(
-                                                                Icons.star,
-                                                                size: 16,
-                                                                color: Colors.white,
-                                                              ),
-                                                            ],
-                                                          ),
+                                                          borderRadius: BorderRadius.circular(20),
+                                                          image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
                                                         ),
                                                       ),
-                                                      productModel.disPrice == "" || productModel.disPrice == "0"
-                                                          ? Text(
-                                                        "$symbol${double.parse(productModel.price).toStringAsFixed(decimal)}",
-                                                              style: TextStyle(letterSpacing: 0.5, color: Color(COLOR_PRIMARY)),
-                                                            )
-                                                          : Column(
+                                                      placeholder: (context, url) => Center(
+                                                          child: CircularProgressIndicator.adaptive(
+                                                        valueColor: AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
+                                                      )),
+                                                      errorWidget: (context, url, error) => ClipRRect(
+                                                        borderRadius: BorderRadius.circular(20),
+                                                        child: Image.network(
+                                                          AppGlobal.placeHolderImage!,
+                                                          width: MediaQuery.of(context).size.width * 0.75,
+                                                          fit: BoxFit.fitHeight,
+                                                        ),
+                                                      ),
+                                                      fit: BoxFit.cover,
+                                                    )),
+                                                    const SizedBox(height: 8),
+                                                    Text(productModel.name,
+                                                        maxLines: 1,
+                                                        style: const TextStyle(
+                                                          letterSpacing: 0.5,
+                                                          fontSize: 16,
+                                                          fontWeight: FontWeight.w600,
+                                                        )).tr(),
+                                                    const SizedBox(
+                                                      height: 5,
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      children: [
+                                                        Container(
+                                                          decoration: BoxDecoration(
+                                                            color: Colors.green,
+                                                            borderRadius: BorderRadius.circular(5),
+                                                          ),
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                                                            child: Row(
+                                                              mainAxisSize: MainAxisSize.min,
                                                               children: [
-                                                                Text(
-                                                                  "$symbol${double.parse(productModel.disPrice.toString()).toStringAsFixed(decimal)}",
-                                                                  style: TextStyle(
-                                                                    fontWeight: FontWeight.bold,
-                                                                    fontSize: 14,
-                                                                    color: Color(COLOR_PRIMARY),
-                                                                  ),
-                                                                ),
-                                                                Text(
-                                                                  '$symbol${double.parse(productModel.price).toStringAsFixed(decimal)}',
-                                                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey, decoration: TextDecoration.lineThrough),
+                                                                Text(productModel.reviewsCount != 0 ? (productModel.reviewsSum / productModel.reviewsCount).toStringAsFixed(1) : 0.toString(),
+                                                                    style: const TextStyle(
+                                                                      letterSpacing: 0.5,
+                                                                      color: Colors.white,
+                                                                    )),
+                                                                const SizedBox(width: 3),
+                                                                const Icon(
+                                                                  Icons.star,
+                                                                  size: 16,
+                                                                  color: Colors.white,
                                                                 ),
                                                               ],
                                                             ),
-                                                    ],
-                                                  ),
-                                                ],
+                                                          ),
+                                                        ),
+                                                        productModel.disPrice == "" || productModel.disPrice == "0"
+                                                            ? Text(
+                                                          "${amountShow(amount: productModel.price)}",
+                                                          style: TextStyle(letterSpacing: 0.5, color: Color(COLOR_PRIMARY)),
+                                                              )
+                                                            : Column(
+                                                                children: [
+                                                                  Text(
+                                                                    "${amountShow(amount: productModel.disPrice)}",
+                                                                    style: TextStyle(
+                                                                      fontWeight: FontWeight.bold,
+                                                                      fontSize: 14,
+                                                                      color: Color(COLOR_PRIMARY),
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    amountShow(amount: productModel.price),
+                                                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey, decoration: TextDecoration.lineThrough),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ))
-                        ],
+                                      );
+                                    },
+                                  ),
+                                ))
+                          ],
+                        ),
                       )),
                   Visibility(
                     visible: widget.productModel.reviewAttributes!.isNotEmpty,
@@ -1738,7 +1756,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                             CachedNetworkImage(
                                               height: 45,
                                               width: 45,
-                                              imageUrl: getImageValidUrl(reviewList[index].profile.toString()),
+                                              imageUrl: getImageVAlidUrl(reviewList[index].profile.toString()),
                                               imageBuilder: (context, imageProvider) => Container(
                                                 decoration: BoxDecoration(
                                                   borderRadius: BorderRadius.circular(35),
@@ -1816,7 +1834,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                                       child: CachedNetworkImage(
                                                         height: 65,
                                                         width: 65,
-                                                        imageUrl: getImageValidUrl(reviewList[index].photos![index1]),
+                                                        imageUrl: getImageVAlidUrl(reviewList[index].photos![index1]),
                                                         imageBuilder: (context, imageProvider) => Container(
                                                           decoration: BoxDecoration(
                                                             borderRadius: BorderRadius.circular(10),
@@ -1889,7 +1907,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           ),
         ]),
       ),
-      bottomNavigationBar: serviceTypeFlag == "ecommerce-service"
+      bottomNavigationBar: sectionConstantModel!.serviceTypeFlag == "ecommerce-service"
           ? Container(
               color: Color(COLOR_PRIMARY),
               padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20, top: 20),
@@ -1897,7 +1915,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 children: [
                   Expanded(
                     child: Text(
-                      "Item Total".tr() + " $symbol" + priceTemp.toStringAsFixed(decimal),
+                      "Item Total".tr() +  " " +amountShow(amount: priceTemp.toString()),
                       style: const TextStyle(color: Colors.white, fontSize: 18),
                     ).tr(),
                   ),
@@ -1906,7 +1924,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       if (MyAppState.currentUser == null) {
                         push(context, const AuthScreen());
                       } else {
-                        if (serviceTypeFlag == "ecommerce-service") {
+                        if (sectionConstantModel!.serviceTypeFlag == "ecommerce-service") {
                           pushAndRemoveUntil(
                               context,
                               EcommeceDashBoardScreen(
@@ -1945,7 +1963,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     children: [
                       Expanded(
                         child: Text(
-                          "Item Total".tr() + " $symbol" + priceTemp.toStringAsFixed(decimal),
+                          "Item Total".tr() +  " " +amountShow(amount: priceTemp.toString()),
                           style: const TextStyle(color: Colors.white, fontSize: 18),
                         ).tr(),
                       ),
@@ -1954,7 +1972,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           if (MyAppState.currentUser == null) {
                             push(context, const AuthScreen());
                           } else {
-                            if (serviceTypeFlag == "ecommerce-service") {
+                            if (sectionConstantModel!.serviceTypeFlag == "ecommerce-service") {
                               pushAndRemoveUntil(
                                   context,
                                   EcommeceDashBoardScreen(
@@ -2000,7 +2018,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       }
     }
     List<CartProduct> cartProducts = await cartDatabase.allCartProducts;
-    print("@-------->${isIncerementQuantity}");
+    print("------------>${isIncerementQuantity}");
     if (productQnt > 1) {
       var joinTitleString = "";
       String mainPrice = "";
@@ -2035,7 +2053,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         joinTitleString = lstAddOnsTemp.join(",");
       }
 
-      print("---@-------->${productQnt}");
+      print("------------>${productQnt}");
 
       final bool _productIsInList = cartProducts.any((product) => product.id == productModel.id + "~" + (productModel.variant_info != null ? productModel.variant_info!.variant_id.toString() : ""));
       if (_productIsInList) {
@@ -2149,7 +2167,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 (variants!.where((element) => element.variant_sku == selectedVariants.join('-')).isNotEmpty
                     ? variants!.where((element) => element.variant_sku == selectedVariants.join('-')).first.variant_id.toString()
                     : ""));
-        print("----#------->${element.quantity}");
+        print("------------>${element.quantity}");
         await cartDatabase.updateProduct(CartProduct(
             id: element.id,
             name: element.name,

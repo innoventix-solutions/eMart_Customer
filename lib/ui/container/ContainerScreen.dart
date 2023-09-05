@@ -98,6 +98,7 @@ class _ContainerScreen extends State<ContainerScreen> {
   int cartCount = 0;
   bool? isWalletEnable;
   late User user;
+  late StreamSubscription eventBusStream;
 
   Future<void> getKeyHash() async {
     String keyHash;
@@ -148,7 +149,18 @@ class _ContainerScreen extends State<ContainerScreen> {
       provisional: false,
       sound: true,
     );
+    getTaxList();
+
   }
+
+  getTaxList() async{
+    await FireStoreUtils().getTaxList(sectionConstantModel!.id).then((value) {
+      if (value != null) {
+        taxList = value;
+      }
+    });
+  }
+
 
   @override
   void didChangeDependencies() {
@@ -226,8 +238,8 @@ class _ContainerScreen extends State<ContainerScreen> {
                                             Switch(
                                               // thumb color (round icon)
                                               splashRadius: 50.0,
-                                              activeThumbImage: const AssetImage('https://lists.gnu.org/archive/html/emacs-devel/2015-10/pngR9b4lzUy39.png'),
-                                              inactiveThumbImage: const AssetImage('http://wolfrosch.com/_img/works/goodies/icon/vim@2x'),
+                                              // activeThumbImage: const AssetImage('https://lists.gnu.org/archive/html/emacs-devel/2015-10/pngR9b4lzUy39.png'),
+                                              // inactiveThumbImage: const AssetImage('http://wolfrosch.com/_img/works/goodies/icon/vim@2x'),
 
                                               value: themeChange.darkTheme,
                                               onChanged: (value) => setState(() => themeChange.darkTheme = value),
@@ -310,7 +322,7 @@ class _ContainerScreen extends State<ContainerScreen> {
                                   }),
                             ),
                             Visibility(
-                              visible: isDineEnable,
+                              visible: sectionConstantModel!.dineInActive!,
                               child: ListTileTheme(
                                 style: ListTileStyle.drawer,
                                 selectedColor: Color(COLOR_PRIMARY),
@@ -512,7 +524,7 @@ class _ContainerScreen extends State<ContainerScreen> {
                               ),
                             ),
                             Visibility(
-                              visible: isDineEnable,
+                              visible: sectionConstantModel!.dineInActive!,
                               child: ListTileTheme(
                                 style: ListTileStyle.drawer,
                                 selectedColor: Color(COLOR_PRIMARY),

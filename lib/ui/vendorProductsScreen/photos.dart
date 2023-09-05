@@ -137,7 +137,7 @@ class _StoreMenuPhotoState extends State<StoreMenuPhoto> {
                             child: CachedNetworkImage(
                                 height: 70,
                                 width: 100,
-                                imageUrl: getImageValidUrl(widget.restaurantMenuPhotos[index]),
+                                imageUrl: getImageVAlidUrl(widget.restaurantMenuPhotos[index]),
                                 imageBuilder: (context, imageProvider) => Container(
                                       width: 70,
                                       height: 100,

@@ -187,7 +187,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       title: "Weight".tr(),
                       value: orderModel.parcelWeight.toString(),
                     ),
-                    buildOtherDetails(title: "Rate".tr(), value: symbol + double.parse(orderModel.subTotal!).toStringAsFixed(decimal), color: Color(COLOR_PRIMARY)),
+                   // buildOtherDetails(title: "Rate".tr(), value: symbol + double.parse(orderModel.subTotal!).toStringAsFixed(decimal), color: Color(COLOR_PRIMARY)),
+                    buildOtherDetails(title: "Rate".tr(), value: amountShow(amount: orderModel.subTotal!), color: Color(COLOR_PRIMARY)),
+
                   ],
                 ),
               ],

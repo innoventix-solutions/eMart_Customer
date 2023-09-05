@@ -18,14 +18,19 @@ import 'parcel_order_detail_screen.dart';
 class ParcelOrderTrackScreen extends StatefulWidget {
   final ParcelOrderModel orderModel;
 
-  const ParcelOrderTrackScreen({Key? key, required this.orderModel}) : super(key: key);
+  const ParcelOrderTrackScreen({Key? key, required this.orderModel})
+      : super(key: key);
 
   @override
   State<ParcelOrderTrackScreen> createState() => _ParcelOrderTrackScreenState();
 }
 
 class _ParcelOrderTrackScreenState extends State<ParcelOrderTrackScreen> {
-  final CameraPosition _kInitialPosition = const CameraPosition(target: LatLng(19.018255973653343, 72.84793849278007), zoom: 11.0, tilt: 0, bearing: 0);
+  final CameraPosition _kInitialPosition = const CameraPosition(
+      target: LatLng(19.018255973653343, 72.84793849278007),
+      zoom: 11.0,
+      tilt: 0,
+      bearing: 0);
   GoogleMapController? _controller;
 
   final Location currentLocation = Location();
@@ -71,7 +76,8 @@ class _ParcelOrderTrackScreenState extends State<ParcelOrderTrackScreen> {
     });
 
     if (_cabOrderModel != null) {
-      driverStream = FireStoreUtils().getDriver(widget.orderModel.driverID.toString());
+      driverStream =
+          FireStoreUtils().getDriver(widget.orderModel.driverID.toString());
       driverStream.listen((event) {
         setState(() => _driverModel = event);
         getDirections();
@@ -121,32 +127,38 @@ class _ParcelOrderTrackScreenState extends State<ParcelOrderTrackScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: isLoading
-            ? const Center(
-                child: CircularProgressIndicator(),
-              )
-            : Stack(
-                children: [
-                  GoogleMap(
-                    zoomControlsEnabled: false,
-                    myLocationButtonEnabled: true,
-                    padding: const EdgeInsets.only(
-                      top: 190.0,
-                    ),
-                    initialCameraPosition: _kInitialPosition,
-                    onMapCreated: (GoogleMapController controller) async {
-                      _controller = controller;
-                      LocationData location = await currentLocation.getLocation();
-                      _controller!.moveCamera(CameraUpdate.newLatLngZoom(LatLng(location.latitude ?? 0.0, location.longitude ?? 0.0), 14));
-                    },
-                    polylines: Set<Polyline>.of(polyLines.values),
-                    myLocationEnabled: false,
-                    markers: _markers.values.toSet(),
+    return Scaffold(
+      body: isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : Stack(
+              children: [
+                GoogleMap(
+                  zoomControlsEnabled: false,
+                  myLocationButtonEnabled: true,
+                  padding: const EdgeInsets.only(
+                    top: 190.0,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  initialCameraPosition: _kInitialPosition,
+                  onMapCreated: (GoogleMapController controller) async {
+                    _controller = controller;
+                    LocationData location = await currentLocation.getLocation();
+                    _controller!.moveCamera(CameraUpdate.newLatLngZoom(
+                        LatLng(location.latitude ?? 0.0,
+                            location.longitude ?? 0.0),
+                        14));
+                  },
+                  polylines: Set<Polyline>.of(polyLines.values),
+                  myLocationEnabled: false,
+                  markers: _markers.values.toSet(),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                        top: MediaQuery.of(context).size.height * 0.04),
                     child: Row(
                       children: [
                         InkWell(
@@ -169,7 +181,9 @@ class _ParcelOrderTrackScreenState extends State<ParcelOrderTrackScreen> {
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 18,
-                                    color: isDarkMode(context) ? Colors.white : Colors.black,
+                                    color: isDarkMode(context)
+                                        ? Colors.white
+                                        : Colors.black,
                                   ),
                                 ),
                               ),
@@ -179,214 +193,295 @@ class _ParcelOrderTrackScreenState extends State<ParcelOrderTrackScreen> {
                       ],
                     ),
                   ),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _cabOrderModel!.driver == null || _driverModel == null
-                            ? Container()
-                            : Container(
-                                decoration: BoxDecoration(
-                                  color: Color(COLOR_PRIMARY),
-                                  borderRadius: const BorderRadius.only(
-                                    topRight: Radius.circular(22),
-                                    topLeft: Radius.circular(22),
-                                  ),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 10.0),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: Row(
-                                          children: [
-                                            const SizedBox(
-                                              width: 15,
-                                            ),
-                                            ClipRRect(
-                                              borderRadius: BorderRadius.circular(10),
-                                              child: CachedNetworkImage(
-                                                height: 50,
-                                                width: 50,
-                                                imageUrl: _driverModel!.profilePictureURL,
-                                                placeholder: (context, url) => Image.asset('assets/images/img_placeholder.png'),
-                                                errorWidget: (context, url, error) => Image.asset('assets/images/placeholder.jpg', fit: BoxFit.cover),
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              width: 15,
-                                            ),
-                                            Column(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  _driverModel!.firstName + " " + _driverModel!.lastName,
-                                                  style: const TextStyle(color: Colors.white, fontSize: 16),
-                                                ),
-                                                const SizedBox(
-                                                  height: 8,
-                                                ),
-                                                Text(
-                                                  "Your shipper".tr(),
-                                                  style: const TextStyle(color: Colors.white, fontSize: 14),
-                                                ),
-                                                const SizedBox(
-                                                  height: 8,
-                                                ),
-                                                Row(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  mainAxisAlignment: MainAxisAlignment.start,
-                                                  children: [
-                                                    const Icon(
-                                                      Icons.star,
-                                                      size: 20,
-                                                      color: Colors.white,
-                                                    ),
-                                                    const SizedBox(width: 3),
-                                                    Text(_driverModel!.reviewsCount != 0 ? (_driverModel!.reviewsSum / _driverModel!.reviewsCount).toStringAsFixed(1) : 0.toString(),
-                                                        style: const TextStyle(
-                                                          letterSpacing: 0.5,
-                                                          color: Colors.white,
-                                                        )),
-                                                    const SizedBox(width: 3),
-                                                    Text('(${_driverModel!.reviewsCount.toStringAsFixed(1)})',
-                                                        style: const TextStyle(
-                                                          letterSpacing: 0.5,
-                                                          color: Colors.white,
-                                                        )),
-                                                    const SizedBox(width: 5),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      InkWell(
-                                          onTap: () {
-                                            UrlLauncher.launch("tel://${_cabOrderModel!.driver!.phoneNumber}");
-                                          },
-                                          child: const Icon(Icons.phone, size: 32)),
-                                      const SizedBox(
-                                        width: 10,
-                                      ),
-                                      InkWell(
-                                        onTap: () async {
-                                          await showProgress(context, "Please wait".tr(), false);
-
-                                          User? customer = await FireStoreUtils.getCurrentUser(widget.orderModel.authorID);
-                                          User? driver = await FireStoreUtils.getCurrentUser(widget.orderModel.driverID.toString());
-
-                                          hideProgress();
-                                          push(
-                                              context,
-                                              ChatScreens(
-                                                customerName: customer!.firstName + " " + customer.lastName,
-                                                restaurantName: driver!.firstName + " " + driver.lastName,
-                                                orderId: widget.orderModel.id,
-                                                restaurantId: driver.userID,
-                                                customerId: customer.userID,
-                                                customerProfileImage: customer.profilePictureURL,
-                                                restaurantProfileImage: driver.profilePictureURL,
-                                                token: driver.fcmToken,
-                                                chatType: 'Driver',
-                                              ));
-                                        },
-                                        child: const ImageIcon(
-                                          AssetImage(
-                                            "assets/images/chatIcon.png",
-                                          ),
-                                          color: Colors.white,
-                                          size: 32,
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        width: 10,
-                                      )
-                                    ],
-                                  ),
+                ),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _cabOrderModel!.driver == null || _driverModel == null
+                          ? Container()
+                          : Container(
+                              decoration: BoxDecoration(
+                                color: Color(COLOR_PRIMARY),
+                                borderRadius: const BorderRadius.only(
+                                  topRight: Radius.circular(22),
+                                  topLeft: Radius.circular(22),
                                 ),
                               ),
-                        Container(
-                          color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
-                          child: Column(
-                            children: [
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              buildStatusLine(address: widget.orderModel.sender!.address.toString(), status: _cabOrderModel!.status == ORDER_STATUS_REJECTED ? "Order Canceled" : "Ready to pickup"),
-                              Visibility(
-                                  visible: _cabOrderModel!.status == ORDER_STATUS_REJECTED ? false : true,
-                                  child: buildStatusLine(
-                                      isLast: true,
-                                      status: "Delivered Parcel".tr(),
-                                      address: widget.orderModel.receiver!.address.toString(),
-                                      image: _cabOrderModel!.status == ORDER_STATUS_COMPLETED ? "assets/images/blue_circel_check.png" : "assets/images/circle.png")),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 10, right: 10),
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10.0),
                                 child: Row(
-                                  mainAxisSize: MainAxisSize.max,
                                   children: [
                                     Expanded(
-                                      child: TextButton(
-                                        onPressed: () async {
-                                          push(context, ParcelOrderDetailScreen(orderModel: widget.orderModel));
-                                        },
-                                        style: ButtonStyle(
-                                            foregroundColor: MaterialStateProperty.all<Color>(Color(COLOR_PRIMARY)),
-                                            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0), side: BorderSide(color: Color(COLOR_PRIMARY))))),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(4.0),
-                                          child: Text(
-                                            'View Order Info'.tr(),
+                                      child: Row(
+                                        children: [
+                                          const SizedBox(
+                                            width: 15,
                                           ),
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            child: CachedNetworkImage(
+                                              height: 50,
+                                              width: 50,
+                                              imageUrl: _driverModel!
+                                                  .profilePictureURL,
+                                              placeholder: (context, url) =>
+                                                  Image.asset(
+                                                      'assets/images/img_placeholder.png'),
+                                              errorWidget: (context, url,
+                                                      error) =>
+                                                  Image.asset(
+                                                      'assets/images/placeholder.jpg',
+                                                      fit: BoxFit.cover),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            width: 15,
+                                          ),
+                                          Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                _driverModel!.firstName +
+                                                    " " +
+                                                    _driverModel!.lastName,
+                                                style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 16),
+                                              ),
+                                              const SizedBox(
+                                                height: 8,
+                                              ),
+                                              Text(
+                                                "Your shipper".tr(),
+                                                style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 14),
+                                              ),
+                                              const SizedBox(
+                                                height: 8,
+                                              ),
+                                              Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  const Icon(
+                                                    Icons.star,
+                                                    size: 20,
+                                                    color: Colors.white,
+                                                  ),
+                                                  const SizedBox(width: 3),
+                                                  Text(
+                                                      _driverModel!
+                                                                  .reviewsCount !=
+                                                              0
+                                                          ? (_driverModel!
+                                                                      .reviewsSum /
+                                                                  _driverModel!
+                                                                      .reviewsCount)
+                                                              .toStringAsFixed(
+                                                                  1)
+                                                          : 0.toString(),
+                                                      style: const TextStyle(
+                                                        letterSpacing: 0.5,
+                                                        color: Colors.white,
+                                                      )),
+                                                  const SizedBox(width: 3),
+                                                  Text(
+                                                      '(${_driverModel!.reviewsCount.toStringAsFixed(1)})',
+                                                      style: const TextStyle(
+                                                        letterSpacing: 0.5,
+                                                        color: Colors.white,
+                                                      )),
+                                                  const SizedBox(width: 5),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    InkWell(
+                                        onTap: () {
+                                          UrlLauncher.launch(
+                                              "tel://${_cabOrderModel!.driver!.phoneNumber}");
+                                        },
+                                        child:
+                                            const Icon(Icons.phone, size: 32)),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    InkWell(
+                                      onTap: () async {
+                                        await showProgress(
+                                            context, "Please wait".tr(), false);
+
+                                        User? customer =
+                                            await FireStoreUtils.getCurrentUser(
+                                                widget.orderModel.authorID);
+                                        User? driver =
+                                            await FireStoreUtils.getCurrentUser(
+                                                widget.orderModel.driverID
+                                                    .toString());
+
+                                        hideProgress();
+                                        push(
+                                            context,
+                                            ChatScreens(
+                                              type: "cab_parcel_chat",
+                                              customerName:
+                                                  customer!.firstName +
+                                                      " " +
+                                                      customer.lastName,
+                                              restaurantName:
+                                                  driver!.firstName +
+                                                      " " +
+                                                      driver.lastName,
+                                              orderId: widget.orderModel.id,
+                                              restaurantId: driver.userID,
+                                              customerId: customer.userID,
+                                              customerProfileImage:
+                                                  customer.profilePictureURL,
+                                              restaurantProfileImage:
+                                                  driver.profilePictureURL,
+                                              token: driver.fcmToken,
+                                              chatType: 'Driver',
+                                            ));
+                                      },
+                                      child: const ImageIcon(
+                                        AssetImage(
+                                          "assets/images/chatIcon.png",
                                         ),
+                                        color: Colors.white,
+                                        size: 32,
                                       ),
                                     ),
                                     const SizedBox(
                                       width: 10,
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                      Container(
+                        color: isDarkMode(context)
+                            ? const Color(DarkContainerColor)
+                            : Colors.white,
+                        child: Column(
+                          children: [
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            buildStatusLine(
+                                address: widget.orderModel.sender!.address
+                                    .toString(),
+                                status: _cabOrderModel!.status ==
+                                        ORDER_STATUS_REJECTED
+                                    ? "Order Canceled"
+                                    : "Ready to pickup"),
+                            Visibility(
+                                visible: _cabOrderModel!.status ==
+                                        ORDER_STATUS_REJECTED
+                                    ? false
+                                    : true,
+                                child: buildStatusLine(
+                                    isLast: true,
+                                    status: "Delivered Parcel".tr(),
+                                    address: widget.orderModel.receiver!.address
+                                        .toString(),
+                                    image: _cabOrderModel!.status ==
+                                            ORDER_STATUS_COMPLETED
+                                        ? "assets/images/blue_circel_check.png"
+                                        : "assets/images/circle.png")),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.only(left: 10, right: 10),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  Expanded(
+                                    child: TextButton(
+                                      onPressed: () async {
+                                        push(
+                                            context,
+                                            ParcelOrderDetailScreen(
+                                                orderModel: widget.orderModel));
+                                      },
+                                      style: ButtonStyle(
+                                          foregroundColor:
+                                              MaterialStateProperty.all<Color>(
+                                                  Color(COLOR_PRIMARY)),
+                                          shape: MaterialStateProperty.all<
+                                                  RoundedRectangleBorder>(
+                                              RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10.0),
+                                                  side: BorderSide(
+                                                      color: Color(
+                                                          COLOR_PRIMARY))))),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(4.0),
+                                        child: Text(
+                                          'View Order Info'.tr(),
+                                        ),
+                                      ),
                                     ),
-                                    Visibility(
-                                      visible: _cabOrderModel!.status == ORDER_STATUS_COMPLETED ? true : false,
-                                      child: Expanded(
-                                        child: ElevatedButton(
-                                          onPressed: () async {
-                                            push(context, ParcelReviewScreen(order: widget.orderModel));
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Color(COLOR_PRIMARY),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(10),
-                                            ),
-                                            elevation: 15.0,
+                                  ),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  Visibility(
+                                    visible: _cabOrderModel!.status ==
+                                            ORDER_STATUS_COMPLETED
+                                        ? true
+                                        : false,
+                                    child: Expanded(
+                                      child: ElevatedButton(
+                                        onPressed: () async {
+                                          push(
+                                              context,
+                                              ParcelReviewScreen(
+                                                  order: widget.orderModel));
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Color(COLOR_PRIMARY),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
                                           ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(12.0),
-                                            child: Text(
-                                              'Add Review'.tr(),
-                                            ),
+                                          elevation: 15.0,
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(12.0),
+                                          child: Text(
+                                            'Add Review'.tr(),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                            ],
-                          ),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-      ),
+                ),
+              ],
+            ),
     );
   }
 
@@ -412,7 +507,7 @@ class _ParcelOrderTrackScreenState extends State<ParcelOrderTrackScreen> {
                 ),
               ),
               Text(
-                status,
+                status.tr(),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
@@ -426,7 +521,8 @@ class _ParcelOrderTrackScreenState extends State<ParcelOrderTrackScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 2),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 2),
               child: Opacity(
                 opacity: isLast ? 0 : 1,
                 child: SizedBox(
@@ -471,10 +567,13 @@ class _ParcelOrderTrackScreenState extends State<ParcelOrderTrackScreen> {
         if (_cabOrderModel!.status == ORDER_STATUS_SHIPPED) {
           List<LatLng> polylineCoordinates = [];
 
-          PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+          PolylineResult result =
+              await polylinePoints.getRouteBetweenCoordinates(
             GOOGLE_API_KEY,
-            PointLatLng(_driverModel!.location.latitude, _driverModel!.location.longitude),
-            PointLatLng(_cabOrderModel!.senderLatLong!.latitude, _cabOrderModel!.senderLatLong!.longitude),
+            PointLatLng(_driverModel!.location.latitude,
+                _driverModel!.location.longitude),
+            PointLatLng(_cabOrderModel!.senderLatLong!.latitude,
+                _cabOrderModel!.senderLatLong!.longitude),
             travelMode: TravelMode.driving,
           );
 
@@ -489,7 +588,8 @@ class _ParcelOrderTrackScreenState extends State<ParcelOrderTrackScreen> {
             _markers['Driver'] = Marker(
                 markerId: const MarkerId('Driver'),
                 infoWindow: const InfoWindow(title: "Driver"),
-                position: LatLng(_driverModel!.location.latitude, _driverModel!.location.longitude),
+                position: LatLng(_driverModel!.location.latitude,
+                    _driverModel!.location.longitude),
                 icon: taxiIcon!,
                 rotation: double.parse(_driverModel!.rotation.toString()));
           });
@@ -498,7 +598,8 @@ class _ParcelOrderTrackScreenState extends State<ParcelOrderTrackScreen> {
           _markers['Departure'] = Marker(
             markerId: const MarkerId('Departure'),
             infoWindow: const InfoWindow(title: "Departure"),
-            position: LatLng(_cabOrderModel!.senderLatLong!.latitude, _cabOrderModel!.senderLatLong!.longitude),
+            position: LatLng(_cabOrderModel!.senderLatLong!.latitude,
+                _cabOrderModel!.senderLatLong!.longitude),
             icon: departureIcon!,
           );
 
@@ -506,17 +607,21 @@ class _ParcelOrderTrackScreenState extends State<ParcelOrderTrackScreen> {
           _markers['Destination'] = Marker(
             markerId: const MarkerId('Destination'),
             infoWindow: const InfoWindow(title: "Destination"),
-            position: LatLng(_cabOrderModel!.receiverLatLong!.latitude, _cabOrderModel!.receiverLatLong!.longitude),
+            position: LatLng(_cabOrderModel!.receiverLatLong!.latitude,
+                _cabOrderModel!.receiverLatLong!.longitude),
             icon: destinationIcon!,
           );
           addPolyLine(polylineCoordinates);
         } else if (_cabOrderModel!.status == ORDER_STATUS_IN_TRANSIT) {
           List<LatLng> polylineCoordinates = [];
 
-          PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+          PolylineResult result =
+              await polylinePoints.getRouteBetweenCoordinates(
             GOOGLE_API_KEY,
-            PointLatLng(_driverModel!.location.latitude, _driverModel!.location.longitude),
-            PointLatLng(_cabOrderModel!.receiverLatLong!.latitude, _cabOrderModel!.receiverLatLong!.longitude),
+            PointLatLng(_driverModel!.location.latitude,
+                _driverModel!.location.longitude),
+            PointLatLng(_cabOrderModel!.receiverLatLong!.latitude,
+                _cabOrderModel!.receiverLatLong!.longitude),
             travelMode: TravelMode.driving,
           );
 
@@ -531,7 +636,8 @@ class _ParcelOrderTrackScreenState extends State<ParcelOrderTrackScreen> {
             _markers['Driver'] = Marker(
                 markerId: const MarkerId('Driver'),
                 infoWindow: const InfoWindow(title: "Driver"),
-                position: LatLng(_driverModel!.location.latitude, _driverModel!.location.longitude),
+                position: LatLng(_driverModel!.location.latitude,
+                    _driverModel!.location.longitude),
                 icon: taxiIcon!,
                 rotation: double.parse(_driverModel!.rotation.toString()));
           });
@@ -539,24 +645,29 @@ class _ParcelOrderTrackScreenState extends State<ParcelOrderTrackScreen> {
           _markers['Departure'] = Marker(
             markerId: const MarkerId('Departure'),
             infoWindow: const InfoWindow(title: "Departure"),
-            position: LatLng(_cabOrderModel!.senderLatLong!.latitude, _cabOrderModel!.senderLatLong!.longitude),
+            position: LatLng(_cabOrderModel!.senderLatLong!.latitude,
+                _cabOrderModel!.senderLatLong!.longitude),
             icon: departureIcon!,
           );
           _markers.remove("Destination");
           _markers['Destination'] = Marker(
             markerId: const MarkerId('Destination'),
             infoWindow: const InfoWindow(title: "Destination"),
-            position: LatLng(_cabOrderModel!.receiverLatLong!.latitude, _cabOrderModel!.receiverLatLong!.longitude),
+            position: LatLng(_cabOrderModel!.receiverLatLong!.latitude,
+                _cabOrderModel!.receiverLatLong!.longitude),
             icon: destinationIcon!,
           );
           addPolyLine(polylineCoordinates);
         } else {
           List<LatLng> polylineCoordinates = [];
 
-          PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+          PolylineResult result =
+              await polylinePoints.getRouteBetweenCoordinates(
             GOOGLE_API_KEY,
-            PointLatLng(_cabOrderModel!.senderLatLong!.latitude, _cabOrderModel!.senderLatLong!.longitude),
-            PointLatLng(_cabOrderModel!.receiverLatLong!.latitude, _cabOrderModel!.receiverLatLong!.longitude),
+            PointLatLng(_cabOrderModel!.senderLatLong!.latitude,
+                _cabOrderModel!.senderLatLong!.longitude),
+            PointLatLng(_cabOrderModel!.receiverLatLong!.latitude,
+                _cabOrderModel!.receiverLatLong!.longitude),
             travelMode: TravelMode.driving,
           );
 
@@ -569,14 +680,16 @@ class _ParcelOrderTrackScreenState extends State<ParcelOrderTrackScreen> {
           _markers['Departure'] = Marker(
             markerId: const MarkerId('Departure'),
             infoWindow: const InfoWindow(title: "Departure"),
-            position: LatLng(_cabOrderModel!.senderLatLong!.latitude, _cabOrderModel!.senderLatLong!.longitude),
+            position: LatLng(_cabOrderModel!.senderLatLong!.latitude,
+                _cabOrderModel!.senderLatLong!.longitude),
             icon: departureIcon!,
           );
           _markers.remove("Destination");
           _markers['Destination'] = Marker(
             markerId: const MarkerId('Destination'),
             infoWindow: const InfoWindow(title: "Destination"),
-            position: LatLng(_cabOrderModel!.receiverLatLong!.latitude, _cabOrderModel!.receiverLatLong!.longitude),
+            position: LatLng(_cabOrderModel!.receiverLatLong!.latitude,
+                _cabOrderModel!.receiverLatLong!.longitude),
             icon: destinationIcon!,
           );
           addPolyLine(polylineCoordinates);
@@ -595,7 +708,8 @@ class _ParcelOrderTrackScreenState extends State<ParcelOrderTrackScreen> {
       geodesic: true,
     );
     polyLines[id] = polyline;
-    updateCameraLocation(polylineCoordinates.first, polylineCoordinates.last, _controller);
+    updateCameraLocation(
+        polylineCoordinates.first, polylineCoordinates.last, _controller);
     setState(() {});
   }
 
@@ -608,12 +722,17 @@ class _ParcelOrderTrackScreenState extends State<ParcelOrderTrackScreen> {
 
     LatLngBounds bounds;
 
-    if (source.latitude > destination.latitude && source.longitude > destination.longitude) {
+    if (source.latitude > destination.latitude &&
+        source.longitude > destination.longitude) {
       bounds = LatLngBounds(southwest: destination, northeast: source);
     } else if (source.longitude > destination.longitude) {
-      bounds = LatLngBounds(southwest: LatLng(source.latitude, destination.longitude), northeast: LatLng(destination.latitude, source.longitude));
+      bounds = LatLngBounds(
+          southwest: LatLng(source.latitude, destination.longitude),
+          northeast: LatLng(destination.latitude, source.longitude));
     } else if (source.latitude > destination.latitude) {
-      bounds = LatLngBounds(southwest: LatLng(destination.latitude, source.longitude), northeast: LatLng(source.latitude, destination.longitude));
+      bounds = LatLngBounds(
+          southwest: LatLng(destination.latitude, source.longitude),
+          northeast: LatLng(source.latitude, destination.longitude));
     } else {
       bounds = LatLngBounds(southwest: source, northeast: destination);
     }
@@ -623,7 +742,8 @@ class _ParcelOrderTrackScreenState extends State<ParcelOrderTrackScreen> {
     return checkCameraLocation(cameraUpdate, mapController);
   }
 
-  Future<void> checkCameraLocation(CameraUpdate cameraUpdate, GoogleMapController mapController) async {
+  Future<void> checkCameraLocation(
+      CameraUpdate cameraUpdate, GoogleMapController mapController) async {
     mapController.animateCamera(cameraUpdate);
     LatLngBounds l1 = await mapController.getVisibleRegion();
     LatLngBounds l2 = await mapController.getVisibleRegion();

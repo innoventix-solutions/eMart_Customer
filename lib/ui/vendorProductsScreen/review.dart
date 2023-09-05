@@ -40,7 +40,10 @@ class _ReviewState extends State<Review> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppGlobal.buildSimpleAppBar(
-          context, 'Reviews -('.tr() + widget.productModel.reviewsCount.toString() + " Reviews)"),
+          context,
+          'Reviews -('.tr() +
+              widget.productModel.reviewsCount.toString() +
+              " Reviews)".tr()),
       body: Padding(
         padding: const EdgeInsets.all(4.0),
         child: ListView.builder(
@@ -53,7 +56,8 @@ class _ReviewState extends State<Review> {
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(10), //border corner radius
+                  borderRadius:
+                      BorderRadius.circular(10), //border corner radius
                   boxShadow: [
                     BoxShadow(
                       color: Colors.grey.withOpacity(0.5), //color of shadow
@@ -77,16 +81,19 @@ class _ReviewState extends State<Review> {
                           CachedNetworkImage(
                             height: 45,
                             width: 45,
-                            imageUrl: getImageValidUrl(reviewList[index].profile.toString()),
+                            imageUrl: getImageVAlidUrl(
+                                reviewList[index].profile.toString()),
                             imageBuilder: (context, imageProvider) => Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(35),
-                                image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+                                image: DecorationImage(
+                                    image: imageProvider, fit: BoxFit.cover),
                               ),
                             ),
                             placeholder: (context, url) => Center(
                                 child: CircularProgressIndicator.adaptive(
-                              valueColor: AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
+                              valueColor:
+                                  AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
                             )),
                             errorWidget: (context, url, error) => ClipRRect(
                                 borderRadius: BorderRadius.circular(35),
@@ -113,7 +120,8 @@ class _ReviewState extends State<Review> {
                                 ),
                                 RatingBar.builder(
                                   ignoreGestures: true,
-                                  initialRating: reviewList[index].rating ?? 0.0,
+                                  initialRating:
+                                      reviewList[index].rating ?? 0.0,
                                   minRating: 1,
                                   itemSize: 22,
                                   direction: Axis.horizontal,
@@ -134,8 +142,9 @@ class _ReviewState extends State<Review> {
                           ),
                           Text(orderDate(reviewList[index].createdAt),
                               style: TextStyle(
-                                  color:
-                                      isDarkMode(context) ? Colors.grey.shade200 : const Color(0XFF555353))),
+                                  color: isDarkMode(context)
+                                      ? Colors.grey.shade200
+                                      : const Color(0XFF555353))),
                         ],
                       ),
                       const Padding(
@@ -166,23 +175,32 @@ class _ReviewState extends State<Review> {
                                     child: CachedNetworkImage(
                                       height: 65,
                                       width: 65,
-                                      imageUrl: getImageValidUrl(reviewList[index].photos![index1]),
-                                      imageBuilder: (context, imageProvider) => Container(
+                                      imageUrl: getImageVAlidUrl(
+                                          reviewList[index].photos![index1]),
+                                      imageBuilder: (context, imageProvider) =>
+                                          Container(
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(10),
-                                          image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          image: DecorationImage(
+                                              image: imageProvider,
+                                              fit: BoxFit.cover),
                                         ),
                                       ),
                                       placeholder: (context, url) => Center(
-                                          child: CircularProgressIndicator.adaptive(
-                                        valueColor: AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
+                                          child: CircularProgressIndicator
+                                              .adaptive(
+                                        valueColor: AlwaysStoppedAnimation(
+                                            Color(COLOR_PRIMARY)),
                                       )),
-                                      errorWidget: (context, url, error) => ClipRRect(
-                                          borderRadius: BorderRadius.circular(10),
-                                          child: Image.network(
-                                            placeholderImage,
-                                            fit: BoxFit.cover,
-                                          )),
+                                      errorWidget: (context, url, error) =>
+                                          ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              child: Image.network(
+                                                placeholderImage,
+                                                fit: BoxFit.cover,
+                                              )),
                                       fit: BoxFit.cover,
                                     ),
                                   );

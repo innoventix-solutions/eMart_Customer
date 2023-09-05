@@ -136,7 +136,7 @@ class _ViewAllPopularFoodNearByScreenState extends State<ViewAllPopularFoodNearB
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: CachedNetworkImage(
-                imageUrl: getImageValidUrl(lstNearByFood[index].photo),
+                imageUrl: getImageVAlidUrl(lstNearByFood[index].photo),
                 height: 100,
                 width: 100,
                 imageBuilder: (context, imageProvider) => Container(
@@ -191,13 +191,13 @@ class _ViewAllPopularFoodNearByScreenState extends State<ViewAllPopularFoodNearB
                   ),
                   lstNearByFood[index].disPrice == "" || lstNearByFood[index].disPrice == "0"
                       ? Text(
-                    symbol + double.parse(lstNearByFood[index].price).toStringAsFixed(decimal),
+                    amountShow(amount: lstNearByFood[index].price),
                           style: TextStyle(fontSize: 16, letterSpacing: 0.5, color: Color(COLOR_PRIMARY)),
                         )
                       : Row(
                           children: [
                             Text(
-                              "$symbol${double.parse(lstNearByFood[index].disPrice.toString()).toStringAsFixed(decimal)}",
+                              "${amountShow(amount: lstNearByFood[index].disPrice)}",
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -208,7 +208,7 @@ class _ViewAllPopularFoodNearByScreenState extends State<ViewAllPopularFoodNearB
                               width: 5,
                             ),
                             Text(
-                              '$symbol${double.parse(lstNearByFood[index].price).toStringAsFixed(decimal)}',
+                              '${amountShow(amount: lstNearByFood[index].price)}',
                               style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey, decoration: TextDecoration.lineThrough),
                             ),
                           ],

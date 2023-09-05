@@ -1,12 +1,16 @@
 import 'dart:convert';
 
 import 'package:emartconsumer/model/PayFastSettingData.dart';
+import 'package:emartconsumer/model/payStackURLModel.dart';
 import 'package:http/http.dart' as http;
 
 import '../main.dart';
 
 class PayStackURLGen {
-  static Future payStackURLGen({required String amount, required String secretKey, required String currency}) async {
+  static Future payStackURLGen(
+      {required String amount,
+      required String secretKey,
+      required String currency}) async {
     const url = "https://api.paystack.co/transaction/initialize";
     final response = await http.post(Uri.parse(url), body: {
       "email": MyAppState.currentUser?.email,
@@ -18,9 +22,10 @@ class PayStackURLGen {
     final data = jsonDecode(response.body);
 
     print(data);
-    return data;
-
-    //return PayStackUrlModel.fromJson(data);
+    if (!data["status"]) {
+      return null;
+    }
+    return PayStackUrlModel.fromJson(data);
   }
 
   static Future<bool> verifyTransaction({
@@ -40,8 +45,12 @@ class PayStackURLGen {
     return data["status"];
   }
 
-  static Future<String> getPayHTML({required String amount, required PayFastSettingData payFastSettingData, String itemName = "wallet Topup"}) async {
-    String newUrl = 'https://${!payFastSettingData.isSandbox ? "www" : "sandbox"}.payfast.co.za/eng/process';
+  static Future<String> getPayHTML(
+      {required String amount,
+      required PayFastSettingData payFastSettingData,
+      String itemName = "wallet Topup"}) async {
+    String newUrl =
+        'https://${!payFastSettingData.isSandbox ? "www" : "sandbox"}.payfast.co.za/eng/process';
     Map body = {
       'merchant_id': payFastSettingData.merchant_id,
       'merchant_key': payFastSettingData.merchant_key,

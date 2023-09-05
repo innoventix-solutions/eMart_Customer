@@ -38,7 +38,7 @@ class _OffersScreenState extends State<OffersScreen> {
   Stream<List<VendorModel>>? lstAllRestaurant;
 
   getData() async {
-    await FireStoreUtils().getAllCoupons().then((value) {
+    await FireStoreUtils().getPublicCoupons().then((value) {
       value.forEach((element1) {
         widget.vendors.forEach((element) {
           if (element1.storeId == element.id && element1.expireOfferDate!.toDate().isAfter(DateTime.now())) {
@@ -53,65 +53,63 @@ class _OffersScreenState extends State<OffersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        //isDarkMode(context) ? Color(COLOR_DARK) : null,
-        body: Column(
-          children: [
-            Stack(
-              alignment: Alignment.centerLeft,
-              children: [
-                Image(
-                  image: const AssetImage("assets/images/offers_bg.png"),
-                  fit: BoxFit.cover,
-                  height: 300,
-                  width: MediaQuery.of(context).size.width,
-                ),
-                Positioned(
-                    left: 20,
-                    child: Text(
-                      "OFFERS\nFOR YOU".tr(),
-                      style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
-                    )),
-                Positioned(
-                  left: 10,
-                  top: 10,
-                  child: Align(
-                    alignment: AlignmentDirectional.topStart,
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.only(left: 5, top: 10, right: 5),
-                        decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.black38),
-                        child: const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Image(
-                            image: AssetImage("assets/images/ic_back.png"),
-                            height: 20,
-                            width: 20,
-                          ),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      //isDarkMode(context) ? Color(COLOR_DARK) : null,
+      body: Column(
+        children: [
+          Stack(
+            alignment: Alignment.centerLeft,
+            children: [
+              Image(
+                image: const AssetImage("assets/images/offers_bg.png"),
+                fit: BoxFit.cover,
+                height: 300,
+                width: MediaQuery.of(context).size.width,
+              ),
+              Positioned(
+                  left: 20,
+                  child: Text(
+                    "OFFERS\nFOR YOU".tr(),
+                    style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
+                  )),
+              Positioned(
+                left: 10,
+                top: 10,
+                child: Align(
+                  alignment: AlignmentDirectional.topStart,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(left: 5, top: 10, right: 5),
+                      decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.black38),
+                      child: const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Image(
+                          image: AssetImage("assets/images/ic_back.png"),
+                          height: 20,
+                          width: 20,
                         ),
                       ),
                     ),
                   ),
                 ),
-              ],
-            ),
-            Expanded(
-              child: offerVendorList.isEmpty
-                  ? showEmptyState('No Offers Found'.tr(), context)
-                  : ListView.builder(
-                      itemCount: offerVendorList.length,
-                      scrollDirection: Axis.vertical,
-                      itemBuilder: (context, index) {
-                        return offerItemView(offerVendorList[index], offersList[index]);
-                      }),
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+          Expanded(
+            child: offerVendorList.isEmpty
+                ? showEmptyState('No Offers Found'.tr(), context)
+                : ListView.builder(
+                    itemCount: offerVendorList.length,
+                    scrollDirection: Axis.vertical,
+                    itemBuilder: (context, index) {
+                      return offerItemView(offerVendorList[index], offersList[index]);
+                    }),
+          ),
+        ],
       ),
     );
   }
@@ -188,7 +186,10 @@ class _OffersScreenState extends State<OffersScreen> {
                     style: TextStyle(color: Color(COLOR_PRIMARY), fontWeight: FontWeight.w500, letterSpacing: 0.1),
                   ),
                   TextSpan(
-                    text: " & get".tr() + " ${offerModel.discountTypeOffer == "Fix Price" ? symbol : ""}${offerModel.discountOffer}${offerModel.discountTypeOffer == "Percentage" ? "% off" : " off"} ",
+                    text: " & get".tr() +
+                       // " ${offerModel.discountTypeOffer == "Fix Price" ? currencyData!.symbol : ""}${offerModel.discountOffer}${offerModel.discountTypeOffer == "Percentage" ? "% off" : " off"} ",
+                       "${ offerModel.discountTypeOffer == "Fix Price" ? (currencyData!.symbolatright == true) ? "${offerModel.discountOffer}${currencyData!.symbol.toString()} OFF":"${currencyData!.symbol.toString()}${offerModel.discountOffer} OFF"
+                        : "${offerModel.discountOffer} % Off"}",
                     style: const TextStyle(fontSize: 16.0, color: Colors.grey, fontWeight: FontWeight.w700),
                   ),
                 ],
@@ -223,7 +224,7 @@ class _OffersScreenState extends State<OffersScreen> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(10),
                     child: CachedNetworkImage(
-                      imageUrl: getImageValidUrl(offerModel.imageOffer!),
+                      imageUrl: getImageVAlidUrl(offerModel.imageOffer!),
                       height: 100,
                       width: 100,
                       fit: BoxFit.cover,
@@ -430,7 +431,9 @@ class _OffersScreenState extends State<OffersScreen> {
                 Container(
                   margin: const EdgeInsets.only(top: 3),
                   child: Text(
-                    "${offerModel.discountTypeOffer == "Fix Price".tr() ? symbol : ""}${offerModel.discountOffer}${offerModel.discountTypeOffer == "Percentage" ? "% Off" : " Off"}",
+                  //  "${offerModel.discountTypeOffer == "Fix Price".tr() ? currencyData!.symbol : ""}${offerModel.discountOffer}${offerModel.discountTypeOffer == "Percentage" ? "% Off" : " Off"}",
+                    offerModel.discountTypeOffer == "Fix Price" ? (currencyData!.symbolatright == true) ? "${offerModel.discountOffer}${currencyData!.symbol.toString()} OFF":"${currencyData!.symbol.toString()}${offerModel.discountOffer} OFF"
+                        : "${offerModel.discountOffer} % Off",
                     style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 0.7),
                   ),
                 )

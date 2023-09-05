@@ -50,23 +50,21 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBeUPzNNcwnSNU880UmPSldYpM08PfUY-c',
-    appId: '1:841077018919:android:86afcc90e0bbd07ab5d902',
-    messagingSenderId: '841077018919',
-    projectId: 'emart-8d99f',
-    databaseURL: 'https://emart-8d99f-default-rtdb.firebaseio.com',
-    storageBucket: 'emart-8d99f.appspot.com',
+    apiKey: 'Place your key',
+    appId: 'Place your key',
+    messagingSenderId: 'Place your key',
+    projectId: 'Place your key',
+    storageBucket: 'Place your key',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDOGbjAMQOqOtPm4kEy5RO3PcZxJzkExHo',
-    appId: '1:841077018919:ios:a3bd2480a35e659bb5d902',
-    messagingSenderId: '841077018919',
-    projectId: 'emart-8d99f',
-    databaseURL: 'https://emart-8d99f-default-rtdb.firebaseio.com',
-    storageBucket: 'emart-8d99f.appspot.com',
-    androidClientId: '841077018919-19kk2v8gtn67780pskpo07kutct6v1t4.apps.googleusercontent.com',
-    iosClientId: '841077018919-ap6ufmadhjb306vmo0j0o83ade5gvkki.apps.googleusercontent.com',
-    iosBundleId: 'com.emart.customer',
+    apiKey: 'Place your key',
+    appId: 'Place your key',
+    messagingSenderId: 'Place your key',
+    projectId: 'Place your key',
+    storageBucket: 'Place your key',
+    androidClientId: 'Place your key',
+    iosClientId: 'Place your key',
+    iosBundleId: 'Place your key',
   );
 }

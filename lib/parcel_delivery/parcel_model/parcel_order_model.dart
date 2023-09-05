@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:emartconsumer/model/TaxModel.dart';
 import 'package:emartconsumer/model/User.dart';
 
 class ParcelOrderModel {
@@ -41,6 +42,7 @@ class ParcelOrderModel {
   Timestamp? trigger_delevery;
   String? sectionId;
   bool? sendToDriver;
+  List<TaxModel>? taxModel;
 
   ParcelOrderModel({
     this.id = '',
@@ -78,11 +80,20 @@ class ParcelOrderModel {
     this.paymentCollectByReceiver = false,
     this.createdAt,
     this.sectionId ,
-    this.trigger_delevery,
+    this.trigger_delevery,this.taxModel
   });
 
   factory ParcelOrderModel.fromJson(Map<String, dynamic> json) {
     print('Value : ${json['id']} ${json['senderPickupDateTime']} ${json['senderPickupDateTime'].runtimeType}');
+
+    List<TaxModel>? taxList;
+    if (json['taxSetting'] != null) {
+      taxList = <TaxModel>[];
+      json['taxSetting'].forEach((v) {
+        taxList!.add(TaxModel.fromJson(v));
+      });
+    }
+
     return ParcelOrderModel(
       id: json['id'] ?? "",
       status: json['status'] ?? "",
@@ -120,6 +131,8 @@ class ParcelOrderModel {
       driver: json.containsKey('driver') ? User.fromJson(json['driver']) : null,
       driverID: json.containsKey('driverID') ? json['driverID'] : null,
       sectionId: json['sectionId'] ??"",
+      taxModel: taxList,
+
     );
   }
 
@@ -159,6 +172,7 @@ class ParcelOrderModel {
       'trigger_delevery': trigger_delevery,
       'paymentCollectByReceiver': paymentCollectByReceiver,
       'sectionId': sectionId,
+      "taxSetting": taxModel != null ? taxModel!.map((v) => v.toJson()).toList() : null,
     };
     if (driver != null) {
       json.addAll({'driverID': driverID, 'driver': driver!.toJson()});

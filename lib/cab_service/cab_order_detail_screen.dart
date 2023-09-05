@@ -1,16 +1,22 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:emartconsumer/cab_service/cab_review_screen.dart';
+import 'package:emartconsumer/cab_service/cab_service_screen.dart';
 import 'package:emartconsumer/constants.dart';
+import 'package:emartconsumer/model/TaxModel.dart';
+import 'package:emartconsumer/services/FirebaseHelper.dart';
 import 'package:emartconsumer/services/helper.dart';
 import 'package:flutter/material.dart';
 
 import '../model/CabOrderModel.dart';
 
 class CabOrderDetailScreen extends StatefulWidget {
-  final CabOrderModel orderModel;
+  final CabOrderModel? orderModel;
+  final String? orderId;
 
-  const CabOrderDetailScreen({Key? key, required this.orderModel}) : super(key: key);
+  const CabOrderDetailScreen({Key? key, this.orderModel, this.orderId})
+      : super(key: key);
 
   @override
   State<CabOrderDetailScreen> createState() => _CabOrderDetailScreenState();
@@ -23,11 +29,22 @@ class _CabOrderDetailScreenState extends State<CabOrderDetailScreen> {
   @override
   void initState() {
     // TODO: implement initState
-    orderModel = widget.orderModel;
+    if (widget.orderModel != null) {
+      orderModel = widget.orderModel;
+      setState(() {});
+    } else {
+       FireStoreUtils().getCabOrderById(widget.orderId).then((value) {
+        orderModel = value;
+        setState(() {});
+      });
+    }
 
-    setState(() {
-      totalAmount = "$symbol ${(double.parse(orderModel!.subTotal!.toString())).toStringAsFixed(decimal)}";
-    });
+
+    if (orderModel != null) {
+      setState(() {
+        totalAmount = amountShow(amount: orderModel!.subTotal!.toString());
+      });
+    }
     super.initState();
   }
 
@@ -35,6 +52,19 @@ class _CabOrderDetailScreenState extends State<CabOrderDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: GestureDetector(
+          onTap: () {
+            if (widget.orderId != null) {
+              push(context, const CabServiceScreen());
+            } else {
+              Navigator.pop(context);
+            }
+          },
+          child: Icon(
+            Icons.arrow_back_ios,
+            color: Color(COLOR_PRIMARY),
+          ),
+        ),
         title: Text(
           "Ride Details".tr(),
           style: TextStyle(
@@ -42,204 +72,266 @@ class _CabOrderDetailScreenState extends State<CabOrderDetailScreen> {
           ),
         ),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Card(
-              elevation: 3,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 10),
-                child: Column(
-                  children: [
-                    widget.orderModel.driver != null
-                        ? Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                child: Row(
-                                  children: [
-                                    CachedNetworkImage(
-                                      height: 50,
-                                      width: 50,
-                                      imageUrl: getImageValidUrl(
-                                        orderModel!.driver!.profilePictureURL,
-                                      ),
-                                      imageBuilder: (context, imageProvider) => Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(10),
-                                          image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
-                                        ),
-                                      ),
-                                      placeholder: (context, url) => Center(
-                                          child: CircularProgressIndicator.adaptive(
-                                        valueColor: AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
-                                      )),
-                                      errorWidget: (context, url, error) => ClipRRect(
-                                          borderRadius: BorderRadius.circular(10),
-                                          child: Image.network(
-                                            placeholderImage,
-                                            fit: BoxFit.cover,
-                                          )),
-                                      fit: BoxFit.cover,
-                                    ),
-                                    const SizedBox(
-                                      width: 12,
-                                    ),
-                                    Expanded(
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+      body: SingleChildScrollView(
+        child: (orderModel != null)
+            ? Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Card(
+                      elevation: 3,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 18.0, vertical: 10),
+                        child: Column(
+                          children: [
+                            orderModel!.driver != null
+                                ? Column(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 8.0),
+                                        child: Row(
                                           children: [
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Text(
-                                                  orderModel!.driver!.firstName +
-                                                      " " +
-                                                      orderModel!.driver!.lastName,
-                                                  style: const TextStyle(
-                                                    fontSize: 18,
-                                                  ),
+                                            CachedNetworkImage(
+                                              height: 50,
+                                              width: 50,
+                                              imageUrl: getImageVAlidUrl(
+                                                orderModel!
+                                                    .driver!.profilePictureURL,
+                                              ),
+                                              imageBuilder:
+                                                  (context, imageProvider) =>
+                                                      Container(
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  image: DecorationImage(
+                                                      image: imageProvider,
+                                                      fit: BoxFit.cover),
                                                 ),
-                                                Text(
-                                                  totalAmount,
-                                                  style: TextStyle(fontSize: 18, color: Color(COLOR_PRIMARY)),
-                                                ),
-                                              ],
+                                              ),
+                                              placeholder: (context, url) =>
+                                                  Center(
+                                                      child:
+                                                          CircularProgressIndicator
+                                                              .adaptive(
+                                                valueColor:
+                                                    AlwaysStoppedAnimation(
+                                                        Color(COLOR_PRIMARY)),
+                                              )),
+                                              errorWidget: (context, url,
+                                                      error) =>
+                                                  ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      child: Image.network(
+                                                        placeholderImage,
+                                                        fit: BoxFit.cover,
+                                                      )),
+                                              fit: BoxFit.cover,
                                             ),
                                             const SizedBox(
-                                              height: 6,
+                                              width: 12,
                                             ),
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  orderDate(orderModel!.createdAt).trim(),
-                                                  style: const TextStyle(fontSize: 14),
+                                            Expanded(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 10.0),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Text(
+                                                          orderModel!.driver!
+                                                                  .firstName +
+                                                              " " +
+                                                              orderModel!
+                                                                  .driver!
+                                                                  .lastName,
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize: 18,
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          totalAmount,
+                                                          style: TextStyle(
+                                                              fontSize: 18,
+                                                              color: Color(
+                                                                  COLOR_PRIMARY)),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 6,
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          orderDate(orderModel!
+                                                                  .createdAt)
+                                                              .trim(),
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontSize: 14),
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .symmetric(
+                                                                  horizontal:
+                                                                      15.0),
+                                                          child: Container(
+                                                            width: 7,
+                                                            height: 7,
+                                                            decoration:
+                                                                const BoxDecoration(
+                                                                    color: Colors
+                                                                        .grey,
+                                                                    shape: BoxShape
+                                                                        .circle),
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          orderModel!
+                                                                  .paymentStatus
+                                                              ? "Paid".tr()
+                                                              : "UnPaid".tr(),
+                                                          style: TextStyle(
+                                                              fontSize: 15,
+                                                              color: orderModel!
+                                                                      .paymentStatus
+                                                                  ? Colors.green
+                                                                  : Colors
+                                                                      .deepOrangeAccent),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
                                                 ),
-                                                Padding(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                                                  child: Container(
-                                                    width: 7,
-                                                    height: 7,
-                                                    decoration: const BoxDecoration(
-                                                        color: Colors.grey, shape: BoxShape.circle),
-                                                  ),
-                                                ),
-                                                Text(
-                                                  orderModel!.paymentStatus ? "Paid".tr() : "UnPaid".tr(),
-                                                  style: TextStyle(
-                                                      fontSize: 15,
-                                                      color: orderModel!.paymentStatus
-                                                          ? Colors.green
-                                                          : Colors.deepOrangeAccent),
-                                                ),
-                                              ],
-                                            ),
+                                              ),
+                                            )
                                           ],
                                         ),
                                       ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              const Divider(thickness: 1),
-                              buildCabDetail(),
-                            ],
-                          )
-                        : Container(),
-                    const Divider(thickness: 1),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Row(
-                      children: [
-                        Image.asset(
-                          "assets/icons/ic_pic_drop_location.png",
-                          height: 80,
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                                      const Divider(thickness: 1),
+                                      buildCabDetail(),
+                                    ],
+                                  )
+                                : Container(),
+                            const Divider(thickness: 1),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Row(
                               children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                        child: Text(
-                                      orderModel!.sourceLocationName.toString(),
-                                      maxLines: 2,
-                                    )),
-                                    const Text(""),
-                                  ],
+                                Image.asset(
+                                  "assets/icons/ic_pic_drop_location.png",
+                                  height: 80,
                                 ),
-                                SizedBox(
-                                  height: 30,
-                                ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                        child: Text(
-                                      orderModel!.destinationLocationName.toString(),
-                                      maxLines: 2,
-                                    )),
-                                    const Text(""),
-                                  ],
-                                ),
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                                child: Text(
+                                              orderModel!.sourceLocationName
+                                                  .toString(),
+                                              maxLines: 2,
+                                            )),
+                                            const Text(""),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 30,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                                child: Text(
+                                              orderModel!
+                                                  .destinationLocationName
+                                                  .toString(),
+                                              maxLines: 2,
+                                            )),
+                                            const Text(""),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )
                               ],
                             ),
-                          ),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    const Divider(thickness: 1),
-                    buildPaymentDetails(),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    Visibility(
-                      visible: widget.orderModel.status == ORDER_STATUS_COMPLETED ? true : false,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: SizedBox(
-                          width: MediaQuery.of(context).size.width,
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              push(context, CabReviewScreen(order: widget.orderModel));
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(COLOR_PRIMARY),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              elevation: 15.0,
+                            SizedBox(
+                              height: 10,
                             ),
-                            child: const Padding(
-                              padding: EdgeInsets.all(10.0),
-                              child: Text(
-                                'Add Review',
-                                style: TextStyle(fontSize: 18),
+                            const Divider(thickness: 1),
+                            buildPaymentDetails(),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            Visibility(
+                              visible:
+                                  orderModel!.status == ORDER_STATUS_COMPLETED
+                                      ? true
+                                      : false,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                child: SizedBox(
+                                  width: MediaQuery.of(context).size.width,
+                                  child: ElevatedButton(
+                                    onPressed: () async {
+                                      push(context,
+                                          CabReviewScreen(order: orderModel!));
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Color(COLOR_PRIMARY),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      elevation: 15.0,
+                                    ),
+                                    child:  Padding(
+                                      padding: EdgeInsets.all(10.0),
+                                      child: Text(
+                                        'Add Review'.tr(),
+                                        style: TextStyle(fontSize: 18),
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
+                  ),
+                ],
+              )
+            : Container(),
       ),
     );
   }
@@ -251,7 +343,7 @@ class _CabOrderDetailScreenState extends State<CabOrderDetailScreen> {
         Padding(
           padding: const EdgeInsets.only(left: 8.0, right: 30),
           child: Text(
-            "Cab Details :",
+            "Cab Details :".tr(),
           ),
         ),
         Row(
@@ -269,7 +361,8 @@ class _CabOrderDetailScreenState extends State<CabOrderDetailScreen> {
               child: Text(
                 "|",
                 style: TextStyle(
-                    color: isDarkMode(context) ? Colors.white54 : Colors.black54,
+                    color:
+                        isDarkMode(context) ? Colors.white54 : Colors.black54,
                     fontSize: 16,
                     fontWeight: FontWeight.w700),
               ),
@@ -289,6 +382,26 @@ class _CabOrderDetailScreenState extends State<CabOrderDetailScreen> {
   }
 
   buildPaymentDetails() {
+    String taxAmount = "0.0";
+    if (orderModel!.taxModel != null) {
+      for (var element in orderModel!.taxModel!) {
+        taxAmount = (double.parse(taxAmount) +
+                getTaxValue(
+                    amount: (double.parse(orderModel!.subTotal.toString()) -
+                            double.parse(orderModel!.discount.toString()))
+                        .toString(),
+                    taxModel: element))
+            .toString();
+      }
+    }
+
+    var total = double.parse(orderModel!.subTotal.toString()) -
+        double.parse(orderModel!.discount.toString()) +
+        double.parse(taxAmount) +
+        double.parse(orderModel!.tipValue!.isEmpty
+            ? "0.0"
+            : orderModel!.tipValue.toString());
+
     return Padding(
       padding: const EdgeInsets.all(4.0),
       child: Column(
@@ -308,6 +421,7 @@ class _CabOrderDetailScreenState extends State<CabOrderDetailScreen> {
           SizedBox(
             height: 10,
           ),
+          const Divider(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -320,7 +434,7 @@ class _CabOrderDetailScreenState extends State<CabOrderDetailScreen> {
                 ),
               ),
               Text(
-                symbol + double.parse(orderModel!.subTotal.toString()).toStringAsFixed(decimal),
+                amountShow(amount: orderModel!.subTotal.toString()),
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
@@ -342,17 +456,17 @@ class _CabOrderDetailScreenState extends State<CabOrderDetailScreen> {
                 ),
               ),
               Text(
-                symbol + orderModel!.discount!.toString(),
+                "(-" + amountShow(amount: orderModel!.discount!.toString()) + ")",
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: isDarkMode(context) ? Colors.white : Colors.black,
+                  color: Colors.red,
                 ),
               )
             ],
           ),
           const Divider(),
-          Row(
+          /* Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
@@ -364,7 +478,7 @@ class _CabOrderDetailScreenState extends State<CabOrderDetailScreen> {
                 ),
               ),
               Text(
-                symbol + taxCalculation(orderModel!).toStringAsFixed(decimal),
+                amountShow(amount: taxCalculation(orderModel!).toString()),
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
@@ -372,8 +486,55 @@ class _CabOrderDetailScreenState extends State<CabOrderDetailScreen> {
                 ),
               )
             ],
-          ),
-          const Divider(),
+          ),*/
+          orderModel!.taxModel != null
+              ? ListView.builder(
+                  itemCount: orderModel!.taxModel!.length,
+                  shrinkWrap: true,
+                  padding: EdgeInsets.zero,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    TaxModel taxModel = orderModel!.taxModel![index];
+                    return Column(
+                      children: [
+
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                "${taxModel.title.toString()} (${taxModel.type == "fix" ? amountShow(amount: taxModel.tax) : "${taxModel.tax}%"})",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: isDarkMode(context) ? Colors.white54 : Colors.black54,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              amountShow(
+                                  amount: getTaxValue(
+                                      amount: (double.parse(orderModel!.subTotal
+                                          .toString()) -
+                                          double.parse(orderModel!.discount
+                                              .toString()))
+                                          .toString(),
+                                      taxModel: taxModel)
+                                      .toString()),
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: isDarkMode(context) ? Colors.white : Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const Divider(),
+                      ],
+                    );
+                  },
+                )
+              : Container(),
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -386,8 +547,9 @@ class _CabOrderDetailScreenState extends State<CabOrderDetailScreen> {
                 ),
               ),
               Text(
-                symbol +
-                    (orderModel!.tipValue!.toString().isEmpty ? "0.0" : orderModel!.tipValue!.toString()),
+                orderModel!.tipValue!.toString().isEmpty
+                    ? amountShow(amount: "0.0")
+                    : amountShow(amount: orderModel!.tipValue!.toString()),
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
@@ -409,7 +571,9 @@ class _CabOrderDetailScreenState extends State<CabOrderDetailScreen> {
                 ),
               ),
               Text(
-                symbol + getTotalAmount().toStringAsFixed(decimal),
+                // amountShow(amount : getTotalAmount().toString()),
+                amountShow(amount: total.toString()),
+
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
@@ -423,26 +587,23 @@ class _CabOrderDetailScreenState extends State<CabOrderDetailScreen> {
     );
   }
 
-  double getTotalAmount() {
+/* double getTotalAmount() {
     return double.parse(orderModel!.subTotal.toString()) -
         double.parse(orderModel!.discount.toString()) +
         taxCalculation(orderModel!) +
         double.parse(orderModel!.tipValue!.isEmpty ? "0.0" : orderModel!.tipValue.toString());
-  }
+  */
 
-  double taxCalculation(CabOrderModel orderModel) {
+/* double taxCalculation(CabOrderModel orderModel) {
     double totalTax = 0.0;
 
     if (orderModel.taxType!.isNotEmpty) {
       if (orderModel.taxType == "percent") {
-        totalTax =
-            (double.parse(orderModel.subTotal.toString()) - double.parse(orderModel.discount.toString())) *
-                double.parse(orderModel.tax.toString()) /
-                100;
+        totalTax = (double.parse(orderModel.subTotal.toString()) - double.parse(orderModel.discount.toString())) * double.parse(orderModel.tax.toString()) / 100;
       } else {
         totalTax = double.parse(orderModel.tax.toString());
       }
     }
     return totalTax;
-  }
+  */
 }

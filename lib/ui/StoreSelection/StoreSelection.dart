@@ -1,12 +1,16 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:emartconsumer/cab_service/dashboard_cab_service.dart';
 import 'package:emartconsumer/ecommarce_service/ecommarce_dashboard.dart';
+import 'package:emartconsumer/main.dart';
+import 'package:emartconsumer/model/CurrencyModel.dart';
 import 'package:emartconsumer/model/SectionModel.dart';
+import 'package:emartconsumer/parcel_delivery/parcel_dashboard.dart';
 import 'package:emartconsumer/rental_service/rental_service_dash_board.dart';
 import 'package:emartconsumer/ui/QrCodeScanner/QrCodeScanner.dart';
 import 'package:emartconsumer/ui/container/ContainerScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:provider/provider.dart';
 
 import '../../constants.dart';
@@ -46,15 +50,22 @@ class StoreSelectionState extends State<StoreSelection> {
   setCurrency() async {
     await FireStoreUtils().getCurrency().then((value) {
       print("---->" + value.toString());
-      for (var element in value) {
+      /*for (var element in value) {
         if (element.isactive = true) {
-          symbol = element.symbol;
-          isRight = element.symbolatright;
-          currName = element.code;
           currencyData = element;
         }
+      }*/
+      if (value != null) {
+        currencyData = value;
+      } else {
+        currencyData = CurrencyModel(id: "", code: "USD", decimal: 2, isactive: true, name: "US Dollar", symbol: "\$", symbolatright: false);
       }
     });
+   // await getCountry();
+    MyAppState.selectedPosition = await getCurrentLocation();
+    List<Placemark> placeMarks = await placemarkFromCoordinates(MyAppState.selectedPosition.latitude, MyAppState.selectedPosition.longitude);
+    country = placeMarks.first.country;
+
     await FireStoreUtils().getRazorPayDemo();
     await FireStoreUtils.getPaypalSettingData();
     await FireStoreUtils.getStripeSettingData();
@@ -212,14 +223,8 @@ class StoreSelectionState extends State<StoreSelection> {
                       height: MediaQuery.of(context).size.width / 2.5,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                              color: isDarkMode(context)
-                                  ? const Color(DarkContainerBorderColor)
-                                  : Colors.grey.shade100,
-                              width: 1),
-                          color: isDarkMode(context)
-                              ? const Color(DarkContainerColor)
-                              : Colors.white,
+                          border: Border.all(color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100, width: 1),
+                          color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
                           boxShadow: [
                             isDarkMode(context)
                                 ? const BoxShadow()
@@ -228,12 +233,7 @@ class StoreSelectionState extends State<StoreSelection> {
                                     blurRadius: 5,
                                   ),
                           ],
-                          image: DecorationImage(
-                              image: NetworkImage(Banner_Url),
-                              fit: BoxFit.cover,
-                              colorFilter: ColorFilter.mode(
-                                  Colors.black.withOpacity(0.5),
-                                  BlendMode.darken))),
+                          image: DecorationImage(image: NetworkImage(Banner_Url), fit: BoxFit.cover, colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.5), BlendMode.darken))),
                     ),
             ),
             Container(
@@ -245,14 +245,12 @@ class StoreSelectionState extends State<StoreSelection> {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(
                         child: CircularProgressIndicator.adaptive(
-                          valueColor:
-                              AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
+                          valueColor: AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
                         ),
                       );
                     }
 
-                    if (snapshot.hasData ||
-                        (snapshot.data?.isNotEmpty ?? false)) {
+                    if (snapshot.hasData || (snapshot.data?.isNotEmpty ?? false)) {
                       return GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
@@ -262,16 +260,9 @@ class StoreSelectionState extends State<StoreSelection> {
                             preSectionList.clear();
                             preSectionList.addAll(snapshot.data!);
                           }
-                          return snapshot.data != null
-                              ? buildCuisineCell(snapshot.data![index])
-                              : showEmptyState('No Categories'.tr(), context);
+                          return snapshot.data != null ? buildCuisineCell(snapshot.data![index]) : showEmptyState('No Categories'.tr(), context);
                         },
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                mainAxisSpacing: 0,
-                                crossAxisSpacing: 8,
-                                mainAxisExtent: 200),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, mainAxisSpacing: 0, crossAxisSpacing: 8, mainAxisExtent: 200),
                       );
                     }
                     return const CircularProgressIndicator();
@@ -288,6 +279,9 @@ class StoreSelectionState extends State<StoreSelection> {
         padding: const EdgeInsets.only(bottom: 12),
         child: GestureDetector(
           onTap: () async {
+            setState(() {
+              COLOR_PRIMARY = int.parse(sectionModel.color!.replaceFirst("#", "0xff"));
+            });
             // if (sectionModel.serviceTypeFlag == "cab-service") {
             //   auth.User? firebaseUser = auth.FirebaseAuth.instance.currentUser;
             //   if (firebaseUser != null) {
@@ -389,75 +383,68 @@ class StoreSelectionState extends State<StoreSelection> {
 
             auth.User? firebaseUser = auth.FirebaseAuth.instance.currentUser;
             if (firebaseUser != null) {
-              User? user =
-                  await FireStoreUtils.getCurrentUser(firebaseUser.uid);
+              User? user = await FireStoreUtils.getCurrentUser(firebaseUser.uid);
 
               if (user!.role == USER_ROLE_CUSTOMER) {
                 user.active = true;
                 user.role = USER_ROLE_CUSTOMER;
-                referralAmount = sectionModel.referralAmount.toString();
-                SELECTED_CATEGORY = sectionModel.id.toString();
-                SELECTED_SECTION_NAME = sectionModel.name.toString();
-                serviceTypeFlag = sectionModel.serviceTypeFlag.toString();
-                isDineEnable = sectionModel.dineInActive!;
-                ecommarceDileveryCharges = sectionModel.delivery_charge!;
-                COLOR_PRIMARY =
-                    int.parse(sectionModel.color!.replaceFirst("#", "0xff"));
-                user.fcmToken =
-                    await FireStoreUtils.firebaseMessaging.getToken() ?? '';
+               // referralAmount = sectionModel.referralAmount.toString();
+               // SELECTED_CATEGORY = sectionModel.id.toString();
+                //SELECTED_SECTION_NAME = sectionModel.name.toString();
+               // serviceTypeFlag = sectionModel.serviceTypeFlag.toString();
+              //  isDineEnable = sectionModel.dineInActive!;
+               //ecommarceDileveryCharges = sectionModel.delivery_charge!;
+
+                sectionConstantModel = sectionModel;
+
+                user.fcmToken = await FireStoreUtils.firebaseMessaging.getToken() ?? '';
                 await FireStoreUtils.updateCurrentUser(user);
-                if (sectionModel.serviceTypeFlag == "ecommerce-service") {
-                  await Provider.of<CartDatabase>(context, listen: false)
-                      .allCartProducts
-                      .then((value) {
+                if (sectionConstantModel!.serviceTypeFlag == "ecommerce-service") {
+                  await Provider.of<CartDatabase>(context, listen: false).allCartProducts.then((value) {
                     if (value.isNotEmpty) {
                       showAlertDialog(context, user, sectionModel);
                     } else {
                       push(context, EcommeceDashBoardScreen(user: user));
                     }
                   });
-                } else if (sectionModel.serviceTypeFlag == "cab-service") {
+                } else if (sectionConstantModel!.serviceTypeFlag == "cab-service") {
                   push(context, DashBoardCabService(user: user));
-                } else if (sectionModel.serviceTypeFlag == "rental-service") {
+                } else if (sectionConstantModel!.serviceTypeFlag == "rental-service") {
                   push(context, RentalServiceDashBoard(user: user));
-                } /* else if (sectionModel.serviceTypeFlag == "parcel_delivery") {
+                } else if (sectionConstantModel!.serviceTypeFlag == "parcel_delivery") {
                   push(context, ParcelDahBoard(user: user));
-                } */
-                else {
-                  await Provider.of<CartDatabase>(context, listen: false)
-                      .allCartProducts
-                      .then((value) {
+                } else {
+                  await Provider.of<CartDatabase>(context, listen: false).allCartProducts.then((value) {
                     if (value.isNotEmpty) {
-                      showAlertDialog(context, user, sectionModel);
+                      showAlertDialog(context, user, sectionConstantModel!);
                     } else {
                       push(context, ContainerScreen(user: user));
                     }
                   });
-                  // showAlertDialog(context,user,sectionModel);
                 }
               } else {
                 pushReplacement(context, const AuthScreen());
               }
             } else {
               if (isSkipLogin) {
-                referralAmount = sectionModel.referralAmount.toString();
-                SELECTED_CATEGORY = sectionModel.id.toString();
-                SELECTED_SECTION_NAME = sectionModel.name.toString();
-                serviceTypeFlag = sectionModel.serviceTypeFlag.toString();
-                isDineEnable = sectionModel.dineInActive!;
-                ecommarceDileveryCharges = sectionModel.delivery_charge!;
-                COLOR_PRIMARY =
-                    int.parse(sectionModel.color!.replaceFirst("#", "0xff"));
-                if (sectionModel.serviceTypeFlag == "ecommerce-service") {
+                // referralAmount = sectionModel.referralAmount.toString();
+                // SELECTED_CATEGORY = sectionModel.id.toString();
+                // SELECTED_SECTION_NAME = sectionModel.name.toString();
+                // serviceTypeFlag = sectionModel.serviceTypeFlag.toString();
+                // isDineEnable = sectionModel.dineInActive!;
+                // ecommarceDileveryCharges = sectionModel.delivery_charge!;
+
+                sectionConstantModel = sectionModel;
+
+                if (sectionConstantModel!.serviceTypeFlag == "ecommerce-service") {
                   push(context, EcommeceDashBoardScreen(user: null));
-                } else if (sectionModel.serviceTypeFlag == "cab-service") {
+                } else if (sectionConstantModel!.serviceTypeFlag == "cab-service") {
                   push(context, DashBoardCabService(user: null));
-                } else if (sectionModel.serviceTypeFlag == "rental-service") {
+                } else if (sectionConstantModel!.serviceTypeFlag == "rental-service") {
                   push(context, RentalServiceDashBoard(user: null));
-                } /* else if (sectionModel.serviceTypeFlag == "parcel_delivery") {
+                } else if (sectionConstantModel!.serviceTypeFlag == "parcel_delivery") {
                   push(context, ParcelDahBoard(user: null));
-                }*/
-                else {
+                } else {
                   push(context, ContainerScreen(user: null));
                 }
               } else {
@@ -469,14 +456,8 @@ class StoreSelectionState extends State<StoreSelection> {
             margin: const EdgeInsets.all(5),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                  color: isDarkMode(context)
-                      ? const Color(DarkContainerBorderColor)
-                      : Colors.grey.shade100,
-                  width: 1),
-              color: isDarkMode(context)
-                  ? const Color(DarkContainerColor)
-                  : Colors.white,
+              border: Border.all(color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100, width: 1),
+              color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
               boxShadow: [
                 isDarkMode(context)
                     ? const BoxShadow()
@@ -492,10 +473,7 @@ class StoreSelectionState extends State<StoreSelection> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Image.network(
-                    (sectionModel.sectionImage == null ||
-                            sectionModel.sectionImage!.isEmpty)
-                        ? placeholderImage
-                        : sectionModel.sectionImage.toString(),
+                    (sectionModel.sectionImage == null || sectionModel.sectionImage!.isEmpty) ? placeholderImage : sectionModel.sectionImage.toString(),
                     height: 75,
                     width: 75,
                     fit: BoxFit.contain,
@@ -516,11 +494,7 @@ class StoreSelectionState extends State<StoreSelection> {
   }
 
   Future<void> getLanguages() async {
-    await FireStoreUtils.firestore
-        .collection(Setting)
-        .doc("languages")
-        .get()
-        .then((value) {
+    await FireStoreUtils.firestore.collection(Setting).doc("languages").get().then((value) {
       List list = value.data()!["list"];
       isLanguageShown = (list.isNotEmpty);
     });
@@ -551,8 +525,7 @@ class StoreSelectionState extends State<StoreSelection> {
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
       title: const Text("Alert!"),
-      content: const Text(
-          "If you select this Section/Service, your previously added items will be removed from the cart."),
+      content: const Text("If you select this Section/Service, your previously added items will be removed from the cart."),
       actions: [
         cancelButton,
         okButton,

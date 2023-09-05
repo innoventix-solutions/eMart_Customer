@@ -2,15 +2,18 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:emartconsumer/model/CurrencyModel.dart';
+import 'package:emartconsumer/model/SectionModel.dart';
 import 'package:emartconsumer/model/VendorModel.dart';
+import 'package:emartconsumer/model/mail_setting.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server.dart';
 
 import 'model/TaxModel.dart';
 
 const FINISHED_ON_BOARDING = 'finishedOnBoarding';
 const COLOR_ACCENT = 0xFF8fd468;
-const COLOR_PRIMARY_DARK = 0x00B761;
 var COLOR_PRIMARY = 0xFF00B761;
 const FACEBOOK_BUTTON_COLOR = 0xFF415893;
 const COUPON_BG_COLOR = 0xFFFCF8F3;
@@ -48,17 +51,19 @@ const PARCELCOUPONS = "parcel_coupons";
 const RENTALCOUPONS = "rental_coupons";
 const ORDERS_TABLE = 'booked_table';
 const POPULAR_DESTINATION = 'popular_destinations';
-
+const dynamicNotification = 'dynamic_notification';
 const STORY = 'story';
 const REFERRAL = 'referral';
+const emailTemplates = 'email_templates';
 
-String SELECTED_CATEGORY = "";
-String SELECTED_SECTION_NAME = "";
-String serviceTypeFlag = "";
-String ecommarceDileveryCharges = "";
-String referralAmount = "";
+//String SELECTED_CATEGORY = "";
+//String SELECTED_SECTION_NAME = "";
+//String serviceTypeFlag = "";
+//String ecommarceDileveryCharges = "";
+//String referralAmount = "";
 
-bool isDineEnable = false, isSkipLogin = false;
+//bool isDineEnable = false;
+bool isSkipLogin = false;
 const SECOND_MILLIS = 1000;
 const MINUTE_MILLIS = 60 * SECOND_MILLIS;
 const HOUR_MILLIS = 60 * MINUTE_MILLIS;
@@ -77,15 +82,26 @@ const ORDER_STATUS_IN_TRANSIT = 'In Transit';
 const ORDER_STATUS_COMPLETED = 'Order Completed';
 const ORDER_REACHED_DESTINATION = 'Reached Destination';
 
+const dineInPlaced = "dinein_placed";
+const orderPlaced = "order_placed";
+const scheduleOrder = "schedule_order";
+const rentalBooked = "rental_booked";
+
+const walletTopup = "wallet_topup";
+const newVendorSignup = "new_vendor_signup";
+const payoutRequestStatus = "payout_request_status";
+const payoutRequest = "payout_request";
+const newOrderPlaced = "new_order_placed";
+const newRideBook = "new_ride_book";
+const newParcelBook = "new_parcel_book";
+const newCarBook = "new_car_book";
+
 const MENU_ITEM = 'banner_items';
 
 const ORDERREQUEST = 'Order';
 const BOOKREQUEST = 'TableBook';
 
 const STRIPE_CURRENCY_CODE = 'USD';
-
-const STRIPE_PUBLISHABLE_KEY =
-    'pk_test_51JSxh2SBrhOQ6gKpCaW25ZzepUsITRbJrZuJWBAvRqotTspPkAbuIAlS046R0JS4YCsF1SZsbMew6NX00Imr6WeV00lpd6mjGp';
 
 const USER_ROLE_DRIVER = 'driver';
 const USER_ROLE_CUSTOMER = 'customer';
@@ -109,27 +125,27 @@ const FavouriteItem = "favorite_item";
 const COD = 'CODSettings';
 const TermsAndConditions = 'terms_and_condition';
 
-const GlobalURL = "https://emartadmin.siswebapp.com/";
+const GlobalURL = "Replace with your Website";
 
 const Currency = 'currencies';
 double radiusValue = 0.0;
 
-String symbol = '';
 const STORAGE_ROOT = 'emart';
-bool isRight = false;
 bool isLanguageShown = false;
-String currName = "";
 CurrencyModel? currencyData;
+SectionModel? sectionConstantModel;
 List<VendorModel> allstoreList = [];
 
 bool isRazorPayEnabled = false;
 bool isRazorPaySandboxEnabled = false;
 String razorpayKey = "";
 String razorpaySecret = "";
-int decimal = 2;
 
 String placeholderImage =
     'https://firebasestorage.googleapis.com/v0/b/emart-8d99f.appspot.com/o/images%2Flogo_placeholder.png?alt=media&token=9593b0c4-6f11-4979-917f-08fa895318c1';
+const tax = 'tax';
+List<TaxModel>? taxList = [];
+String? country = "";
 
 String getReferralCode() {
   var rng = Random();
@@ -161,22 +177,37 @@ String getFileName(String url) {
   return Uri.decodeFull(match.group(2)!);
 }
 
-double getTaxValue(TaxModel? taxModel, double amount) {
-  double taxVal = 0;
-  if (taxModel != null && taxModel.tax_amount != null && taxModel.tax_amount! > 0) {
-    if (taxModel.tax_type == "fix") {
-      taxVal = taxModel.tax_amount!.toDouble();
+// double getTaxValue(TaxModel? taxModel, double amount) {
+//  double taxVal = 0;
+//   if (taxModel != null && taxModel.tax_amount != null && taxModel.tax_amount! > 0) {
+//     if (taxModel.tax_type == "fix") {
+//       taxVal = taxModel.tax_amount!.toDouble();
+//     } else {
+//       taxVal = (amount * taxModel.tax_amount!.toDouble()) / 100;
+//     }
+//   }
+//   return double.parse(taxVal.toStringAsFixed(currencyData!.decimal));
+// }
+
+double getTaxValue({String? amount, TaxModel? taxModel}) {
+  double taxVal = 0.0;
+  if (taxModel != null && taxModel.enable == true) {
+    if (taxModel.type == "fix") {
+      taxVal = double.parse(taxModel.tax.toString());
     } else {
-      taxVal = (amount * taxModel.tax_amount!.toDouble()) / 100;
+      taxVal = (double.parse(amount.toString()) *
+              double.parse(taxModel.tax!.toString())) /
+          100;
     }
   }
-  return double.parse(taxVal.toStringAsFixed(decimal));
+  return taxVal;
 }
 
 Uri createCoordinatesUrl(double latitude, double longitude, [String? label]) {
   var uri;
   if (kIsWeb) {
-    uri = Uri.https('www.google.com', '/maps/search/', {'api': '1', 'query': '$latitude,$longitude'});
+    uri = Uri.https('www.google.com', '/maps/search/',
+        {'api': '1', 'query': '$latitude,$longitude'});
   } else if (Platform.isAndroid) {
     var query = '$latitude,$longitude';
     if (label != null) query += '($label)';
@@ -186,23 +217,71 @@ Uri createCoordinatesUrl(double latitude, double longitude, [String? label]) {
     if (label != null) params['q'] = label;
     uri = Uri.https('maps.apple.com', '/', params);
   } else {
-    uri = Uri.https('www.google.com', '/maps/search/', {'api': '1', 'query': '$latitude,$longitude'});
+    uri = Uri.https('www.google.com', '/maps/search/',
+        {'api': '1', 'query': '$latitude,$longitude'});
   }
 
   return uri;
 }
 
-String getKm(Position pos1, Position pos2) {
-  double distanceInMeters =
-      Geolocator.distanceBetween(pos1.latitude, pos1.longitude, pos2.latitude, pos2.longitude);
-  double kilometer = distanceInMeters / 1000;
-  return kilometer.toStringAsFixed(decimal).toString();
+String amountShow({required String? amount}) {
+  if (currencyData!.symbolatright == true) {
+    return "${double.parse(amount.toString()).toStringAsFixed(currencyData!.decimal)} ${currencyData!.symbol.toString()}";
+  } else {
+    return "${currencyData!.symbol.toString()} ${double.parse(amount.toString()).toStringAsFixed(currencyData!.decimal)}";
+  }
 }
 
-String getImageValidUrl(String url) {
+String getKm(Position pos1, Position pos2) {
+  double distanceInMeters = Geolocator.distanceBetween(
+      pos1.latitude, pos1.longitude, pos2.latitude, pos2.longitude);
+  double kilometer = distanceInMeters / 1000;
+  return kilometer.toStringAsFixed(currencyData!.decimal).toString();
+}
+
+String getImageVAlidUrl(String url) {
   String imageUrl = placeholderImage;
-  if (url.isNotEmpty) {
+  if (url != null && url.isNotEmpty) {
     imageUrl = url;
   }
   return imageUrl;
+}
+
+MailSettings? mailSettings;
+
+final smtpServer = SmtpServer(mailSettings!.host.toString(),
+    username: mailSettings!.userName.toString(),
+    password: mailSettings!.password.toString(),
+    port: 465,
+    ignoreBadCertificate: false,
+    ssl: true,
+    allowInsecure: true);
+
+sendMail(
+    {String? subject,
+    String? body,
+    bool? isAdmin = false,
+    List<dynamic>? recipients}) async {
+  // Create our message.
+  if (isAdmin == true) {
+    recipients!.add(mailSettings!.userName.toString());
+  }
+  final message = Message()
+    ..from = Address(
+        mailSettings!.userName.toString(), mailSettings!.fromName.toString())
+    ..recipients = recipients!
+    ..subject = subject
+    ..text = body
+    ..html = body;
+
+  try {
+    final sendReport = await send(message, smtpServer);
+    print('Message sent: ' + sendReport.toString());
+  } on MailerException catch (e) {
+    print(e);
+    print('Message not sent.');
+    for (var p in e.problems) {
+      print('Problem: ${p.code}: ${p.msg}');
+    }
+  }
 }

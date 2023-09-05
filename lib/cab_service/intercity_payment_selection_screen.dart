@@ -146,67 +146,67 @@ class _InterCityPaymentSelectionScreenState extends State<InterCityPaymentSelect
               physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.all(16),
               children: [
-                const Text("Select Payment Method"),
+                const Text("Select Payment Method").tr(),
                 buildPaymentTile(
                   isVisible: UserPreference.getWalletData() ?? false,
                   selectedPayment: wallet,
                   image: "assets/images/wallet_icon.png",
-                  value: "Wallet",
+                  value: "Wallet".tr(),
                 ),
 
                 buildPaymentTile(
                   isVisible: UserPreference.getWalletData() ?? false,
                   selectedPayment: codPay,
                   image: "assets/images/cash.png",
-                  value: "Cash",
+                  value: "Cash".tr(),
                 ),
                 buildPaymentTile(
                   isVisible: (stripeData == null) ? false : stripeData!.isEnabled,
                   selectedPayment: stripe,
-                  value: "Stripe",
+                  value: "Stripe".tr(),
                 ),
                 buildPaymentTile(
                   isVisible: razorPayData!.isEnabled,
                   selectedPayment: razorPay,
                   image: "assets/images/razorpay_@3x.png",
-                  value: "RazorPay",
+                  value: "RazorPay".tr(),
                 ),
                 buildPaymentTile(
                   isVisible: (paytmSettingData == null) ? false : paytmSettingData!.isEnabled,
                   selectedPayment: payTm,
                   image: "assets/images/paytm_@3x.png",
-                  value: "PayTm",
+                  value: "PayTm".tr(),
                 ),
                 buildPaymentTile(
                   isVisible: (paypalSettingData == null) ? false : paypalSettingData!.isEnabled,
                   selectedPayment: paypal,
                   image: "assets/images/paypal_@3x.png",
-                  value: "PayPal",
+                  value: "PayPal".tr(),
                 ),
 
                 buildPaymentTile(
                   isVisible: (payFastSettingData == null) ? false : payFastSettingData!.isEnable,
                   selectedPayment: payFast,
                   image: "assets/images/payfast.png",
-                  value: "PayFast",
+                  value: "PayFast".tr(),
                 ),
                 buildPaymentTile(
                   isVisible: (payStackSettingData == null) ? false : payStackSettingData!.isEnabled,
                   selectedPayment: payStack,
                   image: "assets/images/paystack.png",
-                  value: "PayStack",
+                  value: "PayStack".tr(),
                 ),
                 buildPaymentTile(
                   isVisible: (flutterWaveSettingData == null) ? false : flutterWaveSettingData!.isEnable,
                   selectedPayment: paypal,
                   image: "assets/images/flutterwave.png",
-                  value: "FlutterWave",
+                  value: "FlutterWave".tr(),
                 ),
                 buildPaymentTile(
                   isVisible: (mercadoPagoSettingData == null) ? false : mercadoPagoSettingData!.isEnabled,
                   selectedPayment: mercadoPago,
                   image: "assets/images/mercadopago.png",
-                  value: "Mercado Pago",
+                  value: "Mercado Pago".tr(),
                 ),
 
                 // Container(
@@ -748,7 +748,7 @@ class _InterCityPaymentSelectionScreenState extends State<InterCityPaymentSelect
         sourceLocationName: widget.departureName.toString(),
         sourceLocation: sourceLocation,
 
-        sectionId: SELECTED_CATEGORY,
+        sectionId: sectionConstantModel!.id,
         rideType: "intercity",
         roundTrip: widget.roundTrip,
         scheduleDateTime: widget.scheduleDateTime,

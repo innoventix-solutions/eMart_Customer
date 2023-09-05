@@ -31,7 +31,9 @@ class _RentalBookingScreenState extends State<RentalBookingScreen> {
   bool isLoading = true;
 
   getBookedData(String status) async {
-    await _fireStoreUtils.getRentalBook(MyAppState.currentUser!.userID, status).then((value) {
+    await _fireStoreUtils
+        .getRentalBook(MyAppState.currentUser!.userID, status)
+        .then((value) {
       setState(() {
         ordersList = value;
         isLoading = false;
@@ -63,7 +65,8 @@ class _RentalBookingScreenState extends State<RentalBookingScreen> {
                 itemCount: ridesCategory.length,
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
-                  return buildRideType(label: ridesCategory[index], index: index);
+                  return buildRideType(
+                      label: ridesCategory[index], index: index);
                 },
               ),
             ),
@@ -74,7 +77,8 @@ class _RentalBookingScreenState extends State<RentalBookingScreen> {
                       ? Center(
                           child: Text(
                           "Booking not found".tr(),
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 20),
                         ))
                       : ListView.builder(
                           physics: const BouncingScrollPhysics(),
@@ -146,12 +150,17 @@ class _RentalBookingScreenState extends State<RentalBookingScreen> {
         child: Container(
           decoration: BoxDecoration(
             color: Color(COLOR_PRIMARY),
-            borderRadius: const BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20), bottomLeft: Radius.circular(15), bottomRight: Radius.circular(15)),
+            borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+                bottomLeft: Radius.circular(15),
+                bottomRight: Radius.circular(15)),
           ),
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 10),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 15.0, horizontal: 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -160,16 +169,21 @@ class _RentalBookingScreenState extends State<RentalBookingScreen> {
                         CachedNetworkImage(
                           height: 50,
                           width: 50,
-                          imageUrl: orderModel.driver!.carInfo!.carImage!.isEmpty ? "" : orderModel.driver!.carInfo!.carImage!.first,
+                          imageUrl:
+                              orderModel.driver!.carInfo!.carImage!.isEmpty
+                                  ? ""
+                                  : orderModel.driver!.carInfo!.carImage!.first,
                           imageBuilder: (context, imageProvider) => Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
-                              image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+                              image: DecorationImage(
+                                  image: imageProvider, fit: BoxFit.cover),
                             ),
                           ),
                           placeholder: (context, url) => Center(
                               child: CircularProgressIndicator.adaptive(
-                            valueColor: AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
+                            valueColor:
+                                AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
                           )),
                           errorWidget: (context, url, error) => ClipRRect(
                               borderRadius: BorderRadius.circular(10),
@@ -183,30 +197,43 @@ class _RentalBookingScreenState extends State<RentalBookingScreen> {
                           width: 10,
                         ),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 4.0, vertical: 4),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                orderModel.driver!.carName + " " + orderModel.driver!.carMakes,
-                                style: const TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.w600),
+                                orderModel.driver!.carName +
+                                    " " +
+                                    orderModel.driver!.carMakes,
+                                style: const TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600),
                               ),
                               const SizedBox(
                                 height: 4,
                               ),
                               Visibility(
-                                visible: orderModel.bookWithDriver == true ? true : false,
+                                visible: orderModel.bookWithDriver == true
+                                    ? true
+                                    : false,
                                 child: const Text(
                                   "With driver trip",
-                                  style: TextStyle(fontSize: 14, color: Colors.white),
+                                  style: TextStyle(
+                                      fontSize: 14, color: Colors.white),
                                 ).tr(),
                               ),
                               const SizedBox(
                                 height: 4,
                               ),
                               Text(
-                                "$symbol ${double.parse(orderModel.subTotal.toString()).toStringAsFixed(decimal)}",
-                                style: const TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w800),
+                                amountShow(
+                                    amount: orderModel.subTotal.toString()),
+                                style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w800),
                               ),
                             ],
                           ),
@@ -218,8 +245,14 @@ class _RentalBookingScreenState extends State<RentalBookingScreen> {
               ),
               Container(
                 decoration: BoxDecoration(
-                  color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20), bottomLeft: Radius.circular(15), bottomRight: Radius.circular(15)),
+                  color: isDarkMode(context)
+                      ? const Color(DarkContainerColor)
+                      : Colors.white,
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                      bottomLeft: Radius.circular(15),
+                      bottomRight: Radius.circular(15)),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -231,11 +264,18 @@ class _RentalBookingScreenState extends State<RentalBookingScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         child: Column(
                           children: [
-                            buildUsersDetails(context, address: orderModel.pickupAddress.toString(), time: DateFormat('yyyy-MM-dd hh:mm a').format(orderModel.pickupDateTime!.toDate())),
+                            buildUsersDetails(context,
+                                address: orderModel.pickupAddress.toString(),
+                                time: DateFormat('yyyy-MM-dd hh:mm a').format(
+                                    orderModel.pickupDateTime!.toDate())),
                             const SizedBox(
                               height: 10,
                             ),
-                            buildUsersDetails(context, isSender: false, address: orderModel.dropAddress.toString(), time: DateFormat('yyyy-MM-dd hh:mm a').format(orderModel.dropDateTime!.toDate())),
+                            buildUsersDetails(context,
+                                isSender: false,
+                                address: orderModel.dropAddress.toString(),
+                                time: DateFormat('yyyy-MM-dd hh:mm a')
+                                    .format(orderModel.dropDateTime!.toDate())),
                           ],
                         ),
                       ),
@@ -245,10 +285,12 @@ class _RentalBookingScreenState extends State<RentalBookingScreen> {
                       Row(
                         children: [
                           Visibility(
-                            visible: orderModel.status == ORDER_STATUS_COMPLETED,
+                            visible:
+                                orderModel.status == ORDER_STATUS_COMPLETED,
                             child: Expanded(
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 10),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
                                 child: SizedBox(
                                   width: MediaQuery.of(context).size.width,
                                   child: ElevatedButton(
@@ -269,15 +311,21 @@ class _RentalBookingScreenState extends State<RentalBookingScreen> {
                             ),
                           ),
                           Visibility(
-                            visible: orderModel.status == ORDER_STATUS_COMPLETED ? true : false,
+                            visible: orderModel.status == ORDER_STATUS_COMPLETED
+                                ? true
+                                : false,
                             child: Expanded(
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 10),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
                                 child: SizedBox(
                                   width: MediaQuery.of(context).size.width,
                                   child: ElevatedButton(
                                     onPressed: () async {
-                                      push(context, RentalReviewScreen(order: orderModel));
+                                      push(
+                                          context,
+                                          RentalReviewScreen(
+                                              order: orderModel));
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.orange,
@@ -295,7 +343,11 @@ class _RentalBookingScreenState extends State<RentalBookingScreen> {
                             ),
                           ),
                           Visibility(
-                            visible: orderModel.status != ORDER_STATUS_COMPLETED && orderModel.status != ORDER_STATUS_REJECTED ? true : false,
+                            visible: orderModel.status !=
+                                        ORDER_STATUS_COMPLETED &&
+                                    orderModel.status != ORDER_STATUS_REJECTED
+                                ? true
+                                : false,
                             child: Expanded(
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
@@ -309,31 +361,64 @@ class _RentalBookingScreenState extends State<RentalBookingScreen> {
                                     orderModel.status = ORDER_STATUS_REJECTED;
                                   });
 
-                                  await FireStoreUtils.updateRentalOrder(orderModel).then((value) {
+                                  await FireStoreUtils.updateRentalOrder(
+                                          orderModel)
+                                      .then((value) {
                                     getBookedData("");
 
-                                    if (orderModel.paymentMethod.toLowerCase() != "cod") {
+                                    if (orderModel.paymentMethod
+                                            .toLowerCase() !=
+                                        "cod") {
                                       double totalTax = 0.0;
-                                      if (orderModel.taxType!.isNotEmpty) {
+                                      /* if (orderModel.taxType!.isNotEmpty) {
                                         if (orderModel.taxType == "percent") {
                                           totalTax = (double.parse(orderModel.subTotal.toString()) - double.parse(orderModel.discount.toString())) * double.parse(orderModel.tax.toString()) / 100;
                                         } else {
                                           totalTax = double.parse(orderModel.tax.toString());
                                         }
+                                      */
+                                      if (taxList != null) {
+                                        for (var element in taxList!) {
+                                          totalTax = totalTax +
+                                              getTaxValue(
+                                                  amount: (double.parse(
+                                                              orderModel
+                                                                  .subTotal
+                                                                  .toString()) -
+                                                          double.parse(
+                                                              orderModel
+                                                                  .discount
+                                                                  .toString()))
+                                                      .toString(),
+                                                  taxModel: element);
+                                        }
                                       }
 
-                                      double subTotal = double.parse(orderModel.subTotal.toString()) - double.parse(orderModel.discount.toString());
+                                      double subTotal = double.parse(
+                                              orderModel.subTotal.toString()) -
+                                          double.parse(
+                                              orderModel.discount.toString());
 
                                       double driverAmount = 0;
 
-                                      if (orderModel.paymentMethod.toLowerCase() != "cod") {
+                                      if (orderModel.paymentMethod
+                                              .toLowerCase() !=
+                                          "cod") {
                                         driverAmount = subTotal + totalTax;
                                       }
 
-                                      FireStoreUtils.createPaymentId().then((value) {
+                                      FireStoreUtils.createPaymentId()
+                                          .then((value) {
                                         final paymentID = value;
-                                        FireStoreUtils.topUpWalletAmount(serviceType: "rental-service", paymentMethod: "Wallet", amount: driverAmount, id: paymentID).then((value) {
-                                          FireStoreUtils.updateWalletAmount(amount: driverAmount).then((value) {});
+                                        FireStoreUtils.topUpWalletAmount(
+                                                serviceType: "rental-service",
+                                                paymentMethod: "Wallet",
+                                                amount: driverAmount,
+                                                id: paymentID)
+                                            .then((value) {
+                                          FireStoreUtils.updateWalletAmount(
+                                                  amount: driverAmount)
+                                              .then((value) {});
                                         });
                                       });
                                     }
@@ -341,7 +426,10 @@ class _RentalBookingScreenState extends State<RentalBookingScreen> {
                                 },
                                 child: Text(
                                   'Cancel Ride'.tr(),
-                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 16),
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16),
                                 ),
                               ),
                             ),
@@ -366,7 +454,9 @@ class _RentalBookingScreenState extends State<RentalBookingScreen> {
     required String address,
   }) {
     return Container(
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.0), border: Border.all(color: Colors.grey.withOpacity(0.30), width: 2.0)),
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15.0),
+          border: Border.all(color: Colors.grey.withOpacity(0.30), width: 2.0)),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
         child: Column(

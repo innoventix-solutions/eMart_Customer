@@ -67,6 +67,7 @@ class User with ChangeNotifier {
   String carRate;
   CarInfo? carInfo;
   List<dynamic>? rentalBookingDate;
+  Timestamp? createdAt;
 
   User(
       {this.email = '',
@@ -107,6 +108,7 @@ class User with ChangeNotifier {
       this.driverRate = "0",
       this.carRate = "0",
       this.vendorID = "",
+        this.createdAt,
       carInfo})
       : lastOnlineTimestamp = lastOnlineTimestamp ?? Timestamp.now(),
         settings = settings ?? UserSettings(),
@@ -171,6 +173,7 @@ class User with ChangeNotifier {
         companyAddress: parsedJson['companyAddress'] ?? '',
         rentalBookingDate: parsedJson['rentalBookingDate'] ?? [],
         vendorID: parsedJson['vendorID'] ?? '',
+        createdAt: parsedJson['createdAt'],
         orderRequestData: parsedJson.containsKey('orderRequestData') ? OrderModel.fromJson(parsedJson['orderRequestData']) : null);
   }
 
@@ -219,6 +222,7 @@ class User with ChangeNotifier {
         companyAddress: parsedJson['companyAddress'] ?? '',
         rentalBookingDate: parsedJson['rentalBookingDate'] ?? [],
         vendorID: parsedJson['vendorID'] ?? '',
+        createdAt: parsedJson['createdAt'],
         orderRequestData: parsedJson.containsKey('orderRequestData') ? OrderModel.fromJson(parsedJson['orderRequestData']) : null);
   }
 
@@ -243,6 +247,7 @@ class User with ChangeNotifier {
       "g": geoFireData.toJson(),
       'coordinates': coordinates,
       "userBankDetails": userBankDetails.toJson(),
+      'createdAt': this.createdAt
     };
     if (role == USER_ROLE_DRIVER) {
       json.addAll({
@@ -299,6 +304,7 @@ class User with ChangeNotifier {
       "g": geoFireData.toJson(),
       'coordinates': coordinates,
       "userBankDetails": userBankDetails.toJson(),
+      'createdAt': this.createdAt,
     };
     if (role == USER_ROLE_DRIVER) {
       json.addAll({

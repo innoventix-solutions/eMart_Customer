@@ -57,14 +57,17 @@ class _FavouriteItemScreenState extends State<FavouriteItemScreen> {
                     itemBuilder: (context, index) {
                       ProductModel? productModel = favProductList[index];
 
-                      return productModel == null ? Container() : buildAllStoreData(productModel, index);
+                      return productModel == null
+                          ? Container()
+                          : buildAllStoreData(productModel, index);
                     }));
   }
 
   Widget buildAllStoreData(ProductModel productModel, int index) {
     return GestureDetector(
       onTap: () async {
-        VendorModel? vendorModel = await FireStoreUtils.getVendor(productModel.vendorID);
+        VendorModel? vendorModel =
+            await FireStoreUtils.getVendor(productModel.vendorID);
         if (vendorModel != null) {
           push(
             context,
@@ -80,8 +83,13 @@ class _FavouriteItemScreenState extends State<FavouriteItemScreen> {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100, width: 1),
-            color: isDarkMode(context) ? Color(DarkContainerColor) : Colors.white,
+            border: Border.all(
+                color: isDarkMode(context)
+                    ? const Color(DarkContainerBorderColor)
+                    : Colors.grey.shade100,
+                width: 1),
+            color:
+                isDarkMode(context) ? Color(DarkContainerColor) : Colors.white,
             boxShadow: [
               isDarkMode(context)
                   ? const BoxShadow()
@@ -104,7 +112,8 @@ class _FavouriteItemScreenState extends State<FavouriteItemScreen> {
                   imageBuilder: (context, imageProvider) => Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
-                      image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+                      image: DecorationImage(
+                          image: imageProvider, fit: BoxFit.cover),
                     ),
                   ),
                   placeholder: (context, url) => Center(
@@ -144,10 +153,16 @@ class _FavouriteItemScreenState extends State<FavouriteItemScreen> {
                           onTap: () {
                             setState(() {
                               FavouriteItemModel favouriteModel =
-                                  FavouriteItemModel(product_id: productModel.id, section_id: SELECTED_CATEGORY, store_id: productModel.vendorID, user_id: MyAppState.currentUser!.userID);
-                              lstFavourite.removeWhere((item) => item.product_id == productModel.id);
+                                  FavouriteItemModel(
+                                      product_id: productModel.id,
+                                      section_id: sectionConstantModel!.id,
+                                      store_id: productModel.vendorID,
+                                      user_id: MyAppState.currentUser!.userID);
+                              lstFavourite.removeWhere(
+                                  (item) => item.product_id == productModel.id);
                               favProductList.removeAt(index);
-                              FireStoreUtils().removeFavouriteItem(favouriteModel);
+                              FireStoreUtils()
+                                  .removeFavouriteItem(favouriteModel);
                             });
                           },
                           child: Icon(
@@ -166,12 +181,21 @@ class _FavouriteItemScreenState extends State<FavouriteItemScreen> {
                         borderRadius: BorderRadius.circular(5),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 5, vertical: 2),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(productModel.reviewsCount != 0 ? (productModel.reviewsSum / productModel.reviewsCount).toStringAsFixed(1) : 0.toString(),
-                                style: const TextStyle(letterSpacing: 0.5, fontSize: 12, color: Colors.white)),
+                            Text(
+                                productModel.reviewsCount != 0
+                                    ? (productModel.reviewsSum /
+                                            productModel.reviewsCount)
+                                        .toStringAsFixed(1)
+                                    : 0.toString(),
+                                style: const TextStyle(
+                                    letterSpacing: 0.5,
+                                    fontSize: 12,
+                                    color: Colors.white)),
                             const SizedBox(width: 3),
                             const Icon(
                               Icons.star,
@@ -187,13 +211,17 @@ class _FavouriteItemScreenState extends State<FavouriteItemScreen> {
                     ),
                     productModel.disPrice == "" || productModel.disPrice == "0"
                         ? Text(
-                      symbol + double.parse(productModel.price).toStringAsFixed(decimal),
-                            style: TextStyle(fontSize: 16, letterSpacing: 0.5, color: Color(COLOR_PRIMARY)),
+                            amountShow(amount: productModel.price),
+                            style: TextStyle(
+                                fontSize: 16,
+                                letterSpacing: 0.5,
+                                color: Color(COLOR_PRIMARY)),
                           )
                         : Row(
                             children: [
                               Text(
-                                "$symbol${double.parse(productModel.disPrice.toString()).toStringAsFixed(decimal)}",
+                                "${amountShow(amount: productModel.disPrice)}",
+                                // "$symbol${double.parse(productModel.disPrice.toString()).toStringAsFixed(decimal)}",
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -204,8 +232,11 @@ class _FavouriteItemScreenState extends State<FavouriteItemScreen> {
                                 width: 10,
                               ),
                               Text(
-                                '$symbol${double.parse(productModel.price).toStringAsFixed(decimal)}',
-                                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey, decoration: TextDecoration.lineThrough),
+                                amountShow(amount: productModel.price),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey,
+                                    decoration: TextDecoration.lineThrough),
                               ),
                             ],
                           ),
@@ -220,7 +251,9 @@ class _FavouriteItemScreenState extends State<FavouriteItemScreen> {
   }
 
   Future<void> getData() async {
-    await fireStoreUtils.getFavouritesProductList(MyAppState.currentUser!.userID).then((value) {
+    await fireStoreUtils
+        .getFavouritesProductList(MyAppState.currentUser!.userID)
+        .then((value) {
       setState(() {
         lstFavourite.clear();
         lstFavourite.addAll(value);
@@ -230,9 +263,11 @@ class _FavouriteItemScreenState extends State<FavouriteItemScreen> {
     await fireStoreUtils.getAllProducts().then((value) {
       setState(() {
         lstFavourite.forEach((element) {
-          final bool _productIsInList = value.any((product) => product.id == element.product_id);
+          final bool _productIsInList =
+              value.any((product) => product.id == element.product_id);
           if (_productIsInList) {
-            ProductModel productModel = value.firstWhere((product) => product.id == element.product_id);
+            ProductModel productModel =
+                value.firstWhere((product) => product.id == element.product_id);
             favProductList.add(productModel);
           }
         });

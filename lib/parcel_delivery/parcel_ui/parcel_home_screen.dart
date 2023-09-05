@@ -1,4 +1,3 @@
-/*
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:emartconsumer/constants.dart';
@@ -55,7 +54,9 @@ class _MyHomePageState extends State<ParcelHomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Welcome!!".tr(), style: TextStyle(color: Color(COLOR_PRIMARY), fontSize: 19)),
+                  Text("Welcome!!".tr(),
+                      style:
+                          TextStyle(color: Color(COLOR_PRIMARY), fontSize: 19)),
                   Text(
                       MyAppState.currentUser != null
                           ? "${MyAppState.currentUser!.firstName} ${MyAppState.currentUser!.lastName}"
@@ -75,18 +76,20 @@ class _MyHomePageState extends State<ParcelHomeScreen> {
             ),
             Padding(
               padding: const EdgeInsets.only(left: 10.0, bottom: 10),
-              child: Text("What are you sending?".tr(), style: const TextStyle(fontSize: 18)),
+              child: Text("What are you sending?".tr(),
+                  style: const TextStyle(fontSize: 18)),
             ),
             isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: GridView.builder(
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
-                            mainAxisExtent: 120),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 10,
+                                mainAxisSpacing: 10,
+                                mainAxisExtent: 120),
                         itemCount: parcelCategory.length,
                         padding: const EdgeInsets.all(8),
                         shrinkWrap: true,
@@ -106,12 +109,12 @@ class _MyHomePageState extends State<ParcelHomeScreen> {
       splashColor: Color(COLOR_PRIMARY).withOpacity(0.5),
       onTap: () {
         if (MyAppState.currentUser != null) {
-          /*Navigator.push(
+          Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (context) => BookParcelScreen(
                         parcelCategory: item,
-                      )));*/
+                      )));
         } else {
           push(context, const AuthScreen());
         }
@@ -120,9 +123,13 @@ class _MyHomePageState extends State<ParcelHomeScreen> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-              color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100,
+              color: isDarkMode(context)
+                  ? const Color(DarkContainerBorderColor)
+                  : Colors.grey.shade100,
               width: 1),
-          color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
+          color: isDarkMode(context)
+              ? const Color(DarkContainerColor)
+              : Colors.white,
           boxShadow: [
             isDarkMode(context)
                 ? const BoxShadow()
@@ -142,7 +149,8 @@ class _MyHomePageState extends State<ParcelHomeScreen> {
               imageBuilder: (context, imageProvider) => Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+                  image:
+                      DecorationImage(image: imageProvider, fit: BoxFit.cover),
                 ),
               ),
               placeholder: (context, url) => Center(
@@ -164,4 +172,3 @@ class _MyHomePageState extends State<ParcelHomeScreen> {
     );
   }
 }
-*/

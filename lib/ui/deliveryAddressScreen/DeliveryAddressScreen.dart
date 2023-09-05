@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:emartconsumer/constants.dart';
 import 'package:emartconsumer/main.dart';
@@ -30,25 +31,27 @@ class DeliveryAddressScreen extends StatefulWidget {
   // final String? orderNotes;
   final String? deliveryCharge;
   final bool? take_away;
-  final TaxModel? taxModel;
+  final List<TaxModel>? taxModel;
   final Map<String, dynamic>? specialDiscountMap;
+  final Timestamp? scheduleTime;
 
-  const DeliveryAddressScreen(
-      {Key? key,
-      required this.total,
-      this.discount,
-      this.couponCode,
-      this.couponId,
-      this.specialDiscountMap,
-      required this.products,
-      this.extra_addons,
-      this.extra_size,
-      this.tipValue,
-      this.take_away,
-      this.deliveryCharge,
-      this.taxModel,
-      this.notes})
-      : super(key: key);
+  const DeliveryAddressScreen({
+    Key? key,
+    required this.total,
+    this.discount,
+    this.couponCode,
+    this.couponId,
+    this.specialDiscountMap,
+    required this.products,
+    this.extra_addons,
+    this.extra_size,
+    this.tipValue,
+    this.take_away,
+    this.deliveryCharge,
+    this.taxModel,
+    this.notes,
+    this.scheduleTime,
+  }) : super(key: key);
 
   @override
   _DeliveryAddressScreenState createState() => _DeliveryAddressScreenState();
@@ -97,7 +100,8 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
       appBar: AppBar(
         title: Text(
           'Delivery Address'.tr(),
-          style: TextStyle(color: isDarkMode(context) ? Colors.white : Colors.black),
+          style: TextStyle(
+              color: isDarkMode(context) ? Colors.white : Colors.black),
         ).tr(),
       ),
       body: Container(
@@ -112,13 +116,17 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
                 ),
                 Card(
                   elevation: 0.5,
-                  color: isDarkMode(context) ? const Color(DARK_BG_COLOR) : const Color(0XFFFFFFFF),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  color: isDarkMode(context)
+                      ? const Color(DARK_BG_COLOR)
+                      : const Color(0XFFFFFFFF),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
                   margin: const EdgeInsets.only(left: 20, right: 20),
                   child: Column(
                     children: [
                       Container(
-                        padding: const EdgeInsetsDirectional.only(start: 20, end: 20, bottom: 10),
+                        padding: const EdgeInsetsDirectional.only(
+                            start: 20, end: 20, bottom: 10),
                         child: TextFormField(
                             // controller: street,
                             controller: street1.text.isEmpty ? street : street1,
@@ -135,30 +143,37 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
                             decoration: InputDecoration(
                               // contentPadding: EdgeInsets.symmetric(horizontal: 24),
                               labelText: 'Street 1'.tr(),
-                              labelStyle: const TextStyle(color: Color(0Xff696A75), fontSize: 17),
+                              labelStyle: const TextStyle(
+                                  color: Color(0Xff696A75), fontSize: 17),
                               hintStyle: TextStyle(color: Colors.grey.shade400),
                               focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Color(COLOR_PRIMARY)),
+                                borderSide:
+                                    BorderSide(color: Color(COLOR_PRIMARY)),
                               ),
                               errorBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Theme.of(context).errorColor),
+                                borderSide: BorderSide(
+                                    color: Theme.of(context).errorColor),
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
                               focusedErrorBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Theme.of(context).errorColor),
+                                borderSide: BorderSide(
+                                    color: Theme.of(context).errorColor),
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
                               enabledBorder: const UnderlineInputBorder(
-                                borderSide: BorderSide(color: Color(0XFFB1BCCA)),
+                                borderSide:
+                                    BorderSide(color: Color(0XFFB1BCCA)),
                                 // borderRadius: BorderRadius.circular(8.0),
                               ),
                             )),
                       ),
                       Container(
-                        padding: const EdgeInsetsDirectional.only(start: 20, end: 20, bottom: 10),
+                        padding: const EdgeInsetsDirectional.only(
+                            start: 20, end: 20, bottom: 10),
                         child: TextFormField(
                           // controller: _controller,
-                          controller: landmark1.text.isEmpty ? landmark : landmark1,
+                          controller:
+                              landmark1.text.isEmpty ? landmark : landmark1,
                           textAlignVertical: TextAlignVertical.center,
                           textInputAction: TextInputAction.next,
                           validator: validateEmptyField,
@@ -171,17 +186,21 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
                           decoration: InputDecoration(
                             // contentPadding: EdgeInsets.symmetric(horizontal: 24),
                             labelText: 'Landmark'.tr(),
-                            labelStyle: const TextStyle(color: Color(0Xff696A75), fontSize: 17),
+                            labelStyle: const TextStyle(
+                                color: Color(0Xff696A75), fontSize: 17),
                             hintStyle: TextStyle(color: Colors.grey.shade400),
                             focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(COLOR_PRIMARY)),
+                              borderSide:
+                                  BorderSide(color: Color(COLOR_PRIMARY)),
                             ),
                             errorBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Theme.of(context).errorColor),
+                              borderSide: BorderSide(
+                                  color: Theme.of(context).errorColor),
                               borderRadius: BorderRadius.circular(8.0),
                             ),
                             focusedErrorBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Theme.of(context).errorColor),
+                              borderSide: BorderSide(
+                                  color: Theme.of(context).errorColor),
                               borderRadius: BorderRadius.circular(8.0),
                             ),
                             enabledBorder: const UnderlineInputBorder(
@@ -203,9 +222,11 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
                       //   ),
                       // ),
                       Container(
-                        padding: const EdgeInsetsDirectional.only(start: 20, end: 20, bottom: 10),
+                        padding: const EdgeInsetsDirectional.only(
+                            start: 20, end: 20, bottom: 10),
                         child: TextFormField(
-                          controller: zipcode1.text.isEmpty ? zipcode : zipcode1,
+                          controller:
+                              zipcode1.text.isEmpty ? zipcode : zipcode1,
                           textAlignVertical: TextAlignVertical.center,
                           textInputAction: TextInputAction.next,
                           validator: validateEmptyField,
@@ -218,17 +239,21 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
                           decoration: InputDecoration(
                             // contentPadding: EdgeInsets.symmetric(horizontal: 24),
                             labelText: 'Zip Code'.tr(),
-                            labelStyle: const TextStyle(color: Color(0Xff696A75), fontSize: 17),
+                            labelStyle: const TextStyle(
+                                color: Color(0Xff696A75), fontSize: 17),
                             hintStyle: TextStyle(color: Colors.grey.shade400),
                             focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(COLOR_PRIMARY)),
+                              borderSide:
+                                  BorderSide(color: Color(COLOR_PRIMARY)),
                             ),
                             errorBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Theme.of(context).errorColor),
+                              borderSide: BorderSide(
+                                  color: Theme.of(context).errorColor),
                               borderRadius: BorderRadius.circular(8.0),
                             ),
                             focusedErrorBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Theme.of(context).errorColor),
+                              borderSide: BorderSide(
+                                  color: Theme.of(context).errorColor),
                               borderRadius: BorderRadius.circular(8.0),
                             ),
                             enabledBorder: const UnderlineInputBorder(
@@ -250,7 +275,8 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
                       //   ),
                       // ),
                       Container(
-                          padding: const EdgeInsetsDirectional.only(start: 20, end: 20, bottom: 10),
+                          padding: const EdgeInsetsDirectional.only(
+                              start: 20, end: 20, bottom: 10),
                           child: TextFormField(
                             controller: city1.text.isEmpty ? city : city1,
                             textAlignVertical: TextAlignVertical.center,
@@ -265,30 +291,37 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
                             decoration: InputDecoration(
                               // contentPadding: EdgeInsets.symmetric(horizontal: 24),
                               labelText: 'City'.tr(),
-                              labelStyle: const TextStyle(color: Color(0Xff696A75), fontSize: 17),
+                              labelStyle: const TextStyle(
+                                  color: Color(0Xff696A75), fontSize: 17),
                               hintStyle: TextStyle(color: Colors.grey.shade400),
                               focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Color(COLOR_PRIMARY)),
+                                borderSide:
+                                    BorderSide(color: Color(COLOR_PRIMARY)),
                               ),
                               errorBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Theme.of(context).errorColor),
+                                borderSide: BorderSide(
+                                    color: Theme.of(context).errorColor),
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
                               focusedErrorBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Theme.of(context).errorColor),
+                                borderSide: BorderSide(
+                                    color: Theme.of(context).errorColor),
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
                               enabledBorder: const UnderlineInputBorder(
-                                borderSide: BorderSide(color: Color(0XFFB1BCCA)),
+                                borderSide:
+                                    BorderSide(color: Color(0XFFB1BCCA)),
                                 // borderRadius: BorderRadius.circular(8.0),
                               ),
                             ),
                           )),
 
                       Container(
-                          padding: const EdgeInsetsDirectional.only(start: 20, end: 20, bottom: 10),
+                          padding: const EdgeInsetsDirectional.only(
+                              start: 20, end: 20, bottom: 10),
                           child: TextFormField(
-                            controller: cutries1.text.isEmpty ? cutries : cutries1,
+                            controller:
+                                cutries1.text.isEmpty ? cutries : cutries1,
                             textAlignVertical: TextAlignVertical.center,
                             textInputAction: TextInputAction.next,
                             validator: validateEmptyField,
@@ -301,21 +334,26 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
                             decoration: InputDecoration(
                               // contentPadding: EdgeInsets.symmetric(horizontal: 24),
                               labelText: 'Country'.tr(),
-                              labelStyle: const TextStyle(color: Color(0Xff696A75), fontSize: 17),
+                              labelStyle: const TextStyle(
+                                  color: Color(0Xff696A75), fontSize: 17),
                               hintStyle: TextStyle(color: Colors.grey.shade400),
                               focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Color(COLOR_PRIMARY)),
+                                borderSide:
+                                    BorderSide(color: Color(COLOR_PRIMARY)),
                               ),
                               errorBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Theme.of(context).errorColor),
+                                borderSide: BorderSide(
+                                    color: Theme.of(context).errorColor),
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
                               focusedErrorBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Theme.of(context).errorColor),
+                                borderSide: BorderSide(
+                                    color: Theme.of(context).errorColor),
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
                               enabledBorder: const UnderlineInputBorder(
-                                borderSide: BorderSide(color: Color(0XFFB1BCCA)),
+                                borderSide:
+                                    BorderSide(color: Color(0XFFB1BCCA)),
                                 // borderRadius: BorderRadius.circular(8.0),
                               ),
                             ),
@@ -448,23 +486,36 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
                                   style: TextStyle(color: Color(COLOR_PRIMARY)),
                                 ),
                                 onTap: () async {
-                                  LocationResult result = await Navigator.of(context).push(
-                                      MaterialPageRoute(builder: (context) => PlacePicker(GOOGLE_API_KEY)));
+                                  LocationResult result =
+                                      await Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  PlacePicker(GOOGLE_API_KEY)));
 
                                   street1.text = result.name.toString();
-                                  landmark1.text = result.subLocalityLevel1!.name == null
-                                      ? result.subLocalityLevel2!.name.toString()
-                                      : result.subLocalityLevel1!.name.toString();
+                                  landmark1.text =
+                                      result.subLocalityLevel1!.name == null
+                                          ? result.subLocalityLevel2!.name
+                                              .toString()
+                                          : result.subLocalityLevel1!.name
+                                              .toString();
                                   city1.text = result.city!.name.toString();
-                                  cutries1.text = result.country!.name.toString();
+                                  cutries1.text =
+                                      result.country!.name.toString();
                                   zipcode1.text = result.postalCode.toString();
                                   lat = result.latLng!.latitude;
                                   long = result.latLng!.longitude;
 
-                                  MyAppState.currentUser!.shippingAddress.location.latitude =
-                                      result.latLng!.latitude;
-                                  MyAppState.currentUser!.shippingAddress.location.longitude =
-                                      result.latLng!.longitude;
+                                  MyAppState
+                                      .currentUser!
+                                      .shippingAddress
+                                      .location
+                                      .latitude = result.latLng!.latitude;
+                                  MyAppState
+                                      .currentUser!
+                                      .shippingAddress
+                                      .location
+                                      .longitude = result.latLng!.longitude;
                                   getDeliveyData();
                                   setState(() {});
                                 })),
@@ -475,7 +526,9 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
                       ),
 
                       Visibility(
-                        child: Text("new-delivery-charge".tr() + symbol + deliveryCharges,
+                        child: Text(
+                            "new-delivery-charge".tr() +
+                                " ${amountShow(amount: deliveryCharges.toString())}",
                             style: const TextStyle()),
                         visible: isLocationChange,
                       ),
@@ -512,15 +565,21 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
   bool isLocationChange = false;
 
   getDeliveyData() async {
-    if (serviceTypeFlag == "ecommerce-service") {
+    if (sectionConstantModel!.serviceTypeFlag == "ecommerce-service") {
       deliveryCharges = "50";
     } else {
       if (!widget.take_away!) {
-        await FireStoreUtils().getVendorByVendorID(widget.products.first.vendorID).then((value) {
+        await FireStoreUtils()
+            .getVendorByVendorID(widget.products.first.vendorID)
+            .then((value) {
           vendorModel = value;
         });
-        num km = num.parse(getKm(Position.fromMap({'latitude': lat, 'longitude': long}),
-            Position.fromMap({'latitude': vendorModel!.latitude, 'longitude': vendorModel!.longitude})));
+        num km = num.parse(getKm(
+            Position.fromMap({'latitude': lat, 'longitude': long}),
+            Position.fromMap({
+              'latitude': vendorModel!.latitude,
+              'longitude': vendorModel!.longitude
+            })));
         await FireStoreUtils().getDeliveryCharges().then((value) {
           if (value != null) {
             DeliveryChargeModel deliveryChargeModel = value;
@@ -528,15 +587,18 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
             if (!deliveryChargeModel.vendor_can_modify) {
               if (km > deliveryChargeModel.minimum_delivery_charges_within_km) {
                 deliveryCharges =
-                    (km * deliveryChargeModel.delivery_charges_per_km).toDouble().toStringAsFixed(decimal);
+                    (km * deliveryChargeModel.delivery_charges_per_km)
+                        .toDouble()
+                        .toStringAsFixed(currencyData!.decimal);
                 if (widget.deliveryCharge != deliveryCharges) {
                   isLocationChange = true;
                   widget.deliveryCharge != deliveryCharges.toString();
                 }
                 setState(() {});
               } else {
-                deliveryCharges =
-                    deliveryChargeModel.minimum_delivery_charges.toDouble().toStringAsFixed(decimal);
+                deliveryCharges = deliveryChargeModel.minimum_delivery_charges
+                    .toDouble()
+                    .toStringAsFixed(currencyData!.decimal);
                 if (widget.deliveryCharge != deliveryCharges) {
                   isLocationChange = true;
                   widget.deliveryCharge != deliveryCharges.toString();
@@ -545,19 +607,23 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
               }
             } else {
               if (vendorModel != null && vendorModel!.DeliveryCharge != null) {
-                if (km > vendorModel!.DeliveryCharge!.minimum_delivery_charges_within_km) {
-                  deliveryCharges = (km * vendorModel!.DeliveryCharge!.delivery_charges_per_km)
+                if (km >
+                    vendorModel!
+                        .DeliveryCharge!.minimum_delivery_charges_within_km) {
+                  deliveryCharges = (km *
+                          vendorModel!.DeliveryCharge!.delivery_charges_per_km)
                       .toDouble()
-                      .toStringAsFixed(decimal);
+                      .toStringAsFixed(currencyData!.decimal);
                   if (widget.deliveryCharge != deliveryCharges) {
                     isLocationChange = true;
                     widget.deliveryCharge != deliveryCharges.toString();
                   }
                   setState(() {});
                 } else {
-                  deliveryCharges = vendorModel!.DeliveryCharge!.minimum_delivery_charges
+                  deliveryCharges = vendorModel!
+                      .DeliveryCharge!.minimum_delivery_charges
                       .toDouble()
-                      .toStringAsFixed(decimal);
+                      .toStringAsFixed(currencyData!.decimal);
                   if (widget.deliveryCharge != deliveryCharges) {
                     isLocationChange = true;
                     widget.deliveryCharge != deliveryCharges.toString();
@@ -565,17 +631,21 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
                   setState(() {});
                 }
               } else {
-                if (km > deliveryChargeModel.minimum_delivery_charges_within_km) {
+                if (km >
+                    deliveryChargeModel.minimum_delivery_charges_within_km) {
                   deliveryCharges =
-                      (km * deliveryChargeModel.delivery_charges_per_km).toDouble().toStringAsFixed(decimal);
+                      (km * deliveryChargeModel.delivery_charges_per_km)
+                          .toDouble()
+                          .toStringAsFixed(currencyData!.decimal);
                   if (widget.deliveryCharge != deliveryCharges) {
                     isLocationChange = true;
                     widget.deliveryCharge != deliveryCharges.toString();
                   }
                   setState(() {});
                 } else {
-                  deliveryCharges =
-                      deliveryChargeModel.minimum_delivery_charges.toDouble().toStringAsFixed(decimal);
+                  deliveryCharges = deliveryChargeModel.minimum_delivery_charges
+                      .toDouble()
+                      .toStringAsFixed(currencyData!.decimal);
                   if (widget.deliveryCharge != deliveryCharges) {
                     isLocationChange = true;
                     widget.deliveryCharge != deliveryCharges.toString();
@@ -642,7 +712,8 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
                     })
                   : MyAppState.currentUser!.shippingAddress.location.latitude),
           longitude: long ??
-              (MyAppState.currentUser!.shippingAddress.location.longitude == 0.01
+              (MyAppState.currentUser!.shippingAddress.location.longitude ==
+                      0.01
                   ? showDialog(
                       barrierDismissible: false,
                       context: context,
@@ -689,11 +760,13 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
         MyAppState.currentUser!.shippingAddress = userAddress;
         await FireStoreUtils.updateCurrentUserAddress(userAddress);
         hideProgress();
-        print("------->Tax ${widget.taxModel!.toJson()}");
-        /*push(
+        push(
           context,
           PaymentScreen(
-            total: isLocationChange ? ((widget.total - num.parse(widget.deliveryCharge!)) + num.parse(deliveryCharges)) : widget.total,
+            total: isLocationChange
+                ? ((widget.total - num.parse(widget.deliveryCharge!)) +
+                    num.parse(deliveryCharges))
+                : widget.total,
             discount: widget.discount!,
             couponCode: widget.couponCode!,
             couponId: widget.couponId!,
@@ -701,12 +774,15 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
             extra_addons: widget.extra_addons,
             tipValue: widget.tipValue,
             take_away: widget.take_away,
-            deliveryCharge: isLocationChange ? deliveryCharges.toString() : widget.deliveryCharge,
+            deliveryCharge: isLocationChange
+                ? deliveryCharges.toString()
+                : widget.deliveryCharge,
             notes: widget.notes,
             taxModel: widget.taxModel,
             specialDiscountMap: widget.specialDiscountMap,
+            scheduleTime: widget.scheduleTime,
           ),
-        );*/
+        );
       }
     } else {
       setState(() {

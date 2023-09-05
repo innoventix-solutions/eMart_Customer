@@ -299,7 +299,7 @@ class _MapViewScreenState extends State<MapViewScreen> {
                                             child: Padding(
                                               padding: const EdgeInsets.all(8.0),
                                               child: CachedNetworkImage(
-                                                imageUrl: getImageValidUrl(vendors[index].photo),
+                                                imageUrl: getImageVAlidUrl(vendors[index].photo),
                                                 imageBuilder: (context, imageProvider) => Container(
                                                   decoration: BoxDecoration(
                                                     borderRadius: BorderRadius.circular(15),

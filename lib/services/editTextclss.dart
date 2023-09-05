@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class EditText extends StatefulWidget {
@@ -31,7 +32,7 @@ class _EditTextState extends State<EditText> {
             controller: TextEditingController(text: widget.value),
             onChanged: widget.onChange as void Function(String)?,
             decoration: InputDecoration(
-              hintText: 'Enter ${widget.text}',
+              hintText: 'Enter'.tr() +'${widget.text}',
               fillColor: Colors.white,
               contentPadding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
               border: OutlineInputBorder(

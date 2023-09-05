@@ -18,7 +18,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
         iconTheme: IconThemeData(color: isDarkMode(context) ? Colors.white : Colors.black),
         elevation: 0.0,
       ),

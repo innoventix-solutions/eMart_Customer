@@ -34,7 +34,7 @@ class _ViewAllRestaurantState extends State<ViewAllRestaurant> {
       isLoading = true;
     });
     print("-------->${radiusValue}");
-    var collectionReference = FireStoreUtils.firestore.collection(VENDORS).where("section_id", isEqualTo: SELECTED_CATEGORY);
+    var collectionReference = FireStoreUtils.firestore.collection(VENDORS).where("section_id", isEqualTo: sectionConstantModel!.id);
 
     GeoFirePoint center = GeoFlutterFire().point(latitude: MyAppState.selectedPosition.latitude, longitude: MyAppState.selectedPosition.longitude);
     String field = 'g';
@@ -48,7 +48,7 @@ class _ViewAllRestaurantState extends State<ViewAllRestaurant> {
         });
       }
     });
-    await FireStoreUtils().getAllCoupons().then((value) {
+    await FireStoreUtils().getPublicCoupons().then((value) {
       setState(() {
         offerList = value;
       });
@@ -143,7 +143,7 @@ class _ViewAllRestaurantState extends State<ViewAllRestaurant> {
                 Stack(
                   children: [
                     CachedNetworkImage(
-                      imageUrl: getImageValidUrl(vendorModel.photo),
+                      imageUrl: getImageVAlidUrl(vendorModel.photo),
                       height: 100,
                       width: 100,
                       imageBuilder: (context, imageProvider) => Container(
@@ -175,7 +175,7 @@ class _ViewAllRestaurantState extends State<ViewAllRestaurant> {
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
-                              discountAmountTempList.reduce(min).toStringAsFixed(decimal) + "% off",
+                              discountAmountTempList.reduce(min).toStringAsFixed(currencyData!.decimal) + "% off",
                               style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                             ),
                           ),
@@ -210,11 +210,11 @@ class _ViewAllRestaurantState extends State<ViewAllRestaurant> {
                               } else {
                                 setState(() {
                                   if (lstFav.contains(vendorModel.id) == true) {
-                                    FavouriteModel favouriteModel = FavouriteModel(section_id: SELECTED_CATEGORY, store_id: vendorModel.id, user_id: MyAppState.currentUser!.userID);
+                                    FavouriteModel favouriteModel = FavouriteModel(section_id: sectionConstantModel!.id, store_id: vendorModel.id, user_id: MyAppState.currentUser!.userID);
                                     lstFav.removeWhere((item) => item == vendorModel.id);
                                     FireStoreUtils().removeFavouriteStore(favouriteModel);
                                   } else {
-                                    FavouriteModel favouriteModel = FavouriteModel(section_id: SELECTED_CATEGORY, store_id: vendorModel.id, user_id: MyAppState.currentUser!.userID);
+                                    FavouriteModel favouriteModel = FavouriteModel(section_id: sectionConstantModel!.id, store_id: vendorModel.id, user_id: MyAppState.currentUser!.userID);
                                     FireStoreUtils().setFavouriteStore(favouriteModel);
                                     lstFav.add(vendorModel.id);
                                   }

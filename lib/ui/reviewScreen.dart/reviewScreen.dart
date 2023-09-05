@@ -127,7 +127,7 @@ class _ReviewScreenState extends State<ReviewScreen> with TickerProviderStateMix
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: isDarkMode(context) ? Colors.black : const Color(0XFFFDFEFE),
-        appBar: AppGlobal.buildSimpleAppBar(context, ratingModel != null ? "Update Review" : "Add Review".tr()),
+        appBar: AppGlobal.buildSimpleAppBar(context, ratingModel != null ? "Update Review".tr() : "Add Review".tr()),
         body: SingleChildScrollView(
             child: Container(
                 padding: const EdgeInsets.only(top: 20, left: 20),

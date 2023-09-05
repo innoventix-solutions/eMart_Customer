@@ -5,6 +5,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:emartconsumer/cab_service/CabPaymentScreen.dart';
 import 'package:emartconsumer/cab_service/cab_payment_selection_screen.dart';
+import 'package:emartconsumer/cab_service/dashboard_cab_service.dart';
 import 'package:emartconsumer/constants.dart';
 import 'package:emartconsumer/main.dart';
 import 'package:emartconsumer/model/CabOrderModel.dart';
@@ -106,7 +107,7 @@ class _CabServiceScreenState extends State<CabServiceScreen> {
 
   @override
   void dispose() {
-    FireStoreUtils().cabOrdersStreamController.close();
+    // FireStoreUtils().cabOrdersStreamController.close();
     FireStoreUtils().cabOrdersStreamSub.cancel();
     FireStoreUtils().driverStreamController.close();
     FireStoreUtils().driverStreamSub.cancel();
@@ -115,35 +116,38 @@ class _CabServiceScreenState extends State<CabServiceScreen> {
   }
 
   String statusOfOrder = "";
-  late Stream<CabOrderModel?> ordersFuture;
+  late Stream<CabOrderModel> ordersFuture;
   CabOrderModel? _cabOrderModel;
 
   late Stream<User> driverStream;
   User? _driverModel;
 
   getCurrentOrder() {
-    if (MyAppState.currentUser != null) {
-      if (MyAppState.currentUser!.inProgressOrderID != null) {
-        ordersFuture = FireStoreUtils()
-            .getCabOrder(MyAppState.currentUser!.inProgressOrderID.toString());
-        ordersFuture.listen((event) {
-          if (event != null) {
-            print("-status#------>${event.status}");
-            print("-W#paymentMethod------>${event.paymentMethod}");
+    try {
+      if (MyAppState.currentUser != null) {
+        if (MyAppState.currentUser!.inProgressOrderID != null) {
+          ordersFuture = FireStoreUtils().getCabOrder(
+              MyAppState.currentUser!.inProgressOrderID.toString());
+          ordersFuture.listen((event) {
+            print("------->${event.status}");
+            print("------->${event.paymentMethod}");
             setState(() {
               _cabOrderModel = event;
               statusOfOrder = event.status;
             });
-            if (_cabOrderModel != null ||
-                _cabOrderModel!.driverID!.isNotEmpty) {
-              getDriverDetails();
+            if (_cabOrderModel!.driverID != null) {
+              if (_cabOrderModel!.driverID!.isNotEmpty) {
+                getDriverDetails();
+              }
             }
             setState(() {});
-          }
-        });
+          });
+        }
+        getDirections();
+        setState(() {});
       }
-      getDirections();
-      setState(() {});
+    } catch (e) {
+      print(e);
     }
   }
 
@@ -183,41 +187,43 @@ class _CabServiceScreenState extends State<CabServiceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: isDarkMode(context) ? Colors.black : null,
-        body: Stack(
-          children: [
-            GoogleMap(
-              zoomControlsEnabled: true,
-              myLocationButtonEnabled: true,
-              padding: const EdgeInsets.only(
-                top: 190.0,
-              ),
-              initialCameraPosition: _kInitialPosition,
-              onMapCreated: (GoogleMapController controller) async {
-                _controller = controller;
-                LocationData location = await currentLocation.getLocation();
-                _controller!.moveCamera(CameraUpdate.newLatLngZoom(
-                    LatLng(location.latitude ?? 0.0, location.longitude ?? 0.0),
-                    14));
-              },
-              polylines: Set<Polyline>.of(polyLines.values),
-              myLocationEnabled: true,
-              markers: _markers.values.toSet(),
+    return Scaffold(
+      backgroundColor: isDarkMode(context) ? Colors.black : null,
+      body: Stack(
+        children: [
+          GoogleMap(
+            zoomControlsEnabled: true,
+            myLocationButtonEnabled: true,
+            padding: const EdgeInsets.only(
+              top: 210.0,
             ),
-            Column(
+            initialCameraPosition: _kInitialPosition,
+            onMapCreated: (GoogleMapController controller) async {
+              _controller = controller;
+
+              // LocationData location = await currentLocation.getLocation();
+              // _controller!.moveCamera(CameraUpdate.newLatLngZoom(LatLng(location.latitude ?? 0.0, location.longitude ?? 0.0), 14));
+            },
+            polylines: Set<Polyline>.of(polyLines.values),
+            myLocationEnabled: true,
+            markers: _markers.values.toSet(),
+          ),
+          Padding(
+            padding:
+                EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.04),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
                   padding: const EdgeInsets.only(top: 3),
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.pop(context);
+                      push(context,
+                          DashBoardCabService(user: MyAppState.currentUser));
                     },
                     style: ElevatedButton.styleFrom(
                       shape: const CircleBorder(),
-                      backgroundColor: Colors.white,
+                      primary: Colors.white,
                       padding: const EdgeInsets.all(8),
                     ),
                     child: const Icon(
@@ -257,24 +263,21 @@ class _CabServiceScreenState extends State<CabServiceScreen> {
                                           Expanded(
                                             child: InkWell(
                                               onTap: () async {
-                                                final result = await Navigator
-                                                        .of(context)
-                                                    .push<LocationResult?>(
-                                                        MaterialPageRoute(
+                                                LocationResult result =
+                                                    await Navigator.of(context)
+                                                        .push(MaterialPageRoute(
                                                             builder: (context) =>
                                                                 PlacePicker(
                                                                     GOOGLE_API_KEY)));
-                                                if (result != null) {
-                                                  setState(() {
-                                                    departureController.text =
-                                                        result.formattedAddress
-                                                            .toString();
-                                                    setDepartureMarker(LatLng(
-                                                        result.latLng!.latitude,
-                                                        result.latLng!
-                                                            .longitude));
-                                                  });
-                                                }
+                                                setState(() {
+                                                  departureController.text =
+                                                      result.formattedAddress
+                                                          .toString();
+                                                  setDepartureMarker(LatLng(
+                                                      result.latLng!.latitude,
+                                                      result
+                                                          .latLng!.longitude));
+                                                });
                                               },
                                               child: buildTextField(
                                                 title: "Departure".tr(),
@@ -301,23 +304,20 @@ class _CabServiceScreenState extends State<CabServiceScreen> {
                                       const Divider(),
                                       InkWell(
                                         onTap: () async {
-                                          final result = await Navigator.of(
-                                                  context)
-                                              .push<LocationResult?>(
+                                          LocationResult result =
+                                              await Navigator.of(context).push(
                                                   MaterialPageRoute(
                                                       builder: (context) =>
                                                           PlacePicker(
                                                               GOOGLE_API_KEY)));
-                                          if (result != null) {
-                                            setState(() {
-                                              destinationController.text =
-                                                  result.formattedAddress
-                                                      .toString();
-                                              setDestinationMarker(LatLng(
-                                                  result.latLng!.latitude,
-                                                  result.latLng!.longitude));
-                                            });
-                                          }
+                                          setState(() {
+                                            destinationController.text = result
+                                                .formattedAddress
+                                                .toString();
+                                            setDestinationMarker(LatLng(
+                                                result.latLng!.latitude,
+                                                result.latLng!.longitude));
+                                          });
                                         },
                                         child: buildTextField(
                                           title:
@@ -338,26 +338,26 @@ class _CabServiceScreenState extends State<CabServiceScreen> {
                 ),
               ],
             ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: statusOfOrder == ORDER_STATUS_PLACED ||
-                      statusOfOrder == ORDER_STATUS_DRIVER_PENDING ||
-                      statusOfOrder == ORDER_STATUS_DRIVER_REJECTED
-                  ? waitingDialog()
-                  : statusOfOrder == ORDER_STATUS_DRIVER_ACCEPTED ||
-                          statusOfOrder == ORDER_STATUS_SHIPPED ||
-                          statusOfOrder == ORDER_STATUS_IN_TRANSIT
-                      ? driverDialog(_cabOrderModel)
-                      : statusOfOrder == ORDER_REACHED_DESTINATION
-                          ? completeRide()
-                          : statusOfOrder == "conformation"
-                              ? conformationButton()
-                              : statusOfOrder == "vehicleType"
-                                  ? vehicleSelection()
-                                  : Container(),
-            )
-          ],
-        ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: statusOfOrder == ORDER_STATUS_PLACED ||
+                    statusOfOrder == ORDER_STATUS_DRIVER_PENDING ||
+                    statusOfOrder == ORDER_STATUS_DRIVER_REJECTED
+                ? waitingDialog()
+                : statusOfOrder == ORDER_STATUS_DRIVER_ACCEPTED ||
+                        statusOfOrder == ORDER_STATUS_SHIPPED ||
+                        statusOfOrder == ORDER_STATUS_IN_TRANSIT
+                    ? driverDialog(_cabOrderModel)
+                    : statusOfOrder == ORDER_REACHED_DESTINATION
+                        ? completeRide()
+                        : statusOfOrder == "conformation"
+                            ? conformationButton()
+                            : statusOfOrder == "vehicleType"
+                                ? vehicleSelection()
+                                : Container(),
+          )
+        ],
       ),
     );
   }
@@ -375,7 +375,7 @@ class _CabServiceScreenState extends State<CabServiceScreen> {
         onPressed: () async {
           await getDurationDistance(departureLatLong!, destinationLatLong!)
               .then((durationValue) async {
-            print("-durationValue---->${durationValue.toString()}");
+            print("----->${durationValue.toString()}");
             if (durationValue != null) {
               setState(() {
                 distance = durationValue['rows']
@@ -433,6 +433,7 @@ class _CabServiceScreenState extends State<CabServiceScreen> {
             ListView.builder(
               itemCount: vehicleType.length,
               shrinkWrap: true,
+              scrollDirection: Axis.vertical,
               itemBuilder: (context, index) {
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -509,7 +510,8 @@ class _CabServiceScreenState extends State<CabServiceScreen> {
                                     Text(
                                       vehicleType[index].name.toString() +
                                           " | " +
-                                          distance.toStringAsFixed(decimal) +
+                                          distance.toStringAsFixed(
+                                              currencyData!.decimal) +
                                           "km",
                                       style: const TextStyle(
                                           fontSize: 16,
@@ -530,9 +532,11 @@ class _CabServiceScreenState extends State<CabServiceScreen> {
                               ),
                             ),
                             Text(
-                              symbol +
-                                  getAmount(vehicleType[index])
-                                      .toStringAsFixed(decimal),
+                              // symbol + getAmount(vehicleType[index]).toStringAsFixed(decimal),
+                              amountShow(
+                                  amount:
+                                      getAmount(vehicleType[index]).toString()),
+
                               style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -567,8 +571,8 @@ class _CabServiceScreenState extends State<CabServiceScreen> {
                                 departureName: departureController.text,
                                 destinationName: destinationController.text,
                                 subTotal: getAmount(selectedVehicleType!)
-                                    .toStringAsFixed(decimal))));
-                    print("-result---->${result}");
+                                    .toStringAsFixed(currencyData!.decimal))));
+                    print("----->${result}");
                     if (result != null) {
                       getCurrentOrder();
                     }
@@ -594,11 +598,10 @@ class _CabServiceScreenState extends State<CabServiceScreen> {
                         fontWeight: FontWeight.w600),
                   ),
                   Text(
-                    symbol +
-                        (selectedVehicleType == null
-                            ? "0.0"
-                            : getAmount(selectedVehicleType!)
-                                .toStringAsFixed(decimal)),
+                    selectedVehicleType == null
+                        ? amountShow(amount: "0.0")
+                        : amountShow(
+                            amount: getAmount(selectedVehicleType!).toString()),
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                         color: Colors.white,
@@ -627,7 +630,10 @@ class _CabServiceScreenState extends State<CabServiceScreen> {
 
   getDriverDetails() async {
     if (_cabOrderModel != null) {
-      print("----driverID--->${_cabOrderModel!.driverID.toString()}");
+      print("------->${_cabOrderModel!.driverID.toString()}");
+      if(statusOfOrder == ORDER_STATUS_DRIVER_ACCEPTED){
+        await FireStoreUtils.sendRideBookEmail(orderModel: _cabOrderModel);
+      }
       if (statusOfOrder == ORDER_STATUS_DRIVER_ACCEPTED ||
           statusOfOrder == ORDER_STATUS_SHIPPED ||
           statusOfOrder == ORDER_STATUS_IN_TRANSIT) {
@@ -892,6 +898,7 @@ class _CabServiceScreenState extends State<CabServiceScreen> {
                                     push(
                                         context,
                                         ChatScreens(
+                                          type: "cab_parcel_chat",
                                           customerName: customer!.firstName +
                                               " " +
                                               customer.lastName,
@@ -1138,8 +1145,9 @@ class _CabServiceScreenState extends State<CabServiceScreen> {
                     await Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => CabPaymentScreen(
                               cabOrderModel: _cabOrderModel,
+                              taxModel: taxList,
                             )));
-                print("---dfdsf-------->${result.toString()}");
+                print("----------->${result.toString()}");
                 if (result != null) {
                   statusOfOrder = "";
                   polyLines.clear();
@@ -1148,6 +1156,8 @@ class _CabServiceScreenState extends State<CabServiceScreen> {
                   destinationController.clear();
                   departureLatLong = null;
                   destinationLatLong = null;
+                  MyAppState.currentUser!.inProgressOrderID = null;
+                  FireStoreUtils.updateCurrentUser(MyAppState.currentUser!);
                   setState(() {});
                 }
               },
@@ -1157,10 +1167,10 @@ class _CabServiceScreenState extends State<CabServiceScreen> {
                 borderRadius: BorderRadius.circular(8),
               ),
               color: Color(COLOR_PRIMARY),
-              child: const Text(
-                "Complete Your Payment",
+              child: Text(
+                "Complete Your Payment".tr(),
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.w600),

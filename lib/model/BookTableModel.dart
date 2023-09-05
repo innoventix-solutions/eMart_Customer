@@ -9,13 +9,14 @@ class BookTableModel {
 
   Timestamp createdAt, date;
 
-  String vendorID, section_id;
+  String vendorID;
+
 
   VendorModel vendor;
 
   String status;
   String id, guestEmail, guestFirstName, guestLastName, guestPhone;
-  String? occasion, specialRequest;
+  String? occasion, specialRequest,section_id;
   bool firstVisit;
   int totalGuest;
 

@@ -1,4 +1,3 @@
-/*
 import 'dart:convert';
 import 'dart:io';
 
@@ -119,8 +118,8 @@ class _BookOrderScreenState extends State<BookParcelScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  buildCategory(icon: "assets/images/asSoonAs.png", title: "As soon as possible", index: 0),
-                  buildCategory(icon: "assets/images/schedule.png", title: "Schedule", index: 1),
+                  buildCategory(icon: "assets/images/asSoonAs.png", title: "As soon as possible".tr(), index: 0),
+                  buildCategory(icon: "assets/images/schedule.png", title: "Schedule".tr(), index: 1),
                 ],
               ),
             ),
@@ -312,7 +311,7 @@ class _BookOrderScreenState extends State<BookParcelScreen> {
                                     child: Container(
                                       decoration: const BoxDecoration(),
                                       child: Text(
-                                        senderData.isEmpty ? 'Select Date' : senderData.toString(),
+                                        senderData.isEmpty ? 'Select Date'.tr() : senderData.toString(),
                                         style: TextStyle(color: Color(COLOR_PRIMARY)),
                                       ),
                                     ),
@@ -858,7 +857,7 @@ class _BookOrderScreenState extends State<BookParcelScreen> {
           ),
           receiverLatLong: receiverLocation,
           senderLatLong: senderLocation,
-          sectionId: SELECTED_CATEGORY);
+          sectionId: sectionConstantModel!.id);
       Navigator.push(
           context,
           MaterialPageRoute(
@@ -943,4 +942,3 @@ class _BookOrderScreenState extends State<BookParcelScreen> {
     showCupertinoModalPopup(context: context, builder: (context) => action);
   }
 }
-*/

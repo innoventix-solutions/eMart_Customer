@@ -34,20 +34,32 @@ class CartProduct extends DataClass implements Insertable<CartProduct> {
     this.variant_info,
   });
 
-  factory CartProduct.fromData(Map<String, dynamic> data, GeneratedDatabase db, {String? prefix}) {
+  factory CartProduct.fromData(Map<String, dynamic> data, GeneratedDatabase db,
+      {String? prefix}) {
     final effectivePrefix = prefix ?? '';
     return CartProduct(
-      id: const StringType().mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
-      category_id: const StringType().mapFromDatabaseResponse(data['${effectivePrefix}category_id'])!,
-      name: const StringType().mapFromDatabaseResponse(data['${effectivePrefix}name'])!,
-      photo: const StringType().mapFromDatabaseResponse(data['${effectivePrefix}photo'])!,
-      price: const StringType().mapFromDatabaseResponse(data['${effectivePrefix}price'])!,
-      discountPrice: const StringType().mapFromDatabaseResponse(data['${effectivePrefix}discount_price']),
-      vendorID: const StringType().mapFromDatabaseResponse(data['${effectivePrefix}vendor_i_d'])!,
-      quantity: const IntType().mapFromDatabaseResponse(data['${effectivePrefix}quantity'])!,
-      extras_price: const StringType().mapFromDatabaseResponse(data['${effectivePrefix}extras_price']),
-      extras: const StringType().mapFromDatabaseResponse(data['${effectivePrefix}extras']),
-      variant_info: const StringType().mapFromDatabaseResponse(data['${effectivePrefix}variant_info']),
+      id: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
+      category_id: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}category_id'])!,
+      name: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}name'])!,
+      photo: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}photo'])!,
+      price: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}price'])!,
+      discountPrice: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}discount_price']),
+      vendorID: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}vendor_i_d'])!,
+      quantity: const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}quantity'])!,
+      extras_price: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}extras_price']),
+      extras: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}extras']),
+      variant_info: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}variant_info']),
     );
   }
 
@@ -83,16 +95,24 @@ class CartProduct extends DataClass implements Insertable<CartProduct> {
       name: Value(name),
       photo: Value(photo),
       price: Value(price),
-      discountPrice: discountPrice == null && nullToAbsent ? const Value.absent() : Value(discountPrice),
+      discountPrice: discountPrice == null && nullToAbsent
+          ? const Value.absent()
+          : Value(discountPrice),
       vendorID: Value(vendorID),
       quantity: Value(quantity),
-      extras_price: extras_price == null && nullToAbsent ? const Value.absent() : Value(extras_price),
-      extras: extras == null && nullToAbsent ? const Value.absent() : Value(extras),
-      variant_info: variant_info == null && nullToAbsent ? const Value.absent() : Value(variant_info),
+      extras_price: extras_price == null && nullToAbsent
+          ? const Value.absent()
+          : Value(extras_price),
+      extras:
+          extras == null && nullToAbsent ? const Value.absent() : Value(extras),
+      variant_info: variant_info == null && nullToAbsent
+          ? const Value.absent()
+          : Value(variant_info),
     );
   }
 
-  factory CartProduct.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
+  factory CartProduct.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
     serializer ??= moorRuntimeOptions.defaultSerializer;
     dynamic extrasVal;
     if (json['extras'] == null) {
@@ -102,7 +122,11 @@ class CartProduct extends DataClass implements Insertable<CartProduct> {
         if (json['extras'] == '[]') {
           extrasVal = List<String>.empty();
         } else {
-          String extraDecode = json['extras'].toString().replaceAll("[", "").replaceAll("]", "").replaceAll("\"", "");
+          String extraDecode = json['extras']
+              .toString()
+              .replaceAll("[", "")
+              .replaceAll("]", "")
+              .replaceAll("\"", "");
           if (extraDecode.contains(",")) {
             extrasVal = extraDecode.split(",");
           } else {
@@ -127,7 +151,10 @@ class CartProduct extends DataClass implements Insertable<CartProduct> {
       extras_price: serializer.fromJson<String?>(json['extras_price']),
       extras: serializer.fromJson<List<dynamic>?>(extrasVal),
       variant_info: json['variant_info'] != null
-          ? serializer.fromJson<VariantInfo>((json.containsKey('variant_info') && json['variant_info'] != null) ? VariantInfo.fromJson(json['variant_info']) : null)
+          ? serializer.fromJson<VariantInfo>(
+              (json.containsKey('variant_info') && json['variant_info'] != null)
+                  ? VariantInfo.fromJson(json['variant_info'])
+                  : null)
           : null,
     );
   }
@@ -143,7 +170,11 @@ class CartProduct extends DataClass implements Insertable<CartProduct> {
         if (extras == '[]' || extras.toString().isEmpty) {
           extras = List<String>.empty();
         } else {
-          extras = extras.toString().replaceAll("[", "").replaceAll("]", "").replaceAll("\"", "");
+          extras = extras
+              .toString()
+              .replaceAll("[", "")
+              .replaceAll("]", "")
+              .replaceAll("\"", "");
           if (extras.toString().contains(",")) {
             extras = extras.toString().split(",");
           } else {
@@ -172,7 +203,10 @@ class CartProduct extends DataClass implements Insertable<CartProduct> {
       'quantity': serializer.toJson<int>(quantity),
       'extras_price': serializer.toJson<String?>(extras_price),
       'extras': serializer.toJson<List<dynamic>>(extras),
-      'variant_info': variant_info != null ? serializer.toJson<Map<String, dynamic>>(VariantInfo.fromJson(jsonDecode(variant_info)).toJson()) : null,
+      'variant_info': variant_info != null
+          ? serializer.toJson<Map<String, dynamic>>(
+              VariantInfo.fromJson(jsonDecode(variant_info)).toJson())
+          : null,
     };
   }
 
@@ -221,7 +255,8 @@ class CartProduct extends DataClass implements Insertable<CartProduct> {
   }
 
   @override
-  int get hashCode => Object.hash(id, category_id, name, photo, price, discountPrice, vendorID, quantity, extras_price, extras, variant_info);
+  int get hashCode => Object.hash(id, category_id, name, photo, price,
+      discountPrice, vendorID, quantity, extras_price, extras, variant_info);
 
   @override
   bool operator ==(Object other) =>
@@ -400,7 +435,8 @@ class CartProductsCompanion extends UpdateCompanion<CartProduct> {
   }
 }
 
-class $CartProductsTable extends CartProducts with TableInfo<$CartProductsTable, CartProduct> {
+class $CartProductsTable extends CartProducts
+    with TableInfo<$CartProductsTable, CartProduct> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -409,51 +445,90 @@ class $CartProductsTable extends CartProducts with TableInfo<$CartProductsTable,
 
   final VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<String?> id = GeneratedColumn<String?>('id', aliasedName, false, type: const StringType(), requiredDuringInsert: true);
+  late final GeneratedColumn<String?> id = GeneratedColumn<String?>(
+      'id', aliasedName, false,
+      type: const StringType(), requiredDuringInsert: true);
 
-  final VerificationMeta _categoryIdMeta = const VerificationMeta('category_id');
+  final VerificationMeta _categoryIdMeta =
+      const VerificationMeta('category_id');
   @override
-  late final GeneratedColumn<String?> categoryId = GeneratedColumn<String?>('category_id', aliasedName, false, type: const StringType(), requiredDuringInsert: true);
+  late final GeneratedColumn<String?> categoryId = GeneratedColumn<String?>(
+      'category_id', aliasedName, false,
+      type: const StringType(), requiredDuringInsert: true);
 
   final VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
-  late final GeneratedColumn<String?> name =
-      GeneratedColumn<String?>('name', aliasedName, false, additionalChecks: GeneratedColumn.checkTextLength(maxTextLength: 50), type: const StringType(), requiredDuringInsert: true);
+  late final GeneratedColumn<String?> name = GeneratedColumn<String?>(
+      'name', aliasedName, false,
+      additionalChecks: GeneratedColumn.checkTextLength(maxTextLength: 50),
+      type: const StringType(),
+      requiredDuringInsert: true);
 
   final VerificationMeta _photoMeta = const VerificationMeta('photo');
   @override
-  late final GeneratedColumn<String?> photo = GeneratedColumn<String?>('photo', aliasedName, false, type: const StringType(), requiredDuringInsert: true);
+  late final GeneratedColumn<String?> photo = GeneratedColumn<String?>(
+      'photo', aliasedName, false,
+      type: const StringType(), requiredDuringInsert: true);
 
   final VerificationMeta _priceMeta = const VerificationMeta('price');
   @override
-  late final GeneratedColumn<String?> price = GeneratedColumn<String?>('price', aliasedName, false, type: const StringType(), requiredDuringInsert: true);
+  late final GeneratedColumn<String?> price = GeneratedColumn<String?>(
+      'price', aliasedName, false,
+      type: const StringType(), requiredDuringInsert: true);
 
-  final VerificationMeta _discountPriceMeta = const VerificationMeta('discountPrice');
+  final VerificationMeta _discountPriceMeta =
+      const VerificationMeta('discountPrice');
   @override
-  late final GeneratedColumn<String?> discountPrice = GeneratedColumn<String?>('discount_price', aliasedName, true, type: const StringType(), requiredDuringInsert: false);
+  late final GeneratedColumn<String?> discountPrice = GeneratedColumn<String?>(
+      'discount_price', aliasedName, true,
+      type: const StringType(), requiredDuringInsert: false);
 
   final VerificationMeta _vendorIDMeta = const VerificationMeta('vendorID');
   @override
-  late final GeneratedColumn<String?> vendorID = GeneratedColumn<String?>('vendor_i_d', aliasedName, false, type: const StringType(), requiredDuringInsert: true);
+  late final GeneratedColumn<String?> vendorID = GeneratedColumn<String?>(
+      'vendor_i_d', aliasedName, false,
+      type: const StringType(), requiredDuringInsert: true);
 
   final VerificationMeta _quantityMeta = const VerificationMeta('quantity');
   @override
-  late final GeneratedColumn<int?> quantity = GeneratedColumn<int?>('quantity', aliasedName, false, type: const IntType(), requiredDuringInsert: true);
+  late final GeneratedColumn<int?> quantity = GeneratedColumn<int?>(
+      'quantity', aliasedName, false,
+      type: const IntType(), requiredDuringInsert: true);
 
-  final VerificationMeta _extras_priceMeta = const VerificationMeta('extras_price');
+  final VerificationMeta _extras_priceMeta =
+      const VerificationMeta('extras_price');
   @override
-  late final GeneratedColumn<String?> extras_price = GeneratedColumn<String?>('extras_price', aliasedName, true, type: const StringType(), requiredDuringInsert: false);
+  late final GeneratedColumn<String?> extras_price = GeneratedColumn<String?>(
+      'extras_price', aliasedName, true,
+      type: const StringType(), requiredDuringInsert: false);
 
   final VerificationMeta _extrasMeta = const VerificationMeta('extras');
   @override
-  late final GeneratedColumn<String?> extras = GeneratedColumn<String?>('extras', aliasedName, true, type: const StringType(), requiredDuringInsert: false);
+  late final GeneratedColumn<String?> extras = GeneratedColumn<String?>(
+      'extras', aliasedName, true,
+      type: const StringType(), requiredDuringInsert: false);
 
-  final VerificationMeta _veriant_infoMeta = const VerificationMeta('variant_info');
+  final VerificationMeta _veriant_infoMeta =
+      const VerificationMeta('variant_info');
   @override
-  late final GeneratedColumn<String?> variant_info = GeneratedColumn<String?>('variant_info', aliasedName, true, type: const StringType(), requiredDuringInsert: false);
+  late final GeneratedColumn<String?> variant_info = GeneratedColumn<String?>(
+      'variant_info', aliasedName, true,
+      type: const StringType(), requiredDuringInsert: false);
 
   @override
-  List<GeneratedColumn> get $columns => [id, categoryId, name, photo, price, discountPrice, vendorID, quantity, extras_price, extras, variant_info];
+  List<GeneratedColumn> get $columns => [
+        id,
+        categoryId,
+        name,
+        photo,
+        price,
+        discountPrice,
+        vendorID,
+        quantity,
+        extras_price,
+        extras,
+        variant_info
+      ];
 
   @override
   String get aliasedName => _alias ?? 'cart_products';
@@ -462,7 +537,8 @@ class $CartProductsTable extends CartProducts with TableInfo<$CartProductsTable,
   String get actualTableName => 'cart_products';
 
   @override
-  VerificationContext validateIntegrity(Insertable<CartProduct> instance, {bool isInserting = false}) {
+  VerificationContext validateIntegrity(Insertable<CartProduct> instance,
+      {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
@@ -471,46 +547,64 @@ class $CartProductsTable extends CartProducts with TableInfo<$CartProductsTable,
       context.missing(_idMeta);
     }
     if (data.containsKey('category_id')) {
-      context.handle(_categoryIdMeta, categoryId.isAcceptableOrUnknown(data['category_id']!, _categoryIdMeta));
+      context.handle(
+          _categoryIdMeta,
+          categoryId.isAcceptableOrUnknown(
+              data['category_id']!, _categoryIdMeta));
     } else if (isInserting) {
       context.missing(_categoryIdMeta);
     }
     if (data.containsKey('name')) {
-      context.handle(_nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
     if (data.containsKey('photo')) {
-      context.handle(_photoMeta, photo.isAcceptableOrUnknown(data['photo']!, _photoMeta));
+      context.handle(
+          _photoMeta, photo.isAcceptableOrUnknown(data['photo']!, _photoMeta));
     } else if (isInserting) {
       context.missing(_photoMeta);
     }
     if (data.containsKey('price')) {
-      context.handle(_priceMeta, price.isAcceptableOrUnknown(data['price']!, _priceMeta));
+      context.handle(
+          _priceMeta, price.isAcceptableOrUnknown(data['price']!, _priceMeta));
     } else if (isInserting) {
       context.missing(_priceMeta);
     }
     if (data.containsKey('discount_price')) {
-      context.handle(_discountPriceMeta, discountPrice.isAcceptableOrUnknown(data['discount_price']!, _discountPriceMeta));
+      context.handle(
+          _discountPriceMeta,
+          discountPrice.isAcceptableOrUnknown(
+              data['discount_price']!, _discountPriceMeta));
     }
     if (data.containsKey('vendor_i_d')) {
-      context.handle(_vendorIDMeta, vendorID.isAcceptableOrUnknown(data['vendor_i_d']!, _vendorIDMeta));
+      context.handle(_vendorIDMeta,
+          vendorID.isAcceptableOrUnknown(data['vendor_i_d']!, _vendorIDMeta));
     } else if (isInserting) {
       context.missing(_vendorIDMeta);
     }
     if (data.containsKey('quantity')) {
-      context.handle(_quantityMeta, quantity.isAcceptableOrUnknown(data['quantity']!, _quantityMeta));
+      context.handle(_quantityMeta,
+          quantity.isAcceptableOrUnknown(data['quantity']!, _quantityMeta));
     } else if (isInserting) {
       context.missing(_quantityMeta);
     }
     if (data.containsKey('extras_price')) {
-      context.handle(_extras_priceMeta, extras_price.isAcceptableOrUnknown(data['extras_price']!, _extras_priceMeta));
+      context.handle(
+          _extras_priceMeta,
+          extras_price.isAcceptableOrUnknown(
+              data['extras_price']!, _extras_priceMeta));
     }
     if (data.containsKey('extras')) {
-      context.handle(_extrasMeta, extras.isAcceptableOrUnknown(data['extras']!, _extrasMeta));
+      context.handle(_extrasMeta,
+          extras.isAcceptableOrUnknown(data['extras']!, _extrasMeta));
     }
     if (data.containsKey('variant_info')) {
-      context.handle(_veriant_infoMeta, variant_info.isAcceptableOrUnknown(data['variant_info']!, _veriant_infoMeta));
+      context.handle(
+          _veriant_infoMeta,
+          variant_info.isAcceptableOrUnknown(
+              data['variant_info']!, _veriant_infoMeta));
     }
     return context;
   }
@@ -520,7 +614,8 @@ class $CartProductsTable extends CartProducts with TableInfo<$CartProductsTable,
 
   @override
   CartProduct map(Map<String, dynamic> data, {String? tablePrefix}) {
-    return CartProduct.fromData(data, attachedDatabase, prefix: tablePrefix != null ? '$tablePrefix.' : null);
+    return CartProduct.fromData(data, attachedDatabase,
+        prefix: tablePrefix != null ? '$tablePrefix.' : null);
   }
 
   @override

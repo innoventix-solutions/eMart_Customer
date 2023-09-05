@@ -29,8 +29,9 @@ class CheckoutScreen extends StatefulWidget {
   final String? deliveryCharge;
   final String? size;
   final bool isPaymentDone;
-  final TaxModel? taxModel;
+  final List<TaxModel>? taxModel;
   final Map<String, dynamic>? specialDiscountMap;
+  final Timestamp? scheduleTime;
 
   const CheckoutScreen(
       {Key? key,
@@ -50,7 +51,8 @@ class CheckoutScreen extends StatefulWidget {
       this.deliveryCharge,
       this.taxModel,
       this.specialDiscountMap,
-      this.size})
+      this.size,
+      this.scheduleTime})
       : super(key: key);
 
   @override
@@ -157,7 +159,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       style: TextStyle(color: Color(COLOR_PRIMARY), fontWeight: FontWeight.bold, fontSize: 18),
                     ),
                     trailing: Text(
-                      symbol + widget.total.toDouble().toStringAsFixed(decimal),
+                      amountShow(amount: widget.total.toString()) ,
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                     ),
                   ),
@@ -177,6 +179,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ),
               ),
               onPressed: () {
+
                 if (!widget.isPaymentDone) {
                   placeOrder();
                 }
@@ -228,6 +231,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     VendorModel vendorModel = await fireStoreUtils.getVendorByVendorID(widget.products.first.vendorID).whenComplete(() => setPrefData());
     log(vendorModel.fcmToken.toString() + "{}{}{}{======TOKENADD" + vendorModel.toJson().toString());
 
+
     OrderModel orderModel = OrderModel(
       address: MyAppState.currentUser!.shippingAddress,
       author: MyAppState.currentUser,
@@ -243,17 +247,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       notes: widget.notes,
       payment_method: widget.paymentType,
       tipValue: widget.tipValue,
-      sectionId: SELECTED_CATEGORY,
+      sectionId: sectionConstantModel!.id,
       adminCommission: isEnableAdminCommission! ? adminCommissionValue : "0",
       adminCommissionType: isEnableAdminCommission! ? addminCommissionType : "",
       taxModel: widget.taxModel,
       takeAway: widget.take_away,
       deliveryCharge: widget.deliveryCharge,
       specialDiscount: widget.specialDiscountMap,
+       scheduleTime: widget.scheduleTime
     );
-
-    OrderModel placedOrder = await fireStoreUtils.placeOrder(orderModel);
     print("||||{}" + orderModel.toJson().toString());
+    OrderModel placedOrder = await fireStoreUtils.placeOrder(orderModel);
+
 
     for (int i = 0; i < tempProduc.length; i++) {
       await FireStoreUtils().getProductByID(tempProduc[i].id.split('~').first).then((value) async {

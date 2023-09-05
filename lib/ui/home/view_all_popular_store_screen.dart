@@ -150,7 +150,7 @@ class _ViewAllPopularStoreScreenState extends State<ViewAllPopularStoreScreen> {
           children: [
             Expanded(
                 child: CachedNetworkImage(
-              imageUrl: getImageValidUrl(vendorModel.photo),
+              imageUrl: getImageVAlidUrl(vendorModel.photo),
               imageBuilder: (context, imageProvider) => Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
@@ -299,6 +299,6 @@ class _ViewAllPopularStoreScreenState extends State<ViewAllPopularStoreScreen> {
     double value = minutes * kilometer;
     final int hour = value ~/ 60;
     final double minute = value % 60;
-    return kilometer.toStringAsFixed(decimal).toString();
+    return kilometer.toStringAsFixed(currencyData!.decimal).toString();
   }
 }

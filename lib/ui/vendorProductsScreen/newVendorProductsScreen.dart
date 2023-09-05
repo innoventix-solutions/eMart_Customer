@@ -230,7 +230,7 @@ class _NewVendorProductsScreenState extends State<NewVendorProductsScreen> with 
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Visibility(
-              visible: isDineEnable,
+              visible: sectionConstantModel!.dineInActive!,
               child: productModel.isEmpty
                   ? Container()
                   : index == 0
@@ -308,7 +308,7 @@ class _NewVendorProductsScreenState extends State<NewVendorProductsScreen> with 
       return datarow(productModel);
     } else if (inx == productModel.categoryID) {
       cate++;
-      return (isAnother == 0 && index) ? showEmptyState("No Food are available.", context) : Container();
+      return (isAnother == 0 && index) ? showEmptyState("No Food are available.".tr(), context) : Container();
     }
     // else Center();
   }
@@ -379,7 +379,7 @@ class _NewVendorProductsScreenState extends State<NewVendorProductsScreen> with 
             CachedNetworkImage(
                 height: 80,
                 width: 80,
-                imageUrl: getImageValidUrl(productModel.photo),
+                imageUrl: getImageVAlidUrl(productModel.photo),
                 imageBuilder: (context, imageProvider) => Container(
                       // width: 100,
                       // height: 100,
@@ -399,7 +399,7 @@ class _NewVendorProductsScreenState extends State<NewVendorProductsScreen> with 
                       height: MediaQuery.of(context).size.height,
                     ))),
             Visibility(
-              visible: isDineEnable,
+              visible: sectionConstantModel!.dineInActive!,
               child: Positioned(
                 left: 5,
                 top: 5,
@@ -431,13 +431,13 @@ class _NewVendorProductsScreenState extends State<NewVendorProductsScreen> with 
                 children: <Widget>[
                   productModel.disPrice == "" || productModel.disPrice == "0"
                       ? Text(
-                    symbol + double.parse(productModel.price).toStringAsFixed(decimal),
-                          style: TextStyle(fontSize: 16, letterSpacing: 0.5, color: Color(COLOR_PRIMARY)),
+                    "${amountShow(amount: productModel.price.toString())}",
+                    style: TextStyle(fontSize: 16, letterSpacing: 0.5, color: Color(COLOR_PRIMARY)),
                         )
                       : Row(
                           children: [
                             Text(
-                              "$symbol${double.parse(productModel.disPrice.toString()).toStringAsFixed(decimal)}",
+                              "${amountShow(amount: productModel.disPrice.toString())}",
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -448,7 +448,7 @@ class _NewVendorProductsScreenState extends State<NewVendorProductsScreen> with 
                               width: 5,
                             ),
                             Text(
-                              '$symbol${double.parse(productModel.price).toStringAsFixed(decimal)}',
+                              "${amountShow(amount: productModel.price.toString())}",
                               style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey, decoration: TextDecoration.lineThrough),
                             ),
                           ],

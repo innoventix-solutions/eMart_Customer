@@ -458,6 +458,8 @@ class _PhoneNumberInputScreenState extends State<PhoneNumberInputScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(snack);
               }
             });
+          }else{
+            await _submitPhoneNumber(_phoneNumber!);
           }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -554,6 +556,7 @@ class _PhoneNumberInputScreenState extends State<PhoneNumberInputScreen> {
                 settings: UserSettings(),
                 email: '',
                 profilePictureURL: profileImageUrl,
+                createdAt: Timestamp.now(),
                 userID: userCredential.user?.uid ?? '');
             String? errorMessage = await FireStoreUtils.firebaseCreateNewUser(user, referralCode ?? '');
             hideProgress();

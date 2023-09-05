@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:bottom_picker/bottom_picker.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -21,14 +22,15 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../model/DeliveryChargeModel.dart';
 import '../payment/PaymentScreen.dart';
 
 class CartScreen extends StatefulWidget {
   final bool fromStoreSelection;
 
-  const CartScreen({Key? key, this.fromStoreSelection = false}) : super(key: key);
+  const CartScreen({Key? key, this.fromStoreSelection = false})
+      : super(key: key);
 
   @override
   _CartScreenState createState() => _CartScreenState();
@@ -37,7 +39,6 @@ class CartScreen extends StatefulWidget {
 class _CartScreenState extends State<CartScreen> {
   late Future<List<CartProduct>> cartFuture;
   late List<CartProduct> cartProducts = [];
-  TaxModel? taxModel;
   TextEditingController noteController = TextEditingController(text: '');
 
   double subTotal = 0.0;
@@ -60,12 +61,17 @@ class _CartScreenState extends State<CartScreen> {
   String? selctedOrderTypeValue = "Delivery".tr();
   bool isDeliverFound = false;
   var tipValue = 0.0;
-  bool isTipSelected = false, isTipSelected1 = false, isTipSelected2 = false, isTipSelected3 = false;
+  bool isTipSelected = false,
+      isTipSelected1 = false,
+      isTipSelected2 = false,
+      isTipSelected3 = false;
   final TextEditingController _textFieldController = TextEditingController();
 
   double specialDiscount = 0.0;
   double specialDiscountAmount = 0.0;
   String specialType = "";
+
+  Timestamp? scheduleTime;
 
   @override
   void initState() {
@@ -77,15 +83,18 @@ class _CartScreenState extends State<CartScreen> {
   getFoodType() async {
     SharedPreferences sp = await SharedPreferences.getInstance();
     setState(() {
-      selctedOrderTypeValue = sp.getString("foodType") == "" || sp.getString("foodType") == null
-          ? "Delivery"
-          : sp.getString("foodType");
+      selctedOrderTypeValue =
+          sp.getString("foodType") == "" || sp.getString("foodType") == null
+              ? "Delivery"
+              : sp.getString("foodType");
     });
   }
 
   Future<void> getDeliveyData() async {
     isDeliverFound = true;
-    await _fireStoreUtils.getVendorByVendorID(cartProducts.first.vendorID).then((value) {
+    await _fireStoreUtils
+        .getVendorByVendorID(cartProducts.first.vendorID)
+        .then((value) {
       vendorModel = value;
     });
     if (selctedOrderTypeValue == "Delivery") {
@@ -95,19 +104,29 @@ class _CartScreenState extends State<CartScreen> {
         if (MyAppState.currentUser != null &&
             MyAppState.currentUser!.shippingAddress.location.longitude != 0 &&
             MyAppState.currentUser!.shippingAddress.location.latitude != 0 &&
-            MyAppState.currentUser!.shippingAddress.location.longitude != 0.01 &&
+            MyAppState.currentUser!.shippingAddress.location.longitude !=
+                0.01 &&
             MyAppState.currentUser!.shippingAddress.location.latitude != 0.01) {
           num km = num.parse(getKm(
               Position.fromMap({
-                'latitude': MyAppState.currentUser!.shippingAddress.location.latitude,
-                'longitude': MyAppState.currentUser!.shippingAddress.location.longitude
+                'latitude':
+                    MyAppState.currentUser!.shippingAddress.location.latitude,
+                'longitude':
+                    MyAppState.currentUser!.shippingAddress.location.longitude
               }),
-              Position.fromMap({'latitude': vendorModel!.latitude, 'longitude': vendorModel!.longitude})));
+              Position.fromMap({
+                'latitude': vendorModel!.latitude,
+                'longitude': vendorModel!.longitude
+              })));
           getDeliveryCharges(km);
         }
       } else {
-        num km = num.parse(getKm(MyAppState.selectedPosition,
-            Position.fromMap({'latitude': vendorModel!.latitude, 'longitude': vendorModel!.longitude})));
+        num km = num.parse(getKm(
+            MyAppState.selectedPosition,
+            Position.fromMap({
+              'latitude': vendorModel!.latitude,
+              'longitude': vendorModel!.longitude
+            })));
         getDeliveryCharges(km);
       }
     }
@@ -115,8 +134,8 @@ class _CartScreenState extends State<CartScreen> {
 
   getDeliveryCharges(num km) async {
     deliverExec = true;
-    if (serviceTypeFlag == "ecommerce-service") {
-      deliveryCharges = ecommarceDileveryCharges;
+    if (sectionConstantModel!.serviceTypeFlag == "ecommerce-service") {
+      deliveryCharges = sectionConstantModel!.delivery_charge!;
       setState(() {});
     } else {
       _fireStoreUtils.getDeliveryCharges().then((value) {
@@ -126,33 +145,44 @@ class _CartScreenState extends State<CartScreen> {
           if (!deliveryChargeModel.vendor_can_modify) {
             if (km > deliveryChargeModel.minimum_delivery_charges_within_km) {
               deliveryCharges =
-                  (km * deliveryChargeModel.delivery_charges_per_km).toDouble().toStringAsFixed(decimal);
+                  (km * deliveryChargeModel.delivery_charges_per_km)
+                      .toDouble()
+                      .toStringAsFixed(currencyData!.decimal);
               setState(() {});
             } else {
-              deliveryCharges =
-                  deliveryChargeModel.minimum_delivery_charges.toDouble().toStringAsFixed(decimal);
+              deliveryCharges = deliveryChargeModel.minimum_delivery_charges
+                  .toDouble()
+                  .toStringAsFixed(currencyData!.decimal);
               setState(() {});
             }
           } else {
             if (vendorModel != null && vendorModel!.DeliveryCharge != null) {
-              if (km > vendorModel!.DeliveryCharge!.minimum_delivery_charges_within_km) {
-                deliveryCharges = (km * vendorModel!.DeliveryCharge!.delivery_charges_per_km)
-                    .toDouble()
-                    .toStringAsFixed(decimal);
+              if (km >
+                  vendorModel!
+                      .DeliveryCharge!.minimum_delivery_charges_within_km) {
+                deliveryCharges =
+                    (km * vendorModel!.DeliveryCharge!.delivery_charges_per_km)
+                        .toDouble()
+                        .toStringAsFixed(currencyData!.decimal);
                 setState(() {});
               } else {
-                deliveryCharges =
-                    vendorModel!.DeliveryCharge!.minimum_delivery_charges.toDouble().toStringAsFixed(decimal);
+                deliveryCharges = vendorModel!
+                    .DeliveryCharge!.minimum_delivery_charges
+                    .toDouble()
+                    .toStringAsFixed(currencyData!.decimal);
                 setState(() {});
               }
             } else {
               if (km > deliveryChargeModel.minimum_delivery_charges_within_km) {
                 deliveryCharges =
-                    (km * deliveryChargeModel.delivery_charges_per_km).toDouble().toStringAsFixed(decimal);
+                    (km * deliveryChargeModel.delivery_charges_per_km)
+                        .toDouble()
+                        .toStringAsFixed(currencyData!.decimal);
                 setState(() {});
               } else {
-                deliveryCharges =
-                    deliveryChargeModel.minimum_delivery_charges.toDouble().toStringAsFixed(decimal);
+                deliveryCharges = deliveryChargeModel.minimum_delivery_charges
+                    .toDouble()
+                    .toStringAsFixed(currencyData!.decimal);
                 setState(() {});
               }
             }
@@ -176,7 +206,8 @@ class _CartScreenState extends State<CartScreen> {
   Widget build(BuildContext context) {
     cartDatabase = Provider.of<CartDatabase>(context, listen: true);
     return Scaffold(
-      backgroundColor: isDarkMode(context) ? Colors.black : const Color(0xffFFFFFF),
+      backgroundColor:
+          isDarkMode(context) ? Colors.black : const Color(0xffFFFFFF),
       body: StreamBuilder<List<CartProduct>>(
         stream: cartDatabase.watchProducts,
         initialData: const [],
@@ -214,7 +245,8 @@ class _CartScreenState extends State<CartScreen> {
                           itemBuilder: (context, index) {
                             vendorID = cartProducts[index].vendorID;
                             return Container(
-                              margin: const EdgeInsets.only(left: 13, top: 13, right: 13, bottom: 13),
+                              margin: const EdgeInsets.only(
+                                  left: 13, top: 13, right: 13, bottom: 13),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
@@ -222,7 +254,9 @@ class _CartScreenState extends State<CartScreen> {
                                         ? const Color(DarkContainerBorderColor)
                                         : Colors.grey.shade100,
                                     width: 1),
-                                color: isDarkMode(context) ? Color(DarkContainerColor) : Colors.white,
+                                color: isDarkMode(context)
+                                    ? Color(DarkContainerColor)
+                                    : Colors.white,
                                 boxShadow: [
                                   isDarkMode(context)
                                       ? const BoxShadow()
@@ -269,14 +303,17 @@ class _CartScreenState extends State<CartScreen> {
                           couponId: couponId,
                           extra_addons: commaSepratedAddOns,
                           tipValue: tipValue.toString(),
-                          take_away: selctedOrderTypeValue == "Delivery" ? false : true,
+                          take_away: selctedOrderTypeValue == "Delivery"
+                              ? false
+                              : true,
                           deliveryCharge: deliveryCharges,
-                          taxModel: taxModel,
+                          taxModel: taxList,
                           specialDiscountMap: specialDiscountMap,
+                          scheduleTime: scheduleTime,
                         ),
                       );
                     } else {
-                      /* push(
+                      push(
                         context,
                         PaymentScreen(
                           total: grandtotal,
@@ -289,10 +326,11 @@ class _CartScreenState extends State<CartScreen> {
                           tipValue: "0",
                           take_away: true,
                           deliveryCharge: "0",
-                          taxModel: taxModel,
+                          taxModel: taxList,
                           specialDiscountMap: specialDiscountMap,
+                          scheduleTime: scheduleTime,
                         ),
-                      );*/
+                      );
                       // placeOrder();
                     }
                   },
@@ -301,7 +339,8 @@ class _CartScreenState extends State<CartScreen> {
                     height: MediaQuery.of(context).size.height * 0.080,
                     child: Container(
                       color: Color(COLOR_PRIMARY),
-                      padding: const EdgeInsets.only(left: 15, right: 10, bottom: 8, top: 8),
+                      padding: const EdgeInsets.only(
+                          left: 15, right: 10, bottom: 8, top: 8),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -311,7 +350,7 @@ class _CartScreenState extends State<CartScreen> {
                                   color: Color(0xFFFFFFFF),
                                 )),
                             Text(
-                              symbol + grandtotal.toDouble().toStringAsFixed(decimal),
+                              amountShow(amount: grandtotal.toString()),
                               style: const TextStyle(
                                 color: Color(0xFFFFFFFF),
                               ),
@@ -348,13 +387,16 @@ class _CartScreenState extends State<CartScreen> {
     }
 
     ProductModel? productModel;
-    FireStoreUtils().getProductByID(cartProduct.id.split('~').first).then((value) {
+    FireStoreUtils()
+        .getProductByID(cartProduct.id.split('~').first)
+        .then((value) {
       productModel = value;
     });
 
     VariantInfo? variantInfo;
     if (cartProduct.variant_info != null) {
-      variantInfo = VariantInfo.fromJson(jsonDecode(cartProduct.variant_info.toString()));
+      variantInfo =
+          VariantInfo.fromJson(jsonDecode(cartProduct.variant_info.toString()));
     }
     if (cartProduct.extras == null) {
       addOnVal.clear();
@@ -363,8 +405,11 @@ class _CartScreenState extends State<CartScreen> {
         if (cartProduct.extras == '[]') {
           addOnVal.clear();
         } else {
-          String extraDecode =
-              cartProduct.extras.toString().replaceAll("[", "").replaceAll("]", "").replaceAll("\"", "");
+          String extraDecode = cartProduct.extras
+              .toString()
+              .replaceAll("[", "")
+              .replaceAll("]", "")
+              .replaceAll("\"", "");
           if (extraDecode.contains(",")) {
             addOnVal = extraDecode.split(",");
           } else {
@@ -383,7 +428,8 @@ class _CartScreenState extends State<CartScreen> {
     if (cartProduct.extras_price != null &&
         cartProduct.extras_price != "" &&
         double.parse(cartProduct.extras_price!) != 0.0) {
-      priceTotalValue += double.parse(cartProduct.extras_price!) * cartProduct.quantity;
+      priceTotalValue +=
+          double.parse(cartProduct.extras_price!) * cartProduct.quantity;
     }
     priceTotalValue += double.parse(cartProduct.price) * cartProduct.quantity;
 
@@ -409,7 +455,7 @@ class _CartScreenState extends State<CartScreen> {
                   child: CachedNetworkImage(
                       height: 80,
                       width: 80,
-                      imageUrl: getImageValidUrl(cartProduct.photo),
+                      imageUrl: getImageVAlidUrl(cartProduct.photo),
                       imageBuilder: (context, imageProvider) => Container(
                             width: 80,
                             height: 80,
@@ -438,8 +484,9 @@ class _CartScreenState extends State<CartScreen> {
                         style: const TextStyle(fontSize: 18),
                       ),
                       Text(
-                        symbol + priceTotalValue.toDouble().toStringAsFixed(decimal),
-                        style: TextStyle(fontSize: 20, color: Color(COLOR_PRIMARY)),
+                        amountShow(amount: priceTotalValue.toString()),
+                        style: TextStyle(
+                            fontSize: 20, color: Color(COLOR_PRIMARY)),
                       ),
                     ],
                   ),
@@ -476,16 +523,24 @@ class _CartScreenState extends State<CartScreen> {
                         print(quen);
                         if (productModel!.itemAttributes != null) {
                           if (productModel!.itemAttributes!.variants!
-                              .where((element) => element.variant_sku == variantInfo!.variant_sku)
+                              .where((element) =>
+                                  element.variant_sku ==
+                                  variantInfo!.variant_sku)
                               .isNotEmpty) {
-                            if (int.parse(productModel!.itemAttributes!.variants!
-                                        .where((element) => element.variant_sku == variantInfo!.variant_sku)
+                            if (int.parse(productModel!
+                                        .itemAttributes!.variants!
+                                        .where((element) =>
+                                            element.variant_sku ==
+                                            variantInfo!.variant_sku)
                                         .first
                                         .variant_quantity
                                         .toString()) >
                                     quen ||
-                                int.parse(productModel!.itemAttributes!.variants!
-                                        .where((element) => element.variant_sku == variantInfo!.variant_sku)
+                                int.parse(productModel!
+                                        .itemAttributes!.variants!
+                                        .where((element) =>
+                                            element.variant_sku ==
+                                            variantInfo!.variant_sku)
                                         .first
                                         .variant_quantity
                                         .toString()) ==
@@ -493,27 +548,31 @@ class _CartScreenState extends State<CartScreen> {
                               quen++;
                               addtocard(cartProduct, quen);
                             } else {
-                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                content: Text("Product is out of Stock"),
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(SnackBar(
+                                content: Text("Product is out of Stock".tr()),
                               ));
                             }
                           } else {
-                            if (productModel!.quantity > quen || productModel!.quantity == -1) {
+                            if (productModel!.quantity > quen ||
+                                productModel!.quantity == -1) {
                               quen++;
                               addtocard(cartProduct, quen);
                             } else {
-                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                content: Text("Product is out of Stock"),
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(SnackBar(
+                                content: Text("Product is out of Stock".tr()),
                               ));
                             }
                           }
                         } else {
-                          if (productModel!.quantity > quen || productModel!.quantity == -1) {
+                          if (productModel!.quantity > quen ||
+                              productModel!.quantity == -1) {
                             quen++;
                             addtocard(cartProduct, quen);
                           } else {
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                              content: Text("Product is out of Stock"),
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text("Product is out of Stock".tr()),
                             ));
                           }
                         }
@@ -531,7 +590,8 @@ class _CartScreenState extends State<CartScreen> {
             variantInfo == null || variantInfo.variant_options!.isEmpty
                 ? Container()
                 : Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
                     child: Wrap(
                       spacing: 6.0,
                       runSpacing: 6.0,
@@ -589,7 +649,8 @@ class _CartScreenState extends State<CartScreen> {
     return currentDate.isAfter(startDate) && currentDate.isBefore(endDate);
   }
 
-  Widget buildTotalRow(List<CartProduct> data, List<AddAddonsDemo> lstExtras, String vendorID) {
+  Widget buildTotalRow(
+      List<CartProduct> data, List<AddAddonsDemo> lstExtras, String vendorID) {
     var _font = 16.00;
     subTotal = 0.00;
     grandtotal = 0;
@@ -606,7 +667,9 @@ class _CartScreenState extends State<CartScreen> {
           AddOnVal = AddOnVal + double.parse(addAddonsDemo.price!);
         }
       }
-      if (e.extras_price != null && e.extras_price != "" && double.parse(e.extras_price!) != 0.0) {
+      if (e.extras_price != null &&
+          e.extras_price != "" &&
+          double.parse(e.extras_price!) != 0.0) {
         subTotal += double.parse(e.extras_price!) * e.quantity;
       }
       subTotal += double.parse(e.price) * e.quantity;
@@ -639,8 +702,10 @@ class _CartScreenState extends State<CartScreen> {
             if (element.timeslot!.isNotEmpty) {
               element.timeslot!.forEach((element) {
                 if (element.discount_type == "delivery") {
-                  var start = DateFormat("dd-MM-yyyy HH:mm").parse(date + " " + element.from.toString());
-                  var end = DateFormat("dd-MM-yyyy HH:mm").parse(date + " " + element.to.toString());
+                  var start = DateFormat("dd-MM-yyyy HH:mm")
+                      .parse(date + " " + element.from.toString());
+                  var end = DateFormat("dd-MM-yyyy HH:mm")
+                      .parse(date + " " + element.to.toString());
                   if (isCurrentDateInRange(start, end)) {
                     specialDiscount = double.parse(element.discount.toString());
                     specialType = element.type.toString();
@@ -661,21 +726,37 @@ class _CartScreenState extends State<CartScreen> {
         specialType = "amount";
       }
     }
-    grandtotal += getTaxValue(taxModel, subTotal - discountVal - specialDiscountAmount);
+    //  grandtotal += getTaxValue(taxModel, subTotal - discountVal - specialDiscountAmount);
+    if (taxList != null) {
+      for (var element in taxList!) {
+        grandtotal = grandtotal +
+            getTaxValue(
+                amount:
+                    (subTotal - discountVal - specialDiscountAmount).toString(),
+                taxModel: element);
+      }
+    }
+
     // });
     // });
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
             padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-            margin: const EdgeInsets.only(left: 13, top: 13, right: 13, bottom: 13),
+            margin:
+                const EdgeInsets.only(left: 13, top: 13, right: 13, bottom: 13),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                  color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100,
+                  color: isDarkMode(context)
+                      ? const Color(DarkContainerBorderColor)
+                      : Colors.grey.shade100,
                   width: 1),
-              color: isDarkMode(context) ? Color(DarkContainerColor) : Colors.white,
+              color: isDarkMode(context)
+                  ? Color(DarkContainerColor)
+                  : Colors.white,
               boxShadow: [
                 isDarkMode(context)
                     ? const BoxShadow()
@@ -716,7 +797,8 @@ class _CartScreenState extends State<CartScreen> {
                         enableDrag: true,
                         builder: (BuildContext context) => sheet());
                   },
-                  child: const Image(image: AssetImage("assets/images/add.png"), width: 40),
+                  child: const Image(
+                      image: AssetImage("assets/images/add.png"), width: 40),
                 )
               ],
             )),
@@ -726,9 +808,13 @@ class _CartScreenState extends State<CartScreen> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                  color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100,
+                  color: isDarkMode(context)
+                      ? const Color(DarkContainerBorderColor)
+                      : Colors.grey.shade100,
                   width: 1),
-              color: isDarkMode(context) ? Color(DarkContainerColor) : Colors.white,
+              color: isDarkMode(context)
+                  ? Color(DarkContainerColor)
+                  : Colors.white,
               boxShadow: [
                 isDarkMode(context)
                     ? const BoxShadow()
@@ -761,18 +847,92 @@ class _CartScreenState extends State<CartScreen> {
                         enableDrag: true,
                         builder: (BuildContext context) => Notesheet());
                   },
-                  child: const Image(image: AssetImage("assets/images/add.png"), width: 40),
+                  child: const Image(
+                      image: AssetImage("assets/images/add.png"), width: 40),
                 )
               ],
             )),
+        if (sectionConstantModel!.serviceTypeFlag != "ecommerce-service")
+          Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              margin: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                    color: isDarkMode(context)
+                        ? const Color(DarkContainerBorderColor)
+                        : Colors.grey.shade100,
+                    width: 1),
+                color: isDarkMode(context)
+                    ? const Color(DarkContainerColor)
+                    : Colors.white,
+                boxShadow: [
+                  isDarkMode(context)
+                      ? const BoxShadow()
+                      : BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          blurRadius: 5,
+                        ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Schedule Order".tr(),
+                        style: const TextStyle(
+                          fontFamily: "Poppinsm",
+                        ),
+                      ),
+                    ],
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      BottomPicker.dateTime(
+                        titleStyle: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 15),
+                        onSubmit: (index) {
+                          setState(() {
+                            DateTime dateAndTime = index;
+                            scheduleTime = Timestamp.fromDate(dateAndTime);
+                          });
+                        },
+                        minDateTime: DateTime.now(),
+                        buttonAlignement: MainAxisAlignment.center,
+                        displayButtonIcon: false,
+                        displaySubmitButton: true,
+                        title: '',
+                        buttonText: 'Confirm'.tr(),
+                        buttonSingleColor: Color(COLOR_PRIMARY),
+                        buttonTextStyle: const TextStyle(color: Colors.white),
+                      ).show(context);
+                    },
+                    child: Text(
+                      scheduleTime == null
+                          ? "Select".tr()
+                          : DateFormat("EEE dd MMMM , HH:mm aa")
+                              .format(scheduleTime!.toDate()),
+                      style: TextStyle(
+                          fontFamily: "Poppinsm", color: Color(COLOR_PRIMARY)),
+                    ),
+                  )
+                ],
+              )),
         Container(
-          margin: const EdgeInsets.only(left: 13, top: 10, right: 13, bottom: 13),
+          margin:
+              const EdgeInsets.only(left: 13, top: 10, right: 13, bottom: 13),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
-                color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100,
+                color: isDarkMode(context)
+                    ? const Color(DarkContainerBorderColor)
+                    : Colors.grey.shade100,
                 width: 1),
-            color: isDarkMode(context) ? Color(DarkContainerColor) : Colors.white,
+            color:
+                isDarkMode(context) ? Color(DarkContainerColor) : Colors.white,
             boxShadow: [
               isDarkMode(context)
                   ? const BoxShadow()
@@ -785,7 +945,8 @@ class _CartScreenState extends State<CartScreen> {
           child: Column(
             children: [
               Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -795,20 +956,25 @@ class _CartScreenState extends State<CartScreen> {
                       ),
                       Text(
                         selctedOrderTypeValue == "Delivery"
-                            ? "Delivery (${symbol + double.parse(deliveryCharges).toStringAsFixed(decimal)})"
+                            ? "Delivery (${amountShow(amount: deliveryCharges.toString())})"
                             : selctedOrderTypeValue! + " (Free)",
+                        //selctedOrderTypeValue == "Delivery" ? "Delivery (${symbol + double.parse(deliveryCharges).toStringAsFixed(decimal)})" : selctedOrderTypeValue! + " (Free)",
                         style: TextStyle(
-                            color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333),
-                            fontSize: selctedOrderTypeValue == "Delivery" ? _font : 15),
+                            color: isDarkMode(context)
+                                ? const Color(0xffFFFFFF)
+                                : const Color(0xff333333),
+                            fontSize: selctedOrderTypeValue == "Delivery"
+                                ? _font
+                                : 15),
                       ),
                     ],
                   )),
               const Divider(
-                color: Color(0xffE2E8F0),
-                height: 0.1,
+                thickness: 1,
               ),
               Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -817,19 +983,21 @@ class _CartScreenState extends State<CartScreen> {
                         style: TextStyle(fontSize: _font),
                       ),
                       Text(
-                        symbol + subTotal.toStringAsFixed(decimal),
+                        amountShow(amount: subTotal.toString()),
                         style: TextStyle(
-                            color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333),
+                            color: isDarkMode(context)
+                                ? const Color(0xffFFFFFF)
+                                : const Color(0xff333333),
                             fontSize: _font),
                       ),
                     ],
                   )),
               const Divider(
-                color: Color(0xffE2E8F0),
-                height: 0.1,
+                thickness: 1,
               ),
               Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -838,69 +1006,214 @@ class _CartScreenState extends State<CartScreen> {
                         style: TextStyle(fontSize: _font),
                       ),
                       Text(
+                        //percentage != 0.0
+                        // ? percentage != null
+                        // ? "(" + symbol + per.toDouble().toStringAsFixed(decimal) + ")"
+                        //    : "(" + symbol + 0.toStringAsFixed(decimal) + ")"
+                        //  : type != null
+                        //  ? "(" + symbol + type.toDouble().toStringAsFixed(decimal) + ")"
+                        //  : "(" + symbol + 0.toStringAsFixed(decimal) + ")",
+
                         percentage != 0.0
                             ? percentage != null
-                                ? "(" + symbol + per.toDouble().toStringAsFixed(decimal) + ")"
-                                : "(" + symbol + 0.toStringAsFixed(decimal) + ")"
+                                ? "(-" +
+                                    amountShow(
+                                        amount: (per.toDouble()).toString()) +
+                                    ")"
+                                : "(-" + amountShow(amount: "0.0") + ")"
                             : type != null
-                                ? "(" + symbol + type.toDouble().toStringAsFixed(decimal) + ")"
-                                : "(" + symbol + 0.toStringAsFixed(decimal) + ")",
+                                ? "(-" +
+                                    amountShow(
+                                        amount: (type.toDouble()).toString()) +
+                                    ")"
+                                : "(-" + amountShow(amount: "0.0") + ")",
+
                         style: TextStyle(
-                            color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333),
+                            fontFamily: "Poppinsm",
+                            color: Colors.red,
                             fontSize: _font),
                       ),
                     ],
                   )),
               const Divider(
-                color: Color(0xffE2E8F0),
-                height: 0.1,
+                thickness: 1,
               ),
               Visibility(
-                visible: vendorModel != null ? vendorModel!.specialDiscountEnable : false,
-                child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Special Discount".tr() +
-                              "($specialDiscount ${specialType == "amount" ? symbol : "%"})",
-                          style: TextStyle(fontSize: _font),
-                        ),
-                        Text(
-                          symbol + specialDiscountAmount.toStringAsFixed(decimal),
-                          style: TextStyle(
-                              color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333),
-                              fontSize: _font),
-                        ),
-                      ],
-                    )),
+                visible: vendorModel != null
+                    ? vendorModel!.specialDiscountEnable
+                    : false,
+                child: Column(
+                  children: [
+                    Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 5),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Special Discount".tr() +
+                                  "($specialDiscount ${specialType == "amount" ? currencyData!.symbol : "%"})",
+                              style: TextStyle(fontSize: _font),
+                            ),
+                            Text(
+                              "(-${amountShow(amount: specialDiscountAmount.toString())})",
+                              //symbol + specialDiscountAmount.toStringAsFixed(decimal),
+                              style: TextStyle(
+                                  fontFamily: "Poppinsm",
+                                  color: Colors.red,
+                                  fontSize: _font),
+                            ),
+                          ],
+                        )),
+                    const Divider(
+                      thickness: 1,
+                    ),
+                  ],
+                ),
               ),
-              const Divider(
-                color: Color(0xffE2E8F0),
-                height: 0.1,
-              ),
+
               selctedOrderTypeValue == "Delivery"
                   ? (widget.fromStoreSelection &&
                           !deliverExec! &&
                           MyAppState.selectedPosition.latitude == 0.0 &&
                           MyAppState.selectedPosition.longitude == 0)
                       ? Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                          child: Text("Delivery Charge Will Applied Next Step.".tr(),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 5),
+                          child: Text(
+                              "Delivery Charge Will Applied Next Step.".tr(),
                               style: TextStyle(fontSize: _font)),
                         )
-                      : Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                      : Column(
+                          children: [
+                            Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 5),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Delivery Charges".tr(),
+                                      style: TextStyle(fontSize: _font),
+                                    ),
+                                    Text(
+                                      amountShow(
+                                          amount: deliveryCharges.toString()),
+                                      style: TextStyle(
+                                          color: isDarkMode(context)
+                                              ? const Color(0xffFFFFFF)
+                                              : const Color(0xff333333),
+                                          fontSize: _font),
+                                    ),
+                                  ],
+                                )),
+                            const Divider(
+                              thickness: 1,
+                            ),
+                          ],
+                        )
+                  : Container(),
+              ListView.builder(
+                itemCount: taxList!.length,
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemBuilder: (context, index) {
+                  TaxModel taxModel = taxList![index];
+                  return Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 5),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                "${taxModel.title.toString()} (${taxModel.type == "fix" ? amountShow(amount: taxModel.tax) : "${taxModel.tax}%"})",
+                                style: TextStyle(
+                                    fontFamily: "Poppinsm", fontSize: _font),
+                              ),
+                            ),
+                            Text(
+                              amountShow(
+                                  amount: getTaxValue(
+                                          amount: (double.parse(
+                                                      subTotal.toString()) -
+                                                  discountVal -
+                                                  specialDiscountAmount)
+                                              .toString(),
+                                          taxModel: taxModel)
+                                      .toString()),
+                              style: TextStyle(
+                                  fontFamily: "Poppinsm",
+                                  color: isDarkMode(context)
+                                      ? const Color(0xffFFFFFF)
+                                      : const Color(0xff333333),
+                                  fontSize: _font),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Divider(
+                        thickness: 1,
+                      ),
+                    ],
+                  );
+                },
+              ),
+              /* taxModel != null
+                  ? Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            ((taxModel!.tax_lable!.isNotEmpty)
+                                    ? taxModel!.tax_lable.toString()
+                                    : "Tax") +
+                                " ${(taxModel!.tax_type == "fix") ? "" : "(${taxModel!.tax_amount} %)"}",
+                            style: TextStyle(fontSize: _font),
+                          ),
+                          Text(
+                            //symbol + getTaxValue(taxModel, subTotal - discountVal - specialDiscountAmount).toStringAsFixed(decimal),
+                            amountShow(amount: getTaxValue(taxModel,subTotal -
+                                discountVal -
+                                specialDiscountAmount).toString()),
+
+                            style: TextStyle(
+                                color: isDarkMode(context)
+                                    ? const Color(0xffFFFFFF)
+                                    : const Color(0xff333333),
+                                fontSize: _font),
+                          ),
+                        ],
+                      ))
+                  : Container(),*/
+              // const Divider(
+              //   color: Color(0xffE2E8F0),
+              //   height: 0.1,
+              // ),
+              Visibility(
+                  visible: ((tipValue) > 0),
+                  child: Column(
+                    children: [
+                      Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 5),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                "Delivery Charges".tr(),
-                                style: TextStyle(fontSize: _font),
+                                "Tip amount".tr(),
+                                style: TextStyle(
+                                    color: isDarkMode(context)
+                                        ? const Color(0xffFFFFFF)
+                                        : const Color(0xff333333),
+                                    fontSize: _font),
                               ),
                               Text(
-                                symbol + double.parse(deliveryCharges).toStringAsFixed(decimal),
+                                '${amountShow(amount: tipValue.toString())}',
                                 style: TextStyle(
                                     color: isDarkMode(context)
                                         ? const Color(0xffFFFFFF)
@@ -908,83 +1221,33 @@ class _CartScreenState extends State<CartScreen> {
                                     fontSize: _font),
                               ),
                             ],
-                          ))
-                  : Container(),
-              taxModel != null
-                  ? const Divider(
-                      color: Color(0xffE2E8F0),
-                      height: 0.1,
-                    )
-                  : Container(),
-              taxModel != null
-                  ? Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            ((taxModel!.tax_lable!.isNotEmpty) ? taxModel!.tax_lable.toString() : "Tax") +
-                                " ${(taxModel!.tax_type == "fix") ? "" : "(${taxModel!.tax_amount} %)"}",
-                            style: TextStyle(fontSize: _font),
-                          ),
-                          Text(
-                            symbol +
-                                getTaxValue(taxModel, subTotal - discountVal - specialDiscountAmount)
-                                    .toStringAsFixed(decimal),
-                            style: TextStyle(
-                                color:
-                                    isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333),
-                                fontSize: _font),
-                          ),
-                        ],
-                      ))
-                  : Container(),
-              const Divider(
-                color: Color(0xffE2E8F0),
-                height: 0.1,
-              ),
-              Visibility(
-                  visible: ((tipValue) > 0),
-                  child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Tip amount".tr(),
-                            style: TextStyle(
-                                color:
-                                    isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333),
-                                fontSize: _font),
-                          ),
-                          Text(
-                            '$symbol${tipValue.toStringAsFixed(decimal)}',
-                            style: TextStyle(
-                                color:
-                                    isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333),
-                                fontSize: _font),
-                          ),
-                        ],
-                      ))),
-              const Divider(
-                color: Color(0xffE2E8F0),
-                height: 0.1,
-              ),
+                          )),
+                      const Divider(
+                        thickness: 1,
+                      ),
+                    ],
+                  )),
+
               Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         "Order Total".tr(),
                         style: TextStyle(
-                            color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333),
+                            color: isDarkMode(context)
+                                ? const Color(0xffFFFFFF)
+                                : const Color(0xff333333),
                             fontSize: _font),
                       ),
                       Text(
-                        symbol + grandtotal.toDouble().toStringAsFixed(decimal),
+                        amountShow(amount: grandtotal.toString()),
                         style: TextStyle(
-                            color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333),
+                            color: isDarkMode(context)
+                                ? const Color(0xffFFFFFF)
+                                : const Color(0xff333333),
                             fontSize: _font),
                       ),
                     ],
@@ -994,7 +1257,8 @@ class _CartScreenState extends State<CartScreen> {
         ),
         selctedOrderTypeValue == "Delivery"
             ? Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -1003,12 +1267,15 @@ class _CartScreenState extends State<CartScreen> {
                       textAlign: TextAlign.start,
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333),
+                          color: isDarkMode(context)
+                              ? const Color(0xffFFFFFF)
+                              : const Color(0xff333333),
                           fontSize: 15),
                     ),
                     Text(
                       "tip-to-driver".tr(),
-                      style: const TextStyle(color: Color(0xff9091A4), fontSize: 14),
+                      style: const TextStyle(
+                          color: Color(0xff9091A4), fontSize: 14),
                     ),
                     const SizedBox(
                       height: 15,
@@ -1041,14 +1308,16 @@ class _CartScreenState extends State<CartScreen> {
                                       ? Colors.black
                                       : const Color(0xffFFFFFF),
                               borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: const Color(0xff9091A4), width: 1),
+                              border: Border.all(
+                                  color: const Color(0xff9091A4), width: 1),
                             ),
                             child: Center(
                                 child: Text(
-                              symbol + double.parse("10").toStringAsFixed(decimal),
+                              amountShow(amount: "10"),
                               style: TextStyle(
-                                  color:
-                                      isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333),
+                                  color: isDarkMode(context)
+                                      ? const Color(0xffFFFFFF)
+                                      : const Color(0xff333333),
                                   fontSize: 14),
                             )),
                           ),
@@ -1078,14 +1347,16 @@ class _CartScreenState extends State<CartScreen> {
                                       ? Colors.black
                                       : const Color(0xffFFFFFF),
                               borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: const Color(0xff9091A4), width: 1),
+                              border: Border.all(
+                                  color: const Color(0xff9091A4), width: 1),
                             ),
                             child: Center(
                                 child: Text(
-                              symbol + double.parse("20").toStringAsFixed(decimal),
+                              amountShow(amount: "20"),
                               style: TextStyle(
-                                  color:
-                                      isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333),
+                                  color: isDarkMode(context)
+                                      ? const Color(0xffFFFFFF)
+                                      : const Color(0xff333333),
                                   fontSize: 14),
                             )),
                           ),
@@ -1117,14 +1388,16 @@ class _CartScreenState extends State<CartScreen> {
                                       ? Colors.black
                                       : const Color(0xffFFFFFF),
                               borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: const Color(0xff9091A4), width: 1),
+                              border: Border.all(
+                                  color: const Color(0xff9091A4), width: 1),
                             ),
                             child: Center(
                                 child: Text(
-                              symbol + double.parse("30").toStringAsFixed(decimal),
+                              amountShow(amount: "30"),
                               style: TextStyle(
-                                  color:
-                                      isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333),
+                                  color: isDarkMode(context)
+                                      ? const Color(0xffFFFFFF)
+                                      : const Color(0xff333333),
                                   fontSize: 14),
                             )),
                           ),
@@ -1148,7 +1421,8 @@ class _CartScreenState extends State<CartScreen> {
                               }
                             },
                             child: Container(
-                              padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                              padding:
+                                  const EdgeInsets.fromLTRB(15, 10, 15, 10),
                               decoration: BoxDecoration(
                                 color: isTipSelected3
                                     ? Color(COLOR_PRIMARY)
@@ -1156,7 +1430,8 @@ class _CartScreenState extends State<CartScreen> {
                                         ? Colors.black
                                         : const Color(0xffFFFFFF),
                                 borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: const Color(0xff9091A4), width: 1),
+                                border: Border.all(
+                                    color: const Color(0xff9091A4), width: 1),
                               ),
                               child: Center(
                                   child: Text(
@@ -1210,9 +1485,14 @@ class _CartScreenState extends State<CartScreen> {
 
   sheet() {
     return Container(
-        padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.height / 4.3, left: 25, right: 25),
+        padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).size.height / 4.3,
+            left: 25,
+            right: 25),
         height: MediaQuery.of(context).size.height * 0.88,
-        decoration: BoxDecoration(color: Colors.transparent, border: Border.all(style: BorderStyle.none)),
+        decoration: BoxDecoration(
+            color: Colors.transparent,
+            border: Border.all(style: BorderStyle.none)),
         child: FutureBuilder<List<OfferModel>>(
             future: coupon,
             initialData: const [],
@@ -1251,7 +1531,9 @@ class _CartScreenState extends State<CartScreen> {
                 ),
                 Expanded(
                     child: Container(
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.white),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.white),
                   alignment: Alignment.center,
                   child: SingleChildScrollView(
                     child: Column(
@@ -1259,23 +1541,29 @@ class _CartScreenState extends State<CartScreen> {
                         Container(
                             padding: const EdgeInsets.only(top: 30),
                             child: const Image(
-                              image: AssetImage('assets/images/redeem_coupon.png'),
+                              image:
+                                  AssetImage('assets/images/redeem_coupon.png'),
                               width: 100,
                             )),
                         Container(
                             padding: const EdgeInsets.only(top: 20),
                             child: Text(
                               'Redeem Your Coupons'.tr(),
-                              style: const TextStyle(color: Color(0XFF2A2A2A), fontSize: 16),
+                              style: const TextStyle(
+                                  color: Color(0XFF2A2A2A), fontSize: 16),
                             )),
                         Container(
                             padding: const EdgeInsets.only(top: 10),
                             child: Text(
                               "Voucher or Coupon code".tr(),
-                              style: const TextStyle(color: Color(0XFF9091A4), letterSpacing: 0.5, height: 2),
+                              style: const TextStyle(
+                                  color: Color(0XFF9091A4),
+                                  letterSpacing: 0.5,
+                                  height: 2),
                             ).tr()),
                         Container(
-                            padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
+                            padding: const EdgeInsets.only(
+                                left: 20, right: 20, top: 20),
                             // height: 120,
                             child: DottedBorder(
                                 borderType: BorderType.RRect,
@@ -1283,10 +1571,14 @@ class _CartScreenState extends State<CartScreen> {
                                 dashPattern: const [4, 2],
                                 color: const Color(0XFFB7B7B7),
                                 child: ClipRRect(
-                                    borderRadius: const BorderRadius.all(Radius.circular(12)),
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(12)),
                                     child: Container(
-                                        padding:
-                                            const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 20),
+                                        padding: const EdgeInsets.only(
+                                            left: 20,
+                                            right: 20,
+                                            top: 20,
+                                            bottom: 20),
                                         color: const Color(0XFFF1F4F7),
                                         // height: 120,
                                         alignment: Alignment.center,
@@ -1298,8 +1590,10 @@ class _CartScreenState extends State<CartScreen> {
                                           decoration: InputDecoration(
                                             border: InputBorder.none,
                                             hintText: "Write Coupon Code".tr(),
-                                            hintStyle: const TextStyle(color: Color(0XFF9091A4)),
-                                            labelStyle: const TextStyle(color: Color(0XFF333333)),
+                                            hintStyle: const TextStyle(
+                                                color: Color(0XFF9091A4)),
+                                            labelStyle: const TextStyle(
+                                                color: Color(0XFF333333)),
                                             //  hintTextDirection: TextDecoration.lineThrough
                                             // contentPadding: EdgeInsets.only(left: 80,right: 30),
                                           ),
@@ -1308,7 +1602,8 @@ class _CartScreenState extends State<CartScreen> {
                           padding: const EdgeInsets.only(top: 30, bottom: 30),
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 15),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 100, vertical: 15),
                               backgroundColor: Color(COLOR_PRIMARY),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
@@ -1319,18 +1614,26 @@ class _CartScreenState extends State<CartScreen> {
                               type = 0.0;
                               couponId = "";
                               setState(() {
-                                for (int a = 0; a < snapshot.data!.length; a++) {
+                                for (int a = 0;
+                                    a < snapshot.data!.length;
+                                    a++) {
                                   OfferModel couponModel = snapshot.data![a];
 
-                                  if (vendorID == couponModel.storeId || couponModel.storeId == "") {
-                                    if (txt.text.toString() == couponModel.offerCode!.toString()) {
-                                      if (couponModel.discountTypeOffer == 'Percentage' ||
-                                          couponModel.discountTypeOffer == 'Percent') {
-                                        percentage = double.parse(couponModel.discountOffer!);
+                                  if (vendorID == couponModel.storeId ||
+                                      couponModel.storeId == "") {
+                                    if (txt.text.toString() ==
+                                        couponModel.offerCode!.toString()) {
+                                      if (couponModel.discountTypeOffer ==
+                                              'Percentage' ||
+                                          couponModel.discountTypeOffer ==
+                                              'Percent') {
+                                        percentage = double.parse(
+                                            couponModel.discountOffer!);
                                         couponId = couponModel.offerId!;
                                         break;
                                       } else {
-                                        type = double.parse(couponModel.discountOffer!);
+                                        type = double.parse(
+                                            couponModel.discountOffer!);
                                         couponId = couponModel.offerId!;
                                       }
                                     }
@@ -1343,7 +1646,10 @@ class _CartScreenState extends State<CartScreen> {
                             child: Text(
                               "REDEEM NOW".tr(),
                               style: TextStyle(
-                                  color: isDarkMode(context) ? Colors.black : Colors.white, fontSize: 16),
+                                  color: isDarkMode(context)
+                                      ? Colors.black
+                                      : Colors.white,
+                                  fontSize: 16),
                             ),
                           ),
                         ),
@@ -1359,9 +1665,14 @@ class _CartScreenState extends State<CartScreen> {
 
   Notesheet() {
     return Container(
-        padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.height / 4.3, left: 25, right: 25),
+        padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).size.height / 4.3,
+            left: 25,
+            right: 25),
         height: MediaQuery.of(context).size.height * 0.88,
-        decoration: BoxDecoration(color: Colors.transparent, border: Border.all(style: BorderStyle.none)),
+        decoration: BoxDecoration(
+            color: Colors.transparent,
+            border: Border.all(style: BorderStyle.none)),
         child: Column(children: [
           InkWell(
               onTap: () => Navigator.pop(context),
@@ -1388,7 +1699,8 @@ class _CartScreenState extends State<CartScreen> {
               child: Container(
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                color: isDarkMode(context) ? Colors.grey.shade700 : Colors.white),
+                color:
+                    isDarkMode(context) ? Colors.grey.shade700 : Colors.white),
             alignment: Alignment.center,
             child: SingleChildScrollView(
               child: Column(
@@ -1398,7 +1710,9 @@ class _CartScreenState extends State<CartScreen> {
                       child: Text(
                         'Remarks'.tr(),
                         style: TextStyle(
-                            color: isDarkMode(context) ? const Color(0XFFD5D5D5) : const Color(0XFF2A2A2A),
+                            color: isDarkMode(context)
+                                ? const Color(0XFFD5D5D5)
+                                : const Color(0XFF2A2A2A),
                             fontSize: 16),
                       )),
                   Container(
@@ -1406,24 +1720,32 @@ class _CartScreenState extends State<CartScreen> {
                       child: Text(
                         'Write remarks for Store'.tr(),
                         style: TextStyle(
-                            color: isDarkMode(context) ? Colors.white70 : const Color(0XFF9091A4),
+                            color: isDarkMode(context)
+                                ? Colors.white70
+                                : const Color(0XFF9091A4),
                             letterSpacing: 0.5,
                             height: 2),
                       ).tr()),
                   Container(
-                      padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
+                      padding:
+                          const EdgeInsets.only(left: 20, right: 20, top: 20),
                       // height: 120,
                       child: DottedBorder(
                           borderType: BorderType.RRect,
                           radius: const Radius.circular(12),
                           dashPattern: const [4, 2],
-                          color: isDarkMode(context) ? const Color(0XFF484848) : const Color(0XFFB7B7B7),
+                          color: isDarkMode(context)
+                              ? const Color(0XFF484848)
+                              : const Color(0XFFB7B7B7),
                           child: ClipRRect(
-                              borderRadius: const BorderRadius.all(Radius.circular(12)),
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(12)),
                               child: Container(
-                                  padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 20),
-                                  color:
-                                      isDarkMode(context) ? const Color(0XFF0e0b08) : const Color(0XFFF1F4F7),
+                                  padding: const EdgeInsets.only(
+                                      left: 20, right: 20, top: 20, bottom: 20),
+                                  color: isDarkMode(context)
+                                      ? const Color(0XFF0e0b08)
+                                      : const Color(0XFFF1F4F7),
                                   // height: 120,
                                   alignment: Alignment.center,
                                   child: TextFormField(
@@ -1432,15 +1754,18 @@ class _CartScreenState extends State<CartScreen> {
                                     decoration: InputDecoration(
                                       border: InputBorder.none,
                                       hintText: 'Write Remarks'.tr(),
-                                      hintStyle: const TextStyle(color: Color(0XFF9091A4)),
-                                      labelStyle: const TextStyle(color: Color(0XFF333333)),
+                                      hintStyle: const TextStyle(
+                                          color: Color(0XFF9091A4)),
+                                      labelStyle: const TextStyle(
+                                          color: Color(0XFF333333)),
                                     ),
                                   ))))),
                   Padding(
                     padding: const EdgeInsets.only(top: 30, bottom: 30),
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 15),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 100, vertical: 15),
                         backgroundColor: Color(COLOR_PRIMARY),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -1451,8 +1776,11 @@ class _CartScreenState extends State<CartScreen> {
                       },
                       child: Text(
                         'SUBMIT'.tr(),
-                        style:
-                            TextStyle(color: isDarkMode(context) ? Colors.black : Colors.white, fontSize: 16),
+                        style: TextStyle(
+                            color: isDarkMode(context)
+                                ? Colors.black
+                                : Colors.white,
+                            fontSize: 16),
                       ),
                     ),
                   ),
@@ -1480,7 +1808,8 @@ class _CartScreenState extends State<CartScreen> {
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                     backgroundColor: Color(COLOR_PRIMARY),
-                    textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.normal)),
+                    textStyle: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.normal)),
                 child: const Text('cancel').tr(),
                 onPressed: () {
                   Navigator.of(context).pop();
@@ -1489,7 +1818,8 @@ class _CartScreenState extends State<CartScreen> {
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                     backgroundColor: Color(COLOR_PRIMARY),
-                    textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.normal)),
+                    textStyle: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.normal)),
                 child: const Text('Submit').tr(),
                 onPressed: () {
                   setState(() {
@@ -1575,12 +1905,12 @@ class _CartScreenState extends State<CartScreen> {
         commaSepratedAddOnsString = commaSepratedAddOns.join(", ");
       }
     }
-    _fireStoreUtils.getSectionTaxSetting(SELECTED_CATEGORY).then((value) {
+    /* _fireStoreUtils.getSectionTaxSetting(SELECTED_CATEGORY).then((value) {
       if (value != null && value.tax_active != null && value.tax_active!) {
         taxModel = value;
         setState(() {});
       }
-    });
+    });*/
   }
 
   Future<void> setPrefData() async {
@@ -1608,9 +1938,12 @@ class _CartScreenState extends State<CartScreen> {
         ),
         child: Center(
             child: Text(
-          symbol + amount!,
+          amountShow(amount: amount!),
+          //symbol + amount!,
           style: TextStyle(
-            color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333),
+            color: isDarkMode(context)
+                ? const Color(0xffFFFFFF)
+                : const Color(0xff333333),
           ),
         )),
       ),
@@ -1620,7 +1953,8 @@ class _CartScreenState extends State<CartScreen> {
 
 Widget _buildChip(String label, int attributesOptionIndex) {
   return Container(
-    decoration: BoxDecoration(color: const Color(0xffEEEDED), borderRadius: BorderRadius.circular(4)),
+    decoration: BoxDecoration(
+        color: const Color(0xffEEEDED), borderRadius: BorderRadius.circular(4)),
     child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: Text(

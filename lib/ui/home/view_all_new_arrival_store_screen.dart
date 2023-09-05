@@ -124,7 +124,7 @@ class _ViewAllNewArrivalStoreScreenState extends State<ViewAllNewArrivalStoreScr
           children: [
             Expanded(
                 child: CachedNetworkImage(
-              imageUrl: getImageValidUrl(vendorModel.photo),
+              imageUrl: getImageVAlidUrl(vendorModel.photo),
               imageBuilder: (context, imageProvider) => Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
@@ -275,6 +275,6 @@ class _ViewAllNewArrivalStoreScreenState extends State<ViewAllNewArrivalStoreScr
     final int hour = value ~/ 60;
     final double minute = value % 60;
     print('${hour.toString().padLeft(2, "0")}:${minute.toStringAsFixed(0).padLeft(2, "0")}');
-    return kilometer.toStringAsFixed(decimal).toString();
+    return kilometer.toStringAsFixed(currencyData!.decimal).toString();
   }
 }

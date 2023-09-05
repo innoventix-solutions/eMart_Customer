@@ -14,7 +14,9 @@ class CategoryDetailsScreen extends StatefulWidget {
   final VendorCategoryModel category;
   final bool isDineIn;
 
-  const CategoryDetailsScreen({Key? key, required this.category, required this.isDineIn}) : super(key: key);
+  const CategoryDetailsScreen(
+      {Key? key, required this.category, required this.isDineIn})
+      : super(key: key);
 
   @override
   _CategoryDetailsScreenState createState() => _CategoryDetailsScreenState();
@@ -28,13 +30,16 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
   void initState() {
     super.initState();
     print(widget.category.id);
-    categoriesFuture = fireStoreUtils.getVendorsByCuisineID(widget.category.id.toString(), isDinein: widget.isDineIn);
+    categoriesFuture = fireStoreUtils.getVendorsByCuisineID(
+        widget.category.id.toString(),
+        isDinein: widget.isDineIn);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppGlobal.buildSimpleAppBar(context, widget.category.title.toString()),
+      appBar: AppGlobal.buildSimpleAppBar(
+          context, widget.category.title.toString()),
       body: StreamBuilder<List<VendorModel>>(
         stream: categoriesFuture,
         initialData: const [],
@@ -53,7 +58,8 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
           } else {
             return ListView.builder(
               itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) => buildVendorItem(snapshot.data![index]),
+              itemBuilder: (context, index) =>
+                  buildVendorItem(snapshot.data![index]),
             );
           }
         },
@@ -96,9 +102,12 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
             children: [
               Expanded(
                 child: CachedNetworkImage(
-                  imageUrl: getImageValidUrl(vendorModel.photo),
+                  imageUrl: getImageVAlidUrl(vendorModel.photo),
                   imageBuilder: (context, imageProvider) => Container(
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), image: DecorationImage(image: imageProvider, fit: BoxFit.cover)),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        image: DecorationImage(
+                            image: imageProvider, fit: BoxFit.cover)),
                   ),
                   placeholder: (context, url) => Center(
                       child: CircularProgressIndicator.adaptive(
@@ -136,18 +145,28 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Wrap(spacing: 8, crossAxisAlignment: WrapCrossAlignment.center, children: <Widget>[
-                        Icon(
-                          Icons.star,
-                          size: 20,
-                          color: Color(COLOR_PRIMARY),
-                        ),
-                        Text(
-                          (vendorModel.reviewsCount != 0) ? (vendorModel.reviewsSum / vendorModel.reviewsCount).toStringAsFixed(1) : "0",
-                          style: const TextStyle(),
-                        ),
-                        Visibility(visible: vendorModel.reviewsCount != 0, child: Text("(${vendorModel.reviewsCount.toStringAsFixed(1)})")),
-                      ]),
+                      Wrap(
+                          spacing: 8,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: <Widget>[
+                            Icon(
+                              Icons.star,
+                              size: 20,
+                              color: Color(COLOR_PRIMARY),
+                            ),
+                            Text(
+                              (vendorModel.reviewsCount != 0)
+                                  ? (vendorModel.reviewsSum /
+                                          vendorModel.reviewsCount)
+                                      .toStringAsFixed(1)
+                                  : "0",
+                              style: const TextStyle(),
+                            ),
+                            Visibility(
+                                visible: vendorModel.reviewsCount != 0,
+                                child: Text(
+                                    "(${vendorModel.reviewsCount.toStringAsFixed(1)})")),
+                          ]),
                     ],
                   ),
                 ),

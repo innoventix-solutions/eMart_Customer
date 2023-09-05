@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:emartconsumer/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
@@ -48,7 +49,7 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                   '''
                   $termsAndCondition
                    ''',
-                  onErrorBuilder: (context, element, error) => Text('$element error: $error'),
+                  onErrorBuilder: (context, element, error) => Text('$element ${"error: ".tr()}$error'),
                   onLoadingBuilder: (context, element, loadingProgress) => const CircularProgressIndicator(),
                 )
               : const Center(child: CircularProgressIndicator()),

@@ -73,7 +73,7 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
 
   String? currentLocation = "";
 
-  String? selctedOrderTypeValue = "Delivery";
+  String? selctedOrderTypeValue = "Delivery".tr();
 
   _getLocation() async {
     islocationGet = true;
@@ -234,7 +234,7 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
       });
     });
 
-    await FireStoreUtils().getAllCoupons().then((value) {
+    await FireStoreUtils().getPublicCoupons().then((value) {
       setState(() {
         offerList = value;
       });
@@ -248,7 +248,7 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
   bool isHomeBannerMiddleLoading = true;
 
   getBanner() async {
-    print("---erfed----->");
+    print("-------->");
     await fireStoreUtils.getHomeTopBanner().then((value) {
       setState(() {
         print(value);
@@ -456,7 +456,7 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                               padding: const EdgeInsets.only(top: 10),
                               child: buildTitleRow(
                                 titleValue: "Popular".tr() +
-                                    " $SELECTED_SECTION_NAME " +
+                                    " ${sectionConstantModel!.name} " +
                                     "Store".tr(),
                                 onClick: () {
                                   push(
@@ -527,7 +527,7 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                                       CircleAvatar(
                                         radius: 40,
                                         child: CachedNetworkImage(
-                                          imageUrl: getImageValidUrl(
+                                          imageUrl: getImageVAlidUrl(
                                               brandModelList[index]
                                                   .photo
                                                   .toString()),
@@ -681,7 +681,7 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                                                         snapshot.data![index];
                                                     return Container(
                                                       margin: const EdgeInsets
-                                                          .symmetric(
+                                                              .symmetric(
                                                           horizontal: 10,
                                                           vertical: 8),
                                                       child: GestureDetector(
@@ -757,7 +757,7 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                                                                   Expanded(
                                                                       child:
                                                                           CachedNetworkImage(
-                                                                    imageUrl: getImageValidUrl(
+                                                                    imageUrl: getImageVAlidUrl(
                                                                         productModel
                                                                             .photo),
                                                                     imageBuilder:
@@ -840,8 +840,7 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                                                                         ),
                                                                         child:
                                                                             Padding(
-                                                                          padding: const EdgeInsets
-                                                                              .symmetric(
+                                                                          padding: const EdgeInsets.symmetric(
                                                                               horizontal: 5,
                                                                               vertical: 2),
                                                                           child:
@@ -868,7 +867,7 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                                                                       productModel.disPrice == "" ||
                                                                               productModel.disPrice == "0"
                                                                           ? Text(
-                                                                              "$symbol${double.parse(productModel.price).toStringAsFixed(decimal)}",
+                                                                              amountShow(amount: productModel.price),
                                                                               style: TextStyle(
                                                                                 fontWeight: FontWeight.bold,
                                                                                 fontSize: 14,
@@ -878,7 +877,7 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                                                                           : Column(
                                                                               children: [
                                                                                 Text(
-                                                                                  "$symbol${double.parse(productModel.disPrice.toString()).toStringAsFixed(decimal)}",
+                                                                                  "${amountShow(amount: productModel.disPrice)}",
                                                                                   style: TextStyle(
                                                                                     fontWeight: FontWeight.bold,
                                                                                     fontSize: 14,
@@ -886,7 +885,7 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                                                                                   ),
                                                                                 ),
                                                                                 Text(
-                                                                                  '$symbol${double.parse(productModel.price).toStringAsFixed(decimal)}',
+                                                                                  '${amountShow(amount: productModel.price)}',
                                                                                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey, decoration: TextDecoration.lineThrough),
                                                                                 ),
                                                                               ],
@@ -1011,7 +1010,7 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: CachedNetworkImage(
-              imageUrl: getImageValidUrl(product.photo),
+              imageUrl: getImageVAlidUrl(product.photo),
               height: 100,
               width: 100,
               memCacheHeight: 100,
@@ -1071,7 +1070,7 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                   height: 10,
                 ),
                 Text(
-                  "$symbol${product.price}",
+                  "${amountShow(amount: product.price)}",
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -1091,15 +1090,16 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
     List<double> discountAmountTempList = [];
     offerList.forEach((element) {
       print(
-          "-----df----->${vendorModel.id} || ${element.storeId} || ${vendorModel.id == element.storeId}");
+          "---------->${vendorModel.id} || ${element.storeId} || ${vendorModel.id == element.storeId}");
       print(
-          "-----dfd----->${element.expireOfferDate!.toDate()} || ${DateTime.now()}");
+          "---------->${element.expireOfferDate!.toDate()} || ${DateTime.now()}");
       if (vendorModel.id == element.storeId &&
           element.expireOfferDate!.toDate().isAfter(DateTime.now())) {
         tempList.add(element);
         discountAmountTempList
             .add(double.parse(element.discountOffer.toString()));
         print("---------->${discountAmountTempList.length}");
+
       }
     });
     return GestureDetector(
@@ -1136,7 +1136,7 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                 Stack(
                   children: [
                     CachedNetworkImage(
-                      imageUrl: getImageValidUrl(vendorModel.photo),
+                      imageUrl: getImageVAlidUrl(vendorModel.photo),
                       height: 100,
                       width: 100,
                       imageBuilder: (context, imageProvider) => Container(
@@ -1175,8 +1175,8 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                             child: Text(
                               discountAmountTempList
                                       .reduce(min)
-                                      .toStringAsFixed(decimal) +
-                                  "% off",
+                                      .toStringAsFixed(currencyData!.decimal) +
+                                  "% off".tr(),
                               style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold),
@@ -1331,7 +1331,7 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           CachedNetworkImage(
-            imageUrl: getImageValidUrl(model.photo.toString()),
+            imageUrl: getImageVAlidUrl(model.photo.toString()),
             imageBuilder: (context, imageProvider) => Container(
               height: MediaQuery.of(context).size.height * 0.08,
               width: MediaQuery.of(context).size.width * 0.18,
@@ -1450,14 +1450,14 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
           if (await canLaunchUrl(uri)) {
             await launchUrl(uri);
           } else {
-            throw 'Could not launch ${categoriesModel.redirect_id.toString()}';
+            throw 'Could not launch'.tr() +'${categoriesModel.redirect_id.toString()}';
           }
         }
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: CachedNetworkImage(
-          imageUrl: getImageValidUrl(categoriesModel.photo.toString()),
+          imageUrl: getImageVAlidUrl(categoriesModel.photo.toString()),
           imageBuilder: (context, imageProvider) => Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
@@ -1532,7 +1532,7 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
               child: Row(
                 children: [
                   CachedNetworkImage(
-                    imageUrl: getImageValidUrl(vendorModel.photo),
+                    imageUrl: getImageVAlidUrl(vendorModel.photo),
                     width: MediaQuery.of(context).size.width * 0.18,
                     height: MediaQuery.of(context).size.width * 0.18,
                     imageBuilder: (context, imageProvider) => Container(
@@ -1671,7 +1671,7 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                       child: Stack(
                     children: [
                       CachedNetworkImage(
-                        imageUrl: getImageValidUrl(vendorModel.photo),
+                        imageUrl: getImageVAlidUrl(vendorModel.photo),
                         imageBuilder: (context, imageProvider) => Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
@@ -1712,8 +1712,9 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
                                     discountAmountTempList.isNotEmpty
                                         ? discountAmountTempList
                                                 .reduce(min)
-                                                .toStringAsFixed(decimal) +
-                                            "% off"
+                                                .toStringAsFixed(
+                                                    currencyData!.decimal) +
+                                            "% off".tr()
                                         : "0",
                                     style: const TextStyle(
                                         color: Colors.white,
@@ -1785,7 +1786,7 @@ class _EcommerceHomeScreenState extends State<EcommerceHomeScreen> {
       setState(() {
         selctedOrderTypeValue =
             sp.getString("foodType") == "" || sp.getString("foodType") == null
-                ? "Delivery"
+                ? "Delivery".tr()
                 : sp.getString("foodType");
       });
     }

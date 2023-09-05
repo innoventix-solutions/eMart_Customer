@@ -516,7 +516,7 @@
 //                 child: Hero(
 //                   tag: mediaUrl,
 //                   child: CachedNetworkImage(
-//                     imageUrl: getImageValidUrl(mediaUrl),
+//                     imageUrl: getImageVAlidUrl(mediaUrl),
 //                     placeholder: (context, url) => Image.asset('assets/images/img_placeholder'
 //                         '.png'),
 //                     errorWidget: (context, url, error) => Image.asset('assets/images/error_image'
@@ -689,7 +689,7 @@
 //                 child: Hero(
 //                   tag: mediaUrl,
 //                   child: CachedNetworkImage(
-//                     imageUrl: getImageValidUrl(mediaUrl),
+//                     imageUrl: getImageVAlidUrl(mediaUrl),
 //                     placeholder: (context, url) => Image.asset('assets/images/img_placeholder'
 //                         '.png'),
 //                     errorWidget: (context, url, error) => Image.asset('assets/images/error_image'

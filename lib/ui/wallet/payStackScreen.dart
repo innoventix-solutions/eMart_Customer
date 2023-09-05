@@ -13,7 +13,14 @@ class PayStackScreen extends StatefulWidget {
   final String secretKey;
   final String callBackUrl;
 
-  const PayStackScreen({Key? key, required this.initialURl, required this.reference, required this.amount, required this.secretKey, required this.callBackUrl}) : super(key: key);
+  const PayStackScreen(
+      {Key? key,
+      required this.initialURl,
+      required this.reference,
+      required this.amount,
+      required this.secretKey,
+      required this.callBackUrl})
+      : super(key: key);
 
   @override
   State<PayStackScreen> createState() => _PayStackScreenState();
@@ -44,16 +51,26 @@ class _PayStackScreenState extends State<PayStackScreen> {
           onWebResourceError: (WebResourceError error) {},
           onNavigationRequest: (NavigationRequest navigation) async {
             print("--->2" + navigation.url);
-            print("--->2" + "${widget.callBackUrl}?trxref=${widget.reference}&reference=${widget.reference}");
-            if (navigation.url == 'https://foodieweb.siswebapp.com/success?trxref=${widget.reference}&reference=${widget.reference}' ||
-                navigation.url == '${widget.callBackUrl}?trxref=${widget.reference}&reference=${widget.reference}') {
-              final isDone = await PayStackURLGen.verifyTransaction(secretKey: widget.secretKey, reference: widget.reference, amount: widget.amount);
+            print("--->2" +
+                "${widget.callBackUrl}?trxref=${widget.reference}&reference=${widget.reference}");
+            if (navigation.url ==
+                    'https://foodieweb.siswebapp.com/success?trxref=${widget.reference}&reference=${widget.reference}' ||
+                navigation.url ==
+                    '${widget.callBackUrl}?trxref=${widget.reference}&reference=${widget.reference}') {
+              final isDone = await PayStackURLGen.verifyTransaction(
+                  secretKey: widget.secretKey,
+                  reference: widget.reference,
+                  amount: widget.amount);
               Navigator.pop(context, isDone); //close webview
             }
-            if ((navigation.url == '${widget.callBackUrl}?trxref=${widget.reference}&reference=${widget.reference}') ||
+            if ((navigation.url ==
+                    '${widget.callBackUrl}?trxref=${widget.reference}&reference=${widget.reference}') ||
                 (navigation.url == "https://hello.pstk.xyz/callback") ||
                 (navigation.url == 'https://standard.paystack.co/close')) {
-              final isDone = await PayStackURLGen.verifyTransaction(secretKey: widget.secretKey, reference: widget.reference, amount: widget.amount);
+              final isDone = await PayStackURLGen.verifyTransaction(
+                  secretKey: widget.secretKey,
+                  reference: widget.reference,
+                  amount: widget.amount);
               Navigator.pop(context, isDone);
               //close webview
             }
@@ -82,7 +99,6 @@ class _PayStackScreenState extends State<PayStackScreen> {
               },
               child: const Icon(
                 Icons.arrow_back,
-                color: Colors.white,
               ),
             )),
         body: WebViewWidget(controller: controller),
@@ -97,8 +113,8 @@ class _PayStackScreenState extends State<PayStackScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Cancel Payment').tr(),
-          content: const SingleChildScrollView(
-            child: Text("cancelPayment?"),
+          content: SingleChildScrollView(
+            child: Text("cancelPayment?").tr(),
           ),
           actions: <Widget>[
             TextButton(

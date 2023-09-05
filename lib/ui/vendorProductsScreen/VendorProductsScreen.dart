@@ -151,7 +151,7 @@
 //                       ),
 //                       width: _width * 1,
 //                       child: CachedNetworkImage(
-//                         imageUrl: getImageValidUrl(widget.vendorModel.photo),
+//                         imageUrl: getImageVAlidUrl(widget.vendorModel.photo),
 //                         imageBuilder: (context, imageProvider) => Container(
 //                           decoration: BoxDecoration(
 //                             borderRadius: BorderRadius.circular(0),
@@ -854,7 +854,7 @@
 //             CachedNetworkImage(
 //                 height: 80,
 //                 width: 80,
-//                 imageUrl: getImageValidUrl(productModel.photo),
+//                 imageUrl: getImageVAlidUrl(productModel.photo),
 //                 imageBuilder: (context, imageProvider) => Container(
 //                       // width: 100,
 //                       // height: 100,

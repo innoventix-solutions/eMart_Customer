@@ -12,24 +12,21 @@ import 'package:emartconsumer/model/CodModel.dart';
 import 'package:emartconsumer/model/FlutterWaveSettingDataModel.dart';
 import 'package:emartconsumer/model/MercadoPagoSettingsModel.dart';
 import 'package:emartconsumer/model/PayFastSettingData.dart';
-import 'package:emartconsumer/model/PayPalCurrencyCodeErrorModel.dart'
-    as payPalCurrModel;
 import 'package:emartconsumer/model/PayStackSettingsModel.dart';
+import 'package:emartconsumer/model/RazorPayFailedModel.dart';
 import 'package:emartconsumer/model/StripePayFailedModel.dart';
+import 'package:emartconsumer/model/TaxModel.dart';
 import 'package:emartconsumer/model/User.dart';
 import 'package:emartconsumer/model/createRazorPayOrderModel.dart';
 import 'package:emartconsumer/model/getPaytmTxtToken.dart';
 import 'package:emartconsumer/model/offer_model.dart';
 import 'package:emartconsumer/model/payStackURLModel.dart';
-import 'package:emartconsumer/model/paypalErrorSettle.dart';
-import 'package:emartconsumer/model/paypalPaymentSettle.dart' as payPalSettel;
 import 'package:emartconsumer/model/paypalSettingData.dart';
 import 'package:emartconsumer/model/paytmSettingData.dart';
 import 'package:emartconsumer/model/razorpayKeyModel.dart';
 import 'package:emartconsumer/model/stripeSettingData.dart';
 import 'package:emartconsumer/services/FirebaseHelper.dart';
 import 'package:emartconsumer/services/helper.dart';
-import 'package:emartconsumer/services/paypalclientToken.dart';
 import 'package:emartconsumer/services/paystack_url_genrater.dart';
 import 'package:emartconsumer/services/rozorpayConroller.dart';
 import 'package:emartconsumer/ui/wallet/MercadoPagoScreen.dart';
@@ -39,17 +36,18 @@ import 'package:emartconsumer/userPrefrence.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_braintree/flutter_braintree.dart';
 import 'package:flutter_stripe/flutter_stripe.dart' as stripe1;
+import 'package:flutterwave_standard/flutterwave.dart';
 import 'package:http/http.dart' as http;
 import 'package:mercadopago_sdk/mercadopago_sdk.dart';
 import 'package:paytm_allinonesdk/paytm_allinonesdk.dart';
-// import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class CabPaymentScreen extends StatefulWidget {
   final CabOrderModel? cabOrderModel;
+  final List<TaxModel>? taxModel;
 
-  const CabPaymentScreen({Key? key, required this.cabOrderModel})
+  const CabPaymentScreen({Key? key, required this.cabOrderModel, this.taxModel})
       : super(key: key);
 
   @override
@@ -58,6 +56,7 @@ class CabPaymentScreen extends StatefulWidget {
 
 class _CabPaymentScreenState extends State<CabPaymentScreen> {
   late Future<List<OfferModel>> coupon;
+  late Future<List<OfferModel>> publicoupon;
   TextEditingController txt = TextEditingController(text: '');
   final FireStoreUtils _fireStoreUtils = FireStoreUtils();
   var tipValue = 0.0;
@@ -67,7 +66,7 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
       isTipSelected3 = false;
   final TextEditingController _textFieldController = TextEditingController();
 
-  // final Razorpay _razorPay = Razorpay();
+  final Razorpay _razorPay = Razorpay();
 
   @override
   void initState() {
@@ -75,7 +74,7 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
     print("----->${widget.cabOrderModel!.paymentMethod}");
     setAllFalse(
         value: widget.cabOrderModel!.paymentMethod.toString() == "cod"
-            ? "Cash"
+            ? "Cash".tr()
             : widget.cabOrderModel!.paymentMethod.toString());
 
     if (widget.cabOrderModel!.paymentMethod == "stripe") {
@@ -111,18 +110,20 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
 
     getTexDetails();
     getPaymentSettingData();
-    /* _razorPay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorPay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
     _razorPay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWaller);
-    _razorPay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);*/
+    _razorPay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    publicoupon = _fireStoreUtils.getOfferByCabCoupons();
     coupon = _fireStoreUtils.getCabCoupons();
     setState(() {});
   }
 
-  bool? taxActive = false;
+  // bool? taxActive = false;
   bool? isEnableCommission = false;
-  double taxAmount = 0.0;
-  String taxLable = "";
-  String taxType = "";
+
+  // double taxAmount = 0.0;
+  // String taxLable = "";
+  // String taxType = "";
   double commissionAmount = 0.0;
   String commissionType = "";
   double subTotal = 0.0;
@@ -136,38 +137,54 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
 
   getTexDetails() async {
     subTotal = double.parse(widget.cabOrderModel!.subTotal.toString());
-    await FireStoreUtils().getSectionsById(SELECTED_CATEGORY).then((value) {
-      taxActive = value!.taxActive;
-      isEnableCommission = value.isEnableCommission;
-      taxAmount = double.parse(value.taxAmount.toString());
+    await FireStoreUtils()
+        .getSectionsById(sectionConstantModel!.id)
+        .then((value) {
+      // taxActive = value!.taxActive;
+      isEnableCommission = value!.isEnableCommission;
+      // taxAmount = double.parse(value.taxAmount.toString());
       commissionAmount = double.parse(value.commissionAmount.toString());
-      taxLable = value.taxLable.toString();
-      taxType = value.taxType.toString();
+      //  taxLable = value.taxLable.toString();
+      //  taxType = value.taxType.toString();
       commissionType = value.commissionType.toString();
     });
 
-    await coupon.then((value) {
+    //await coupon.then((value) {
+    await publicoupon.then((value) {
       couponList = value;
     });
     setState(() {});
   }
 
-  double getTaxAmount() {
-    double totalTax = 0.0;
-
-    if (taxActive == true) {
-      if (taxType == "percent") {
-        totalTax = (subTotal - discountAmount) * taxAmount / 100;
-      } else {
-        totalTax = taxAmount;
-      }
-    }
-    return totalTax;
-  }
+  // double getTaxAmount() {
+  //   double totalTax = 0.0;
+  //
+  //   if (taxActive == true) {
+  //     if (taxType == "percent") {
+  //       totalTax = (subTotal - discountAmount) * taxAmount / 100;
+  //     } else {
+  //       totalTax = taxAmount;
+  //     }
+  //   }
+  //   return totalTax;
+  // }
 
   double getTotalAmount() {
-    return subTotal - discountAmount + getTaxAmount() + tipValue;
+    double taxAmount = 0.0;
+    if (taxList != null) {
+      for (var element in taxList!) {
+        taxAmount = taxAmount +
+            getTaxValue(
+                amount: (subTotal - discountAmount).toString(),
+                taxModel: element);
+      }
+    }
+    return subTotal - discountAmount + taxAmount + tipValue;
   }
+
+  // double getTotalAmount() {
+  // return subTotal - discountAmount + getTaxAmount() + tipValue;
+  //}
 
   @override
   void didChangeDependencies() {
@@ -179,15 +196,17 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
     CabOrderModel? orderModel = widget.cabOrderModel;
     orderModel!.tipValue = tipValue.toString();
     orderModel.paymentMethod = paymentType;
-    if (taxActive != null && taxActive == true) {
+    /* if (taxActive != null && taxActive == true) {
       orderModel.taxType = taxType.toString();
       orderModel.tax = taxAmount.toString();
-    }
+    }*/
     orderModel.discount = discountAmount;
     orderModel.adminCommission = commissionAmount.toString();
     orderModel.adminCommissionType = commissionType.toString();
     orderModel.adminCommissionType = commissionType.toString();
     orderModel.paymentStatus = true;
+    orderModel.taxModel = taxList;
+
     await FireStoreUtils().cabOrderPlace(orderModel, true);
     Navigator.pop(context, true);
   }
@@ -242,10 +261,10 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
                       response: "contact-admin".tr(), colors: Colors.red);
                 } else {
                   CreateRazorPayOrderModel result = value;
-                  /*openCheckout(
+                  openCheckout(
                     amount: getTotalAmount(),
                     orderId: result.id,
-                  );*/
+                  );
                 }
               });
             } else if (payTm) {
@@ -261,7 +280,8 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
               showLoadingAlert();
               PayStackURLGen.getPayHTML(
                       payFastSettingData: payFastSettingData!,
-                      amount: getTotalAmount().toStringAsFixed(decimal))
+                      amount: getTotalAmount()
+                          .toStringAsFixed(currencyData!.decimal))
                   .then((value) async {
                 bool isDone =
                     await Navigator.of(context).push(MaterialPageRoute(
@@ -298,10 +318,15 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
               paymentType = 'paystack';
               showLoadingAlert();
               payStackPayment(context);
+            } else if (flutterWave) {
+              setRef();
+              paymentType = 'flutterwave';
+              _flutterWaveInitiatePayment(context);
             } else if (paypal) {
               paymentType = 'paypal';
               showLoadingAlert();
-              _makePaypalPayment(amount: getTotalAmount().toString());
+              //  _makePaypalPayment(amount: getTotalAmount().toString());
+              // paypalPaymentSheet(amount: getTotalAmount().toString());
             } else if (wallet && walletBalanceError == false) {
               paymentType = 'wallet';
 
@@ -463,7 +488,11 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
                       Container(
                         margin: const EdgeInsets.only(top: 3),
                         child: Text(
-                          "${snapshot[index].discountTypeOffer == "Fix Price" ? symbol : ""}${snapshot[index].discountOffer}${snapshot[index].discountTypeOffer == "Percentage" ? "% OFF" : " OFF"}",
+                          snapshot[index].discountTypeOffer == "Fix Price"
+                              ? (currencyData!.symbolatright == true)
+                                  ? "${snapshot[index].discountOffer}${currencyData!.symbol.toString()} OFF"
+                                  : "${currencyData!.symbol.toString()}${snapshot[index].discountOffer} OFF"
+                              : "${snapshot[index].discountOffer} % Off",
                           style: const TextStyle(
                               color: Color(GREY_TEXT_COLOR),
                               fontWeight: FontWeight.bold,
@@ -601,7 +630,7 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
             children: [
               Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -610,7 +639,7 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
                         style: const TextStyle(fontSize: 16),
                       ),
                       Text(
-                        symbol + subTotal.toStringAsFixed(decimal),
+                        amountShow(amount: subTotal.toString()),
                         style: TextStyle(
                             color: isDarkMode(context)
                                 ? const Color(0xffFFFFFF)
@@ -620,12 +649,11 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
                     ],
                   )),
               const Divider(
-                color: Color(0xffE2E8F0),
-                height: 0.1,
+                thickness: 1,
               ),
               Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -634,15 +662,10 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
                         style: const TextStyle(fontSize: 16),
                       ),
                       Text(
-                        "(" +
-                            symbol +
-                            discountAmount.toStringAsFixed(decimal) +
+                        "(-" +
+                            amountShow(amount: discountAmount.toString()) +
                             ")",
-                        style: TextStyle(
-                            color: isDarkMode(context)
-                                ? const Color(0xffFFFFFF)
-                                : const Color(0xff333333),
-                            fontSize: 16),
+                        style: TextStyle(color: Colors.red, fontSize: 16),
                       ),
                     ],
                   )),
@@ -652,7 +675,7 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                   child: Text(
-                    "Coupon code : ${offerCode}",
+                    "Coupon code :".tr() + "${offerCode}",
                     style: TextStyle(
                         fontWeight: FontWeight.w600,
                         color: Color(COLOR_PRIMARY),
@@ -661,69 +684,114 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
                 ),
               ),
               const Divider(
-                color: Color(0xffE2E8F0),
-                height: 0.1,
+                thickness: 1,
               ),
-              Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              ListView.builder(
+                itemCount: taxList!.length,
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemBuilder: (context, index) {
+                  TaxModel taxModel = taxList![index];
+                  return Column(
                     children: [
-                      Text(
-                        ((taxLable.isNotEmpty)
-                                ? taxLable.toString()
-                                : "Tax".tr()) +
-                            " ${(taxType == "fix") ? "(${taxAmount} $symbol)" : "($taxAmount %)"}",
-                        style: const TextStyle(fontSize: 16),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 5),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                "${taxModel.title.toString()} (${taxModel.type == "fix" ? amountShow(amount: taxModel.tax) : "${taxModel.tax}%"})",
+                                style: const TextStyle(fontSize: 16),
+                              ),
+                            ),
+                            Text(
+                              amountShow(
+                                  amount: getTaxValue(
+                                          amount: (subTotal - discountAmount)
+                                              .toString(),
+                                          taxModel: taxModel)
+                                      .toString()),
+                              style: TextStyle(
+                                  color: isDarkMode(context)
+                                      ? const Color(0xffFFFFFF)
+                                      : const Color(0xff333333),
+                                  fontSize: 16),
+                            ),
+                          ],
+                        ),
                       ),
-                      Text(
-                        symbol + getTaxAmount().toStringAsFixed(decimal),
-                        style: TextStyle(
-                            color: isDarkMode(context)
-                                ? const Color(0xffFFFFFF)
-                                : const Color(0xff333333),
-                            fontSize: 16),
+                      const Divider(
+                        thickness: 1,
+                      ),
+                    ],
+                  );
+                },
+              ),
+              // Container(
+              //     padding:
+              //         const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              //     child: Row(
+              //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //       children: [
+              //         Text(
+              //           ((taxLable.isNotEmpty)
+              //                   ? taxLable.toString()
+              //                   : "Tax".tr()) +
+              //               " ${(taxType == "fix") ? "(${taxAmount} ${currencyData!.symbol})" : "($taxAmount %)"}",
+              //           style: const TextStyle(fontSize: 16),
+              //         ),
+              //         Text(
+              //           amountShow(amount:getTaxAmount().toString()),
+              //           style: TextStyle(
+              //               color: isDarkMode(context)
+              //                   ? const Color(0xffFFFFFF)
+              //                   : const Color(0xff333333),
+              //               fontSize: 16),
+              //         ),
+              //       ],
+              //     )),
+              // const Divider(
+              //   color: Color(0xffE2E8F0),
+              //   height: 0.1,
+              // ),
+              Visibility(
+                  visible: ((tipValue) > 0),
+                  child: Column(
+                    children: [
+                      Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 5),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Tip amount".tr(),
+                                style: TextStyle(
+                                    color: isDarkMode(context)
+                                        ? const Color(0xffFFFFFF)
+                                        : const Color(0xff333333),
+                                    fontSize: 16),
+                              ),
+                              Text(
+                                amountShow(amount: tipValue.toString()),
+                                style: TextStyle(
+                                    color: isDarkMode(context)
+                                        ? const Color(0xffFFFFFF)
+                                        : const Color(0xff333333),
+                                    fontSize: 16),
+                              ),
+                            ],
+                          )),
+                      const Divider(
+                        thickness: 1,
                       ),
                     ],
                   )),
-              const Divider(
-                color: Color(0xffE2E8F0),
-                height: 0.1,
-              ),
-              Visibility(
-                  visible: ((tipValue) > 0),
-                  child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Tip amount".tr(),
-                            style: TextStyle(
-                                color: isDarkMode(context)
-                                    ? const Color(0xffFFFFFF)
-                                    : const Color(0xff333333),
-                                fontSize: 16),
-                          ),
-                          Text(
-                            '$symbol${tipValue.toStringAsFixed(decimal)}',
-                            style: TextStyle(
-                                color: isDarkMode(context)
-                                    ? const Color(0xffFFFFFF)
-                                    : const Color(0xff333333),
-                                fontSize: 16),
-                          ),
-                        ],
-                      ))),
-              const Divider(
-                color: Color(0xffE2E8F0),
-                height: 0.1,
-              ),
+
               Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -736,7 +804,7 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
                             fontSize: 16),
                       ),
                       Text(
-                        symbol + getTotalAmount().toStringAsFixed(decimal),
+                        amountShow(amount: getTotalAmount().toString()),
                         style: TextStyle(
                             color: isDarkMode(context)
                                 ? const Color(0xffFFFFFF)
@@ -803,7 +871,7 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
                       ),
                       child: Center(
                           child: Text(
-                        symbol + "10",
+                        amountShow(amount: "10"),
                         style: TextStyle(
                             color: isDarkMode(context)
                                 ? const Color(0xffFFFFFF)
@@ -842,7 +910,7 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
                       ),
                       child: Center(
                           child: Text(
-                        symbol + "20",
+                        amountShow(amount: "20"),
                         style: TextStyle(
                             color: isDarkMode(context)
                                 ? const Color(0xffFFFFFF)
@@ -883,7 +951,8 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
                       ),
                       child: Center(
                           child: Text(
-                        symbol + "30",
+                        //symbol + "30",
+                        amountShow(amount: "30"),
                         style: TextStyle(
                             color: isDarkMode(context)
                                 ? const Color(0xffFFFFFF)
@@ -1087,10 +1156,14 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
                                           double.parse(
                                               couponModel.discountOffer!) /
                                           100;
+                                      offerCode =
+                                          couponModel.offerCode.toString();
                                       break;
                                     } else {
                                       discountAmount = double.parse(
                                           couponModel.discountOffer!);
+                                      offerCode =
+                                          couponModel.offerCode.toString();
                                     }
                                   }
                                 }
@@ -1129,7 +1202,7 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
               controller: _textFieldController,
               textInputAction: TextInputAction.go,
               keyboardType: const TextInputType.numberWithOptions(),
-              decoration: const InputDecoration(hintText: "Enter your tip"),
+              decoration: InputDecoration(hintText: "Enter your tip".tr()),
             ),
             actions: <Widget>[
               ElevatedButton(
@@ -1147,7 +1220,7 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
                     backgroundColor: Color(COLOR_PRIMARY),
                     textStyle: const TextStyle(
                         fontSize: 15, fontWeight: FontWeight.normal)),
-                child: const Text('Submit'),
+                child: const Text('Submit').tr(),
                 onPressed: () {
                   setState(() {
                     var value = _textFieldController.text.toString();
@@ -1212,8 +1285,54 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
     mercadoPagoSettingData = await UserPreference.getMercadoPago();
 
     futurecod = fireStoreUtils.getCod();
+
+    initPayPal();
   }
 
+  void initPayPal() async {
+    //set debugMode for error logging
+    // FlutterPaypalNative.isDebugMode = paypalSettingData!.isLive == false ? true : false;
+    //initiate payPal plugin
+    /*   await _flutterPaypalNativePlugin.init(
+      //your app id !!! No Underscore!!! see readme.md for help
+      returnUrl: "com.emart.customer://paypalpay",
+      //client id from developer dashboard
+      clientID: paypalSettingData!.paypalClient,
+      //sandbox, staging, live etc
+     // payPalEnvironment: paypalSettingData!.isLive == true ? FPayPalEnvironment.live : FPayPalEnvironment.sandbox,
+      //what currency do you plan to use? default is US dollars
+     // currencyCode: FPayPalCurrencyCode.usd,
+      //action paynow?
+     // action: FPayPalUserAction.payNow,
+    );*/
+
+    //call backs for payment
+    /* _flutterPaypalNativePlugin.setPayPalOrderCallback(
+    */ /*  callback: FPayPalOrderCallback(
+        onCancel: () {
+          //user canceled the payment
+          Navigator.pop(context);
+          ShowToastDialog.showToast("Payment canceled");
+        },
+        onSuccess: (data) {
+          //successfully paid
+          //remove all items from queue
+          Navigator.pop(context);
+          _flutterPaypalNativePlugin.removeAllPurchaseItems();
+          ShowToastDialog.showToast("Payment Successfully");
+          placeOrderChanges();
+        },
+        onError: (data) {
+          Navigator.pop(context);
+          ShowToastDialog.showToast("error: ${data.reason}");
+        },
+        onShippingChange: (data) {
+          Navigator.pop(context);
+          ShowToastDialog.showToast("shipping change: ${data.shippingChangeAddress?.adminArea1 ?? ""}");
+        },
+      ),*/ /*
+    );*/
+  }
   Widget paymentListView() {
     return Column(
       children: [
@@ -1306,12 +1425,10 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
                             selectedPayment: wallet,
                             walletError: walletBalanceError,
                             image: "assets/images/wallet_icon.png",
-                            value: "Wallet",
+                            value: "Wallet".tr(),
                             childWidget: Text(
-                              currencyData!.symbol +
-                                  double.parse(
-                                          userData.wallet_amount.toString())
-                                      .toStringAsFixed(decimal),
+                              amountShow(
+                                  amount: userData.wallet_amount.toString()),
                               style: TextStyle(
                                 color: walletBalanceError
                                     ? Colors.red
@@ -1356,25 +1473,25 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
           isVisible: UserPreference.getWalletData() ?? false,
           selectedPayment: codPay,
           image: "assets/images/cash.png",
-          value: "Cash",
+          value: "Cash".tr(),
         ),
         buildPaymentTile(
           isVisible: (stripeData == null) ? false : stripeData!.isEnabled,
           selectedPayment: stripe,
-          value: "Stripe",
+          value: "Stripe".tr(),
         ),
         buildPaymentTile(
           isVisible: razorPayData!.isEnabled,
           selectedPayment: razorPay,
           image: "assets/images/razorpay_@3x.png",
-          value: "RazorPay",
+          value: "RazorPay".tr(),
         ),
         buildPaymentTile(
           isVisible:
               (paytmSettingData == null) ? false : paytmSettingData!.isEnabled,
           selectedPayment: payTm,
           image: "assets/images/paytm_@3x.png",
-          value: "PayTm",
+          value: "PayTm".tr(),
         ),
         buildPaymentTile(
           isVisible: (paypalSettingData == null)
@@ -1382,7 +1499,7 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
               : paypalSettingData!.isEnabled,
           selectedPayment: paypal,
           image: "assets/images/paypal_@3x.png",
-          value: "PayPal",
+          value: "PayPal".tr(),
         ),
 
         buildPaymentTile(
@@ -1391,7 +1508,7 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
               : payFastSettingData!.isEnable,
           selectedPayment: payFast,
           image: "assets/images/payfast.png",
-          value: "PayFast",
+          value: "PayFast".tr(),
         ),
         buildPaymentTile(
           isVisible: (payStackSettingData == null)
@@ -1399,7 +1516,7 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
               : payStackSettingData!.isEnabled,
           selectedPayment: payStack,
           image: "assets/images/paystack.png",
-          value: "PayStack",
+          value: "PayStack".tr(),
         ),
         buildPaymentTile(
           isVisible: (flutterWaveSettingData == null)
@@ -1407,7 +1524,7 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
               : flutterWaveSettingData!.isEnable,
           selectedPayment: paypal,
           image: "assets/images/flutterwave.png",
-          value: "FlutterWave",
+          value: "FlutterWave".tr(),
         ),
 
         buildPaymentTile(
@@ -1416,7 +1533,7 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
               : mercadoPagoSettingData!.isEnabled,
           selectedPayment: mercadoPago,
           image: "assets/images/mercadopago.png",
-          value: "Mercado Pago",
+          value: "Mercado Pago".tr(),
         ),
 
         // Visibility(
@@ -1780,11 +1897,11 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
 
       if (value == "Stripe" || value == "stripe") {
         stripe = true;
-        print("--#------>$stripe");
+        print("-------->$stripe");
       }
       if (value == "Cash") {
         codPay = true;
-        print("----#---->$codPay");
+        print("-------->$codPay");
       }
       if (value == "PayTm" || value == "paytm") {
         payTm = true;
@@ -1904,7 +2021,7 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
   }
 
   //RazorPay payment function
-  /*void openCheckout({required amount, required orderId}) async {
+  void openCheckout({required amount, required orderId}) async {
     var options = {
       'key': razorPayData!.razorpayKey,
       'amount': amount * 100,
@@ -1928,9 +2045,9 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
     } catch (e) {
       debugPrint('Error: $e');
     }
-  }*/
+  }
 
-  /* void _handlePaymentSuccess(PaymentSuccessResponse response) {
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
     Navigator.pop(_globalKey.currentContext!, true);
     print(response.orderId);
     print(response.paymentId);
@@ -1943,9 +2060,9 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
       backgroundColor: Colors.green.shade400,
       duration: const Duration(seconds: 6),
     ));
-  }*/
+  }
 
-  /* void _handleExternalWaller(ExternalWalletResponse response) {
+  void _handleExternalWaller(ExternalWalletResponse response) {
     Navigator.pop(_globalKey.currentContext!);
     ScaffoldMessenger.of(_globalKey.currentContext!).showSnackBar(SnackBar(
       content: Text(
@@ -1954,12 +2071,13 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
       backgroundColor: Colors.blue.shade400,
       duration: const Duration(seconds: 8),
     ));
-  }*/
+  }
 
-/*  void _handlePaymentError(PaymentFailureResponse response) {
+  void _handlePaymentError(PaymentFailureResponse response) {
     Navigator.pop(_globalKey.currentContext!);
     print(response.code);
-    RazorPayFailedModel lom = RazorPayFailedModel.fromJson(jsonDecode(response.message!.toString()));
+    RazorPayFailedModel lom =
+        RazorPayFailedModel.fromJson(jsonDecode(response.message!.toString()));
     ScaffoldMessenger.of(_globalKey.currentContext!).showSnackBar(SnackBar(
       content: Text(
         "Payment Failed!!\n".tr() + lom.error.description,
@@ -1967,7 +2085,7 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
       backgroundColor: Colors.red.shade400,
       duration: const Duration(seconds: 8),
     ));
-  }*/
+  }
 
   ///Stripe payment function
 
@@ -1995,6 +2113,7 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
                 currencyCode: currencyData!.code,
               ),
               style: ThemeMode.system,
+              customFlow: true,
               appearance: stripe1.PaymentSheetAppearance(
                 colors: stripe1.PaymentSheetAppearanceColors(
                   primary: Color(COLOR_PRIMARY),
@@ -2078,8 +2197,8 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
           Uri.parse('https://api.stripe.com/v1/payment_intents'),
           body: body,
           headers: {
-            'Authorization':
-                'Bearer ${stripeData?.stripeSecret}', //$_paymentIntentClientSecret',
+            'Authorization': 'Bearer ${stripeData?.stripeSecret}',
+            //$_paymentIntentClientSecret',
             'Content-Type': 'application/x-www-form-urlencoded'
           });
       print('Create Intent response ===> ${response.body.toString()}');
@@ -2097,96 +2216,116 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
   }
 
   ///PayPal payment function
-  _makePaypalPayment({required amount}) async {
-    PayPalClientTokenGen.paypalClientToken(
-            paypalSettingData: paypalSettingData!)
-        .then((value) async {
-      final String tokenizationKey =
-          paypalSettingData!.braintree_tokenizationKey;
+//  final _flutterPaypalNativePlugin = FlutterPaypalNative.instance;
+/*  paypalPaymentSheet({required amount}) {
+    //add 1 item to cart. Max is 4!
+    if (_flutterPaypalNativePlugin.canAddMorePurchaseUnit) {
+      _flutterPaypalNativePlugin.addPurchaseUnit(
+        */ /*FPayPalPurchaseUnit(
+          // random prices
+          amount: double.parse(amount),
 
-      var request = BraintreePayPalRequest(
-          amount: amount,
-          currencyCode: currencyData!.code,
-          billingAgreementDescription: "djsghxghf",
-          displayName: PAYID);
+          ///please use your own algorithm for referenceId. Maybe ProductID?
+          referenceId: FPayPalStrHelper.getRandomString(16),
+        ),*/ /*
+      );
+    }
+    // initPayPal();
+    _flutterPaypalNativePlugin.makeOrder(
+     // action: FPayPalUserAction.payNow,
+    );
+  }*/
 
-      BraintreePaymentMethodNonce? resultData;
-      try {
-        resultData =
-            await Braintree.requestPaypalNonce(tokenizationKey, request);
-      } on Exception {
-        print("Stripe error");
-        showAlert(_globalKey.currentContext!,
-            response: "Something went wrong, please contact admin.".tr(),
-            colors: Colors.red);
-      }
-      print(resultData?.nonce);
-      print(resultData?.paypalPayerId);
-      if (resultData?.nonce != null) {
-        PayPalClientTokenGen.paypalSettleAmount(
-          paypalSettingData: paypalSettingData!,
-          nonceFromTheClient: resultData?.nonce,
-          amount: amount,
-          deviceDataFromTheClient: resultData?.typeLabel,
-        ).then((value) {
-          print('payment done!!');
-          if (value['success'] == "true" || value['success'] == true) {
-            if (value['data']['success'] == "true" ||
-                value['data']['success'] == true) {
-              payPalSettel.PayPalClientSettleModel settleResult =
-                  payPalSettel.PayPalClientSettleModel.fromJson(value);
-
-              placeOrderChanges();
-              ScaffoldMessenger.of(_globalKey.currentContext!)
-                  .showSnackBar(SnackBar(
-                content: Text(
-                  "Status".tr() +
-                      " : ${settleResult.data.transaction.status}\n"
-                              "Transaction id"
-                          .tr() +
-                      " : ${settleResult.data.transaction.id}\n"
-                              "Amount"
-                          .tr() +
-                      " : ${settleResult.data.transaction.amount}",
-                ),
-                duration: const Duration(seconds: 8),
-                backgroundColor: Colors.green,
-              ));
-            } else {
-              print(value);
-              payPalCurrModel.PayPalCurrencyCodeErrorModel settleResult =
-                  payPalCurrModel.PayPalCurrencyCodeErrorModel.fromJson(value);
-              Navigator.pop(_globalKey.currentContext!);
-              ScaffoldMessenger.of(_globalKey.currentContext!)
-                  .showSnackBar(SnackBar(
-                content:
-                    Text("Status".tr() + " : ${settleResult.data.message}"),
-                duration: const Duration(seconds: 8),
-                backgroundColor: Colors.red,
-              ));
-            }
-          } else {
-            PayPalErrorSettleModel settleResult =
-                PayPalErrorSettleModel.fromJson(value);
-            Navigator.pop(_globalKey.currentContext!);
-            ScaffoldMessenger.of(_globalKey.currentContext!)
-                .showSnackBar(SnackBar(
-              content: Text("Status".tr() + " : ${settleResult.data.message}"),
-              duration: const Duration(seconds: 8),
-              backgroundColor: Colors.red,
-            ));
-          }
-        });
-      } else {
-        Navigator.pop(_globalKey.currentContext!);
-        ScaffoldMessenger.of(_globalKey.currentContext!).showSnackBar(SnackBar(
-          content: Text("Status : Payment Incomplete!!".tr()),
-          duration: const Duration(seconds: 8),
-          backgroundColor: Colors.red,
-        ));
-      }
-    });
-  }
+  // _makePaypalPayment({required amount}) async {
+  //   PayPalClientTokenGen.paypalClientToken(
+  //           paypalSettingData: paypalSettingData!)
+  //       .then((value) async {
+  //     final String tokenizationKey =
+  //         paypalSettingData!.braintree_tokenizationKey;
+  //
+  //     var request = BraintreePayPalRequest(
+  //         amount: amount,
+  //         currencyCode: currencyData!.code,
+  //         billingAgreementDescription: "djsghxghf",
+  //         displayName: PAYID);
+  //
+  //     BraintreePaymentMethodNonce? resultData;
+  //     try {
+  //       resultData =
+  //           await Braintree.requestPaypalNonce(tokenizationKey, request);
+  //     } on Exception {
+  //       print("Stripe error");
+  //       showAlert(_globalKey.currentContext!,
+  //           response: "Something went wrong, please contact admin.".tr(),
+  //           colors: Colors.red);
+  //     }
+  //     print(resultData?.nonce);
+  //     print(resultData?.paypalPayerId);
+  //     if (resultData?.nonce != null) {
+  //       PayPalClientTokenGen.paypalSettleAmount(
+  //         paypalSettingData: paypalSettingData!,
+  //         nonceFromTheClient: resultData?.nonce,
+  //         amount: amount,
+  //         deviceDataFromTheClient: resultData?.typeLabel,
+  //       ).then((value) {
+  //         print('payment done!!');
+  //         if (value['success'] == "true" || value['success'] == true) {
+  //           if (value['data']['success'] == "true" ||
+  //               value['data']['success'] == true) {
+  //             payPalSettel.PayPalClientSettleModel settleResult =
+  //                 payPalSettel.PayPalClientSettleModel.fromJson(value);
+  //
+  //             placeOrderChanges();
+  //             ScaffoldMessenger.of(_globalKey.currentContext!)
+  //                 .showSnackBar(SnackBar(
+  //               content: Text(
+  //                 "Status".tr() +
+  //                     " : ${settleResult.data.transaction.status}\n"
+  //                             "Transaction id"
+  //                         .tr() +
+  //                     " : ${settleResult.data.transaction.id}\n"
+  //                             "Amount"
+  //                         .tr() +
+  //                     " : ${settleResult.data.transaction.amount}",
+  //               ),
+  //               duration: const Duration(seconds: 8),
+  //               backgroundColor: Colors.green,
+  //             ));
+  //           } else {
+  //             print(value);
+  //             payPalCurrModel.PayPalCurrencyCodeErrorModel settleResult =
+  //                 payPalCurrModel.PayPalCurrencyCodeErrorModel.fromJson(value);
+  //             Navigator.pop(_globalKey.currentContext!);
+  //             ScaffoldMessenger.of(_globalKey.currentContext!)
+  //                 .showSnackBar(SnackBar(
+  //               content:
+  //                   Text("Status".tr() + " : ${settleResult.data.message}"),
+  //               duration: const Duration(seconds: 8),
+  //               backgroundColor: Colors.red,
+  //             ));
+  //           }
+  //         } else {
+  //           PayPalErrorSettleModel settleResult =
+  //               PayPalErrorSettleModel.fromJson(value);
+  //           Navigator.pop(_globalKey.currentContext!);
+  //           ScaffoldMessenger.of(_globalKey.currentContext!)
+  //               .showSnackBar(SnackBar(
+  //             content: Text("Status".tr() + " : ${settleResult.data.message}"),
+  //             duration: const Duration(seconds: 8),
+  //             backgroundColor: Colors.red,
+  //           ));
+  //         }
+  //       });
+  //     } else {
+  //       Navigator.pop(_globalKey.currentContext!);
+  //       ScaffoldMessenger.of(_globalKey.currentContext!).showSnackBar(SnackBar(
+  //         content: Text("Status : Payment Incomplete!!".tr()),
+  //         duration: const Duration(seconds: 8),
+  //         backgroundColor: Colors.red,
+  //       ));
+  //     }
+  //   });
+  // }
 
   ///Paytm payment function
   getPaytmCheckSum(
@@ -2214,21 +2353,23 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
             checkSum: data["code"], amount: amount, orderId: orderId)
         .then((value) {
       initiatePayment(amount: amount, orderId: orderId).then((value) {
-        GetPaymentTxtTokenModel result = value;
-        String callback = "";
-        if (paytmSettingData!.isSandboxEnabled) {
-          callback = callback +
-              "https://securegw-stage.paytm.in/theia/paytmCallback?ORDER_ID=$orderId";
-        } else {
-          callback = callback +
-              "https://securegw.paytm.in/theia/paytmCallback?ORDER_ID=$orderId";
-        }
+        if (value != null) {
+          GetPaymentTxtTokenModel result = value;
+          String callback = "";
+          if (paytmSettingData!.isSandboxEnabled) {
+            callback = callback +
+                "https://securegw-stage.paytm.in/theia/paytmCallback?ORDER_ID=$orderId";
+          } else {
+            callback = callback +
+                "https://securegw.paytm.in/theia/paytmCallback?ORDER_ID=$orderId";
+          }
 
-        _startTransaction(context,
-            txnTokenBy: result.body.txnToken,
-            orderId: orderId,
-            amount: amount,
-            callBackURL: callback);
+          _startTransaction(context,
+              txnTokenBy: result.body.txnToken,
+              orderId: orderId,
+              amount: amount,
+              callBackURL: callback);
+        }
       });
     });
   }
@@ -2296,7 +2437,7 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
 
     print("uday");
     print(amount.toString());
-    print(amount.toStringAsFixed(decimal).toString());
+    print(amount.toStringAsFixed(currencyData!.decimal).toString());
     String callback = "";
     if (paytmSettingData!.isSandboxEnabled) {
       callback = callback +
@@ -2310,7 +2451,7 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
       "mid": paytmSettingData?.PaytmMID,
       "order_id": orderId,
       "key_secret": paytmSettingData?.PAYTM_MERCHANT_KEY.toString(),
-      "amount": amount.toStringAsFixed(decimal),
+      "amount": amount.toStringAsFixed(currencyData!.decimal),
       "currency": "INR", //currencyData!.code,
       "callback_url": callback,
       "custId": MyAppState.currentUser!.userID,
@@ -2322,7 +2463,7 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
         data["body"]["txnToken"].toString().isEmpty) {
       Navigator.pop(_globalKey.currentContext!);
       showAlert(_globalKey.currentContext!,
-          response: "contact-admin", colors: Colors.red);
+          response: "contact-admin".tr(), colors: Colors.red);
     }
     print(data);
     return GetPaymentTxtTokenModel.fromJson(data);
@@ -2364,6 +2505,62 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
         _ref = "IOSRef$year$refNumber";
       });
     }
+  }
+
+  _flutterWaveInitiatePayment(
+    BuildContext context,
+  ) async {
+    final style = FlutterwaveStyle(
+      appBarText: PAYID,
+      buttonColor: Color(COLOR_PRIMARY),
+      buttonTextStyle: const TextStyle(
+        color: Colors.white,
+        fontSize: 20,
+      ),
+      appBarColor: Color(COLOR_PRIMARY),
+      dialogCancelTextStyle: const TextStyle(
+        color: Colors.black,
+        fontSize: 18,
+      ),
+      dialogContinueTextStyle: TextStyle(
+        color: Color(COLOR_PRIMARY),
+        fontSize: 18,
+      ),
+      mainTextStyle:
+          const TextStyle(color: Colors.black, fontSize: 19, letterSpacing: 2),
+      dialogBackgroundColor: Colors.white,
+      appBarTitleTextStyle: const TextStyle(
+        color: Colors.white,
+        fontSize: 18,
+      ),
+    );
+    final flutterwave = Flutterwave(
+      amount: getTotalAmount().toStringAsFixed(currencyData!.decimal).trim(),
+      currency: currencyData!.code,
+      style: style,
+      customer: Customer(
+          name: MyAppState.currentUser!.firstName,
+          phoneNumber: MyAppState.currentUser!.phoneNumber.trim(),
+          email: MyAppState.currentUser!.email.trim()),
+      context: context,
+      publicKey: flutterWaveSettingData!.publicKey.trim(),
+      paymentOptions: "card, payattitude",
+      customization: Customization(title: PAYID),
+      txRef: _ref!,
+      isTestMode: flutterWaveSettingData!.isSandbox,
+      redirectUrl: '${GlobalURL}success',
+    );
+    final ChargeResponse response = await flutterwave.charge();
+    if (response.success!) {
+      placeOrderChanges();
+      ScaffoldMessenger.of(_globalKey.currentContext!).showSnackBar(SnackBar(
+        content: Text("Payment Successful!!\n".tr()),
+        backgroundColor: Colors.green,
+      ));
+    } else {
+      showLoading(message: response.status!);
+    }
+    print("${response.toJson()}");
   }
 
   Future<void> showLoading(
@@ -2457,8 +2654,10 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
 
   ///PayStack Payment Method
   payStackPayment(BuildContext context) async {
-    var amount = (double.parse(getTotalAmount().toStringAsFixed(decimal)) * 100)
-        .toString();
+    var amount =
+        (double.parse(getTotalAmount().toStringAsFixed(currencyData!.decimal)) *
+                100)
+            .toString();
     print(amount);
     await PayStackURLGen.payStackURLGen(
       amount: amount,

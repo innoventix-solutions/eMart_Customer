@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:emartconsumer/constants.dart';
@@ -135,16 +136,27 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
     );
   }
 
-  animateOut() {
-    FireStoreUtils.sendFcmMessage(
-        'New Order!'.tr(), "${MyAppState.currentUser!.firstName} ${MyAppState.currentUser!.lastName} placed new order !".tr(), widget.orderModel.vendor.fcmToken);
+  animateOut() async{
+    Map<String,dynamic>  payLoad =  <String, dynamic>{
+      "type":"vendor_order",
+      "orderId":widget.orderModel.id
+
+    };
+
+    if (widget.orderModel.scheduleTime != null) {
+      await FireStoreUtils.sendFcmMessage(scheduleOrder, widget.orderModel.vendor.fcmToken,payLoad);
+    } else {
+      await FireStoreUtils.sendFcmMessage(orderPlaced, widget.orderModel.vendor.fcmToken,payLoad);
+    }
+
+   await FireStoreUtils.sendOrderEmail(orderModel: widget.orderModel);
 
     Provider.of<CartDatabase>(context, listen: false).deleteAllProducts();
 
-    if (SELECTED_CATEGORY == null || SELECTED_CATEGORY.isEmpty || SELECTED_CATEGORY == "") {
+    if (sectionConstantModel!.id == null  || sectionConstantModel!.id == "") {
       pushAndRemoveUntil(context, const StoreSelection(), false);
     } else {
-      if (serviceTypeFlag == "ecommerce-service") {
+      if (sectionConstantModel!.serviceTypeFlag == "ecommerce-service") {
         pushAndRemoveUntil(
             context,
             EcommeceDashBoardScreen(

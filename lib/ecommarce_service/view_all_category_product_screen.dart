@@ -144,13 +144,13 @@ class _ViewAllCategoryProductScreenState extends State<ViewAllCategoryProductScr
                     ),
                     productModel.disPrice == "" || productModel.disPrice == "0"
                         ? Text(
-                            symbol + double.parse(productModel.price).toStringAsFixed(decimal),
+                      amountShow(amount: productModel.price),
                             style: TextStyle(fontSize: 16, letterSpacing: 0.5, color: Color(COLOR_PRIMARY)),
                           )
                         : Row(
                             children: [
                               Text(
-                                "$symbol${double.parse(productModel.disPrice.toString()).toStringAsFixed(decimal)}",
+                                "${amountShow(amount: productModel.disPrice)}",
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -161,7 +161,7 @@ class _ViewAllCategoryProductScreenState extends State<ViewAllCategoryProductScr
                                 width: 10,
                               ),
                               Text(
-                                '$symbol${double.parse(productModel.price).toStringAsFixed(decimal)}',
+                                '${amountShow(amount: productModel.price)}',
                                 style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey, decoration: TextDecoration.lineThrough),
                               ),
                             ],

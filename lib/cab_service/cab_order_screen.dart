@@ -26,7 +26,8 @@ class _CabOrderScreenState extends State<CabOrderScreen> {
   @override
   void initState() {
     super.initState();
-    ordersFuture = _fireStoreUtils.getCabDriverOrders(MyAppState.currentUser!.userID);
+    ordersFuture =
+        _fireStoreUtils.getCabDriverOrders(MyAppState.currentUser!.userID);
   }
 
   @override
@@ -56,7 +57,8 @@ class _CabOrderScreenState extends State<CabOrderScreen> {
               return ListView.builder(
                   itemCount: ordersList.length,
                   padding: const EdgeInsets.all(12),
-                  itemBuilder: (context, index) => buildOrderItem(ordersList[index]));
+                  itemBuilder: (context, index) =>
+                      buildOrderItem(ordersList[index]));
             }
           }),
     );
@@ -64,7 +66,8 @@ class _CabOrderScreenState extends State<CabOrderScreen> {
 
   Widget buildOrderItem(CabOrderModel orderModel) {
     String totalAmount =
-        "$symbol ${(double.parse(orderModel.subTotal!.toString())).toStringAsFixed(decimal)}";
+        "${amountShow(amount: orderModel.subTotal!.toString())}";
+
     return InkWell(
       onTap: () => push(
           context,
@@ -77,9 +80,13 @@ class _CabOrderScreenState extends State<CabOrderScreen> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-                color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100,
+                color: isDarkMode(context)
+                    ? const Color(DarkContainerBorderColor)
+                    : Colors.grey.shade100,
                 width: 1),
-            color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
+            color: isDarkMode(context)
+                ? const Color(DarkContainerColor)
+                : Colors.white,
             boxShadow: [
               isDarkMode(context)
                   ? const BoxShadow()
@@ -101,16 +108,20 @@ class _CabOrderScreenState extends State<CabOrderScreen> {
                             CachedNetworkImage(
                               height: 50,
                               width: 50,
-                              imageUrl: getImageValidUrl(orderModel.driver!.profilePictureURL),
-                              imageBuilder: (context, imageProvider) => Container(
+                              imageUrl: getImageVAlidUrl(
+                                  orderModel.driver!.profilePictureURL),
+                              imageBuilder: (context, imageProvider) =>
+                                  Container(
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
-                                  image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+                                  image: DecorationImage(
+                                      image: imageProvider, fit: BoxFit.cover),
                                 ),
                               ),
                               placeholder: (context, url) => Center(
                                   child: CircularProgressIndicator.adaptive(
-                                valueColor: AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
+                                valueColor: AlwaysStoppedAnimation(
+                                    Color(COLOR_PRIMARY)),
                               )),
                               errorWidget: (context, url, error) => ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
@@ -122,22 +133,28 @@ class _CabOrderScreenState extends State<CabOrderScreen> {
                             ),
                             Expanded(
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10.0),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          orderModel.driver!.firstName + " " + orderModel.driver!.lastName,
+                                          orderModel.driver!.firstName +
+                                              " " +
+                                              orderModel.driver!.lastName,
                                           style: const TextStyle(
                                             fontSize: 18,
                                           ),
                                         ),
                                         Text(
                                           totalAmount,
-                                          style: TextStyle(fontSize: 18, color: Color(COLOR_PRIMARY)),
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              color: Color(COLOR_PRIMARY)),
                                         ),
                                       ],
                                     ),
@@ -145,23 +162,29 @@ class _CabOrderScreenState extends State<CabOrderScreen> {
                                       height: 6,
                                     ),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
                                       children: [
                                         Text(
-                                          orderDate(orderModel.createdAt).trim(),
+                                          orderDate(orderModel.createdAt)
+                                              .trim(),
                                           style: const TextStyle(fontSize: 14),
                                         ),
                                         Padding(
-                                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 15.0),
                                           child: Container(
                                             width: 7,
                                             height: 7,
                                             decoration: const BoxDecoration(
-                                                color: Colors.grey, shape: BoxShape.circle),
+                                                color: Colors.grey,
+                                                shape: BoxShape.circle),
                                           ),
                                         ),
                                         Text(
-                                          orderModel.paymentStatus ? "Paid".tr() : "UnPaid".tr(),
+                                          orderModel.paymentStatus
+                                              ? "Paid".tr()
+                                              : "UnPaid".tr(),
                                           style: TextStyle(
                                               fontSize: 15,
                                               color: orderModel.paymentStatus
@@ -228,7 +251,9 @@ class _CabOrderScreenState extends State<CabOrderScreen> {
                   height: 10,
                 ),
                 Visibility(
-                  visible: orderModel.status == ORDER_STATUS_COMPLETED ? true : false,
+                  visible: orderModel.status == ORDER_STATUS_COMPLETED
+                      ? true
+                      : false,
                   child: Row(
                     children: [
                       Expanded(
@@ -238,7 +263,8 @@ class _CabOrderScreenState extends State<CabOrderScreen> {
                             width: MediaQuery.of(context).size.width,
                             child: ElevatedButton(
                               onPressed: () async {
-                                push(context, CabReviewScreen(order: orderModel));
+                                push(context,
+                                    CabReviewScreen(order: orderModel));
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Color(COLOR_PRIMARY),
@@ -267,7 +293,8 @@ class _CabOrderScreenState extends State<CabOrderScreen> {
                             width: MediaQuery.of(context).size.width,
                             child: ElevatedButton(
                               onPressed: () async {
-                                push(context, ComplainScreen(order: orderModel));
+                                push(
+                                    context, ComplainScreen(order: orderModel));
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Color(COLOR_PRIMARY),
@@ -319,10 +346,10 @@ class _CabOrderScreenState extends State<CabOrderScreen> {
 
     if (orderModel.taxType!.isNotEmpty) {
       if (orderModel.taxType == "percent") {
-        totalTax =
-            (double.parse(orderModel.subTotal.toString()) - double.parse(orderModel.discount.toString())) *
-                double.parse(orderModel.tax.toString()) /
-                100;
+        totalTax = (double.parse(orderModel.subTotal.toString()) -
+                double.parse(orderModel.discount.toString())) *
+            double.parse(orderModel.tax.toString()) /
+            100;
       } else {
         totalTax = double.parse(orderModel.tax.toString());
       }

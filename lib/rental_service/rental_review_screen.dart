@@ -93,7 +93,7 @@ class _RentalReviewScreenState extends State<RentalReviewScreen> with TickerProv
             color: Colors.white,
           ),
         ),
-        title: Text(ratingModel != null ? "Update Review" : "Add Review", style: const TextStyle(color: Colors.white)).tr(),
+        title: Text(ratingModel != null ? "Update Review".tr() : "Add Review".tr(), style: const TextStyle(color: Colors.white)).tr(),
       ),
       body: Form(
           key: _formKey,
@@ -159,17 +159,17 @@ class _RentalReviewScreenState extends State<RentalReviewScreen> with TickerProv
                                   padding: EdgeInsets.symmetric(vertical: 12),
                                   child: MySeparator(color: Colors.grey),
                                 ),
-                                const Padding(
-                                  padding: EdgeInsets.only(top: 16),
+                                 Padding(
+                                  padding:const EdgeInsets.only(top: 16),
                                   child: Text(
-                                    'How is your trip?',
+                                    'How is your trip?'.tr(),
                                     style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.bold, letterSpacing: 2),
                                   ),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 8),
                                   child: Text(
-                                    'Your feedback  will help us improve \n driving experience better',
+                                    'Your feedback  will help us improve \n driving experience better'.tr(),
                                     textAlign: TextAlign.center,
                                     style: TextStyle(color: Colors.black.withOpacity(0.60), letterSpacing: 0.8),
                                   ),
@@ -177,7 +177,7 @@ class _RentalReviewScreenState extends State<RentalReviewScreen> with TickerProv
                                 Padding(
                                   padding: const EdgeInsets.only(top: 20),
                                   child: Text(
-                                    'Rate for',
+                                    'Rate for'.tr(),
                                     textAlign: TextAlign.center,
                                     style: TextStyle(color: Colors.black.withOpacity(0.60), letterSpacing: 0.8),
                                   ),
@@ -229,7 +229,7 @@ class _RentalReviewScreenState extends State<RentalReviewScreen> with TickerProv
                                           border: OutlineInputBorder(
                                             borderSide: BorderSide(color: Color(COLOR_PRIMARY), width: 0.7),
                                           ),
-                                          hintText: "Type comment....",
+                                          hintText: "Type comment....".tr(),
                                           hintStyle: TextStyle(color: Colors.black.withOpacity(0.60))),
                                       maxLines: 5,
                                     )),
@@ -247,7 +247,7 @@ class _RentalReviewScreenState extends State<RentalReviewScreen> with TickerProv
                                     ),
                                     color: Color(COLOR_PRIMARY),
                                     child: Text(
-                                      ratingModel != null ? "Update Review" : "Add Review".tr(),
+                                      ratingModel != null ? "Update Review".tr() : "Add Review".tr(),
                                       style: TextStyle(color: isDarkMode(context) ? Colors.black : Colors.white, fontSize: 16),
                                     ),
                                   ),

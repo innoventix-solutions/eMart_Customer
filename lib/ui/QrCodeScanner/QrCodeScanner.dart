@@ -95,7 +95,7 @@ class _QrCodeScannerState extends State<QrCodeScanner> {
                                   }
                                 }
                               } else {
-                                if (SELECTED_CATEGORY.isNotEmpty && SELECTED_CATEGORY == sectionId) {
+                                if (sectionConstantModel!.id != null && sectionConstantModel!.id == sectionId) {
                                   if (allstoreList.isNotEmpty) {
                                     for (VendorModel storeModel in allstoreList) {
                                       if (storeModel.id == codeVal["vendorid"]) {
@@ -139,9 +139,10 @@ class _QrCodeScannerState extends State<QrCodeScanner> {
       if (user != null && user.role == USER_ROLE_CUSTOMER) {
         user.active = true;
         user.role = USER_ROLE_CUSTOMER;
-        SELECTED_CATEGORY = sectionModel.id.toString();
-        SELECTED_SECTION_NAME = sectionModel.name.toString();
-        isDineEnable = sectionModel.dineInActive!;
+        sectionConstantModel = sectionModel;
+        //SELECTED_CATEGORY = sectionModel.id.toString();
+       // SELECTED_SECTION_NAME = sectionModel.name.toString();
+       // isDineEnable = sectionModel.dineInActive!;
         COLOR_PRIMARY = int.parse(sectionModel.color!.replaceFirst("#", "0xff"));
         user.fcmToken = await FireStoreUtils.firebaseMessaging.getToken() ?? '';
         await FireStoreUtils.updateCurrentUser(user);
@@ -157,9 +158,10 @@ class _QrCodeScannerState extends State<QrCodeScanner> {
       }
     } else {
       if (isSkipLogin) {
-        SELECTED_CATEGORY = sectionModel.id.toString();
-        SELECTED_SECTION_NAME = sectionModel.name.toString();
-        isDineEnable = sectionModel.dineInActive!;
+        sectionConstantModel = sectionModel;
+        //SELECTED_CATEGORY = sectionModel.id.toString();
+       // SELECTED_SECTION_NAME = sectionModel.name.toString();
+       // isDineEnable = sectionModel.dineInActive!;
         COLOR_PRIMARY = int.parse(sectionModel.color!.replaceFirst("#", "0xff"));
         push(context, ContainerScreen(user: null));
       } else {

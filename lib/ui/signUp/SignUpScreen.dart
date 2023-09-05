@@ -468,25 +468,39 @@ class _SignUpState extends State<SignUpScreen> {
   _signUp() async {
     if (_key.currentState?.validate() ?? false) {
       _key.currentState!.save();
-      if(referralCode.toString().isNotEmpty){
-        FireStoreUtils.checkReferralCodeValidOrNot(referralCode.toString()).then((value) async {
-          if(value == true){
-            await _signUpWithEmailAndPassword();
-          }else{
-            final snack = SnackBar(
-              content: Text(
-                'Referral Code is Invalid'.tr(),
-                style: const TextStyle(color: Colors.white),
-              ),
-              duration: const Duration(seconds: 2),
-              backgroundColor: Colors.black,
-            );
-            ScaffoldMessenger.of(context).showSnackBar(snack);
-          }
-
-        });
+      if(mobile != null) {
+        if (referralCode
+            .toString()
+            .isNotEmpty) {
+          FireStoreUtils.checkReferralCodeValidOrNot(referralCode.toString())
+              .then((value) async {
+            if (value == true) {
+              await _signUpWithEmailAndPassword();
+            } else {
+              final snack = SnackBar(
+                content: Text(
+                  'Referral Code is Invalid'.tr(),
+                  style: const TextStyle(color: Colors.white),
+                ),
+                duration: const Duration(seconds: 2),
+                backgroundColor: Colors.black,
+              );
+              ScaffoldMessenger.of(context).showSnackBar(snack);
+            }
+          });
+        } else {
+          await _signUpWithEmailAndPassword();
+        }
       }else{
-        await _signUpWithEmailAndPassword();
+        final snack = SnackBar(
+          content: Text(
+            'Phone number is Empty'.tr(),
+            style: TextStyle(color: Colors.white),
+          ),
+          duration: Duration(seconds: 2),
+          backgroundColor: Colors.red,
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snack);
       }
     } else {
       setState(() {

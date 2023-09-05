@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:emartconsumer/constants.dart';
+import 'package:emartconsumer/services/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -60,7 +62,7 @@ class _MercadoPagoScreenState extends State<MercadoPagoScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-            title: const Text("Payment"),
+            title: const Text("Payment").tr(),
             centerTitle: false,
             leading: GestureDetector(
               onTap: () {
@@ -68,7 +70,7 @@ class _MercadoPagoScreenState extends State<MercadoPagoScreen> {
               },
               child: const Icon(
                 Icons.arrow_back,
-                color: Colors.white,
+
               ),
             )),
         // body: WebView(
@@ -103,16 +105,16 @@ class _MercadoPagoScreenState extends State<MercadoPagoScreen> {
       barrierDismissible: true, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Cancel Payment'),
-          content: const SingleChildScrollView(
-            child: Text("cancelPayment?"),
+          title: const Text('Cancel Payment').tr(),
+          content:  SingleChildScrollView(
+            child: Text("cancelPayment?").tr(),
           ),
           actions: <Widget>[
             TextButton(
               child: const Text(
                 'Cancel',
                 style: TextStyle(color: Colors.red),
-              ),
+              ).tr(),
               onPressed: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).pop(false);
@@ -122,7 +124,7 @@ class _MercadoPagoScreenState extends State<MercadoPagoScreen> {
               child: const Text(
                 'Continue',
                 style: TextStyle(color: Colors.green),
-              ),
+              ).tr(),
               onPressed: () {
                 Navigator.of(context).pop();
               },

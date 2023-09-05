@@ -49,8 +49,8 @@ class _VehicleTypeScreenState extends State<VehicleTypeScreen> {
 
   getCompanyDriver(String vehicleType) async {
     driverListStrem = FireStoreUtils()
-        .getRentalCompanyDriver(widget.rentalOrderModel, vehicleType, rentalOrderModel!.pickupDateTime!,
-            rentalOrderModel!.dropDateTime!)
+        .getRentalCompanyDriver(widget.rentalOrderModel, vehicleType,
+            rentalOrderModel!.pickupDateTime!, rentalOrderModel!.dropDateTime!)
         .asBroadcastStream();
   }
 
@@ -111,7 +111,8 @@ class _VehicleTypeScreenState extends State<VehicleTypeScreen> {
                                 decoration: BoxDecoration(
                                   color: isDarkMode(context)
                                       ? Colors.grey.shade700
-                                      : selectedVehicleType == vehicleType[index]
+                                      : selectedVehicleType ==
+                                              vehicleType[index]
                                           ? Color(COLOR_PRIMARY)
                                           : Colors.black.withOpacity(0.10),
                                   borderRadius: const BorderRadius.only(
@@ -122,27 +123,36 @@ class _VehicleTypeScreenState extends State<VehicleTypeScreen> {
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.only(left: 20, top: 20),
+                                padding:
+                                    const EdgeInsets.only(left: 20, top: 20),
                                 child: CachedNetworkImage(
                                   height: 60,
                                   width: 100,
-                                  imageUrl: getImageValidUrl(vehicleType[index].rentalVehicleIcon.toString()),
-                                  imageBuilder: (context, imageProvider) => Container(
+                                  imageUrl: getImageVAlidUrl(vehicleType[index]
+                                      .rentalVehicleIcon
+                                      .toString()),
+                                  imageBuilder: (context, imageProvider) =>
+                                      Container(
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(20),
-                                      image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+                                      image: DecorationImage(
+                                          image: imageProvider,
+                                          fit: BoxFit.cover),
                                     ),
                                   ),
                                   placeholder: (context, url) => Center(
                                       child: CircularProgressIndicator.adaptive(
-                                    valueColor: AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
+                                    valueColor: AlwaysStoppedAnimation(
+                                        Color(COLOR_PRIMARY)),
                                   )),
-                                  errorWidget: (context, url, error) => ClipRRect(
-                                      borderRadius: BorderRadius.circular(20),
-                                      child: Image.network(
-                                        placeholderImage,
-                                        fit: BoxFit.fill,
-                                      )),
+                                  errorWidget: (context, url, error) =>
+                                      ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          child: Image.network(
+                                            placeholderImage,
+                                            fit: BoxFit.fill,
+                                          )),
                                   fit: BoxFit.fill,
                                 ),
                               ),
@@ -175,7 +185,8 @@ class _VehicleTypeScreenState extends State<VehicleTypeScreen> {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(
                         child: CircularProgressIndicator.adaptive(
-                          valueColor: AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
+                          valueColor:
+                              AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
                         ),
                       );
                     }
@@ -185,43 +196,56 @@ class _VehicleTypeScreenState extends State<VehicleTypeScreen> {
                       driverList.clear();
                       snapshot.data!.forEach((element) {
                         if (element.rentalBookingDate!.isNotEmpty) {
-                          print("------->");
                           print(element.rentalBookingDate!.first.runtimeType);
-                          print(widget.rentalOrderModel!.pickupDateTime!.toDate());
-                          print(widget.rentalOrderModel!.dropDateTime!.toDate());
+                          print(widget.rentalOrderModel!.pickupDateTime!
+                              .toDate());
+                          print(
+                              widget.rentalOrderModel!.dropDateTime!.toDate());
                           print(element.rentalBookingDate!.first.toDate());
                           print(element.rentalBookingDate!.last.toDate());
                           print(widget.rentalOrderModel!.pickupDateTime!
                               .toDate()
-                              .isAfter(element.rentalBookingDate!.first.toDate()));
+                              .isAfter(
+                                  element.rentalBookingDate!.first.toDate()));
                           print(widget.rentalOrderModel!.pickupDateTime!
                               .toDate()
-                              .isBefore(element.rentalBookingDate!.last.toDate()));
+                              .isBefore(
+                                  element.rentalBookingDate!.last.toDate()));
                           print(widget.rentalOrderModel!.pickupDateTime!
                                   .toDate()
-                                  .isAfter(element.rentalBookingDate!.first.toDate()) &&
+                                  .isAfter(element.rentalBookingDate!.first
+                                      .toDate()) &&
                               widget.rentalOrderModel!.pickupDateTime!
                                   .toDate()
-                                  .isBefore(element.rentalBookingDate!.last.toDate()));
+                                  .isBefore(element.rentalBookingDate!.last
+                                      .toDate()));
 
                           if (!(widget.rentalOrderModel!.pickupDateTime!
                                   .toDate()
-                                  .isAfter(element.rentalBookingDate!.first.toDate()) &&
+                                  .isAfter(element.rentalBookingDate!.first
+                                      .toDate()) &&
                               widget.rentalOrderModel!.pickupDateTime!
                                   .toDate()
-                                  .isBefore(element.rentalBookingDate!.last.toDate()))) {
+                                  .isBefore(element.rentalBookingDate!.last
+                                      .toDate()))) {
                             if (!(widget.rentalOrderModel!.dropDateTime!
                                     .toDate()
-                                    .isAfter(element.rentalBookingDate!.first.toDate()) &&
+                                    .isAfter(element.rentalBookingDate!.first
+                                        .toDate()) &&
                                 widget.rentalOrderModel!.dropDateTime!
                                     .toDate()
-                                    .isBefore(element.rentalBookingDate!.last.toDate()))) {
+                                    .isBefore(element.rentalBookingDate!.last
+                                        .toDate()))) {
+                              print("CCCCCCC");
                               driverList.add(element);
                             }
                           }
                         } else {
+                          print("DDDDD");
                           driverList.add(element);
                         }
+                        print("AAAAbbbbb");
+                        print(driverList.length);
                       });
 
                       return Container(
@@ -235,7 +259,8 @@ class _VehicleTypeScreenState extends State<VehicleTypeScreen> {
                           itemBuilder: (context, index) {
                             return InkWell(
                               onTap: () {
-                                print(widget.rentalOrderModel!.pickupLatLong!.toJson());
+                                print(widget.rentalOrderModel!.pickupLatLong!
+                                    .toJson());
                                 push(
                                     context,
                                     VehicleDetailsScreen(
@@ -250,16 +275,19 @@ class _VehicleTypeScreenState extends State<VehicleTypeScreen> {
                                     borderRadius: BorderRadius.circular(20),
                                     border: Border.all(
                                         color: isDarkMode(context)
-                                            ? const Color(DarkContainerBorderColor)
+                                            ? const Color(
+                                                DarkContainerBorderColor)
                                             : Colors.grey.shade100,
                                         width: 1),
-                                    color:
-                                        isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
+                                    color: isDarkMode(context)
+                                        ? const Color(DarkContainerColor)
+                                        : Colors.white,
                                     boxShadow: [
                                       isDarkMode(context)
                                           ? const BoxShadow()
                                           : BoxShadow(
-                                              color: Colors.grey.withOpacity(0.5),
+                                              color:
+                                                  Colors.grey.withOpacity(0.5),
                                               blurRadius: 5,
                                             ),
                                     ],
@@ -267,32 +295,58 @@ class _VehicleTypeScreenState extends State<VehicleTypeScreen> {
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 10),
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 10),
                                           child: CachedNetworkImage(
-                                            height: MediaQuery.of(context).size.height * 0.14,
-                                            imageUrl: driverList[index].carInfo!.carImage!.isEmpty
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.14,
+                                            imageUrl: driverList[index]
+                                                    .carInfo!
+                                                    .carImage!
+                                                    .isEmpty
                                                 ? ""
-                                                : driverList[index].carInfo!.carImage!.first,
-                                            imageBuilder: (context, imageProvider) => Container(
+                                                : driverList[index]
+                                                    .carInfo!
+                                                    .carImage!
+                                                    .first,
+                                            imageBuilder:
+                                                (context, imageProvider) =>
+                                                    Container(
                                               decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(10),
-                                                image:
-                                                    DecorationImage(image: imageProvider, fit: BoxFit.cover),
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                image: DecorationImage(
+                                                    image: imageProvider,
+                                                    fit: BoxFit.cover),
                                               ),
                                             ),
-                                            placeholder: (context, url) => Center(
-                                                child: CircularProgressIndicator.adaptive(
-                                              valueColor: AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
+                                            placeholder: (context, url) =>
+                                                Center(
+                                                    child:
+                                                        CircularProgressIndicator
+                                                            .adaptive(
+                                              valueColor:
+                                                  AlwaysStoppedAnimation(
+                                                      Color(COLOR_PRIMARY)),
                                             )),
-                                            errorWidget: (context, url, error) => Container(
-                                              width: MediaQuery.of(context).size.width,
+                                            errorWidget:
+                                                (context, url, error) =>
+                                                    Container(
+                                              width: MediaQuery.of(context)
+                                                  .size
+                                                  .width,
                                               decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.circular(20),
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
                                                   image: DecorationImage(
-                                                      image: NetworkImage(placeholderImage),
+                                                      image: NetworkImage(
+                                                          placeholderImage),
                                                       fit: BoxFit.cover)),
                                             ),
                                             fit: BoxFit.fill,
@@ -304,7 +358,9 @@ class _VehicleTypeScreenState extends State<VehicleTypeScreen> {
                                         Text(
                                           "${driverList[index].carName.toString()} ${driverList[index].carMakes.toString()}",
                                           style: const TextStyle(
-                                              fontSize: 16, letterSpacing: 2, fontWeight: FontWeight.w600),
+                                              fontSize: 16,
+                                              letterSpacing: 2,
+                                              fontWeight: FontWeight.w600),
                                         ),
                                         const SizedBox(
                                           height: 5,
@@ -314,28 +370,39 @@ class _VehicleTypeScreenState extends State<VehicleTypeScreen> {
                                             Expanded(
                                               child: Row(
                                                 children: [
-                                                  const Icon(Icons.people, size: 16),
+                                                  const Icon(Icons.people,
+                                                      size: 16),
                                                   const SizedBox(
                                                     width: 5,
                                                   ),
                                                   Text(
-                                                    "${driverList[index].carInfo!.passenger.toString()} seater",
+                                                    "${driverList[index].carInfo!.passenger.toString()}" +"seater".tr(),
                                                     style: const TextStyle(
-                                                        letterSpacing: 2, fontWeight: FontWeight.w600),
+                                                        letterSpacing: 2,
+                                                        fontWeight:
+                                                            FontWeight.w600),
                                                   ),
                                                   const SizedBox(
                                                     width: 10,
                                                   ),
                                                   Icon(Icons.star,
-                                                      color: Colors.orange.withOpacity(0.80), size: 16),
+                                                      color: Colors.orange
+                                                          .withOpacity(0.80),
+                                                      size: 16),
                                                   const SizedBox(
                                                     width: 5,
                                                   ),
                                                   Text(
-                                                      driverList[index].reviewsCount != 0
-                                                          ? (driverList[index].reviewsSum /
-                                                                  driverList[index].reviewsCount)
-                                                              .toStringAsFixed(1)
+                                                      driverList[index]
+                                                                  .reviewsCount !=
+                                                              0
+                                                          ? (driverList[index]
+                                                                      .reviewsSum /
+                                                                  driverList[
+                                                                          index]
+                                                                      .reviewsCount)
+                                                              .toStringAsFixed(
+                                                                  1)
                                                           : 0.toString(),
                                                       style: const TextStyle(
                                                         letterSpacing: 0.5,
@@ -344,7 +411,10 @@ class _VehicleTypeScreenState extends State<VehicleTypeScreen> {
                                               ),
                                             ),
                                             Text(
-                                              symbol + driverList[index].carRate,
+                                              amountShow(
+                                                  amount: driverList[index]
+                                                      .carRate
+                                                      .toString()),
                                               style: TextStyle(
                                                   color: Color(COLOR_PRIMARY),
                                                   letterSpacing: 0.5,
@@ -353,7 +423,8 @@ class _VehicleTypeScreenState extends State<VehicleTypeScreen> {
                                             Text(
                                               "/" + "day".tr(),
                                               style: const TextStyle(
-                                                  letterSpacing: 0.5, fontWeight: FontWeight.w600),
+                                                  letterSpacing: 0.5,
+                                                  fontWeight: FontWeight.w600),
                                             ),
                                           ],
                                         )

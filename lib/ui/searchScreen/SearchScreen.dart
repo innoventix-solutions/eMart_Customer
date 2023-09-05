@@ -54,7 +54,8 @@ class SearchScreenState extends State<SearchScreen> {
           actions: [
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.only(left: 50, top: 10, right: 10, bottom: 10),
+                padding: const EdgeInsets.only(
+                    left: 50, top: 10, right: 10, bottom: 10),
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width,
                   child: TextFormField(
@@ -63,18 +64,22 @@ class SearchScreenState extends State<SearchScreen> {
                       onSearchTextChanged(value);
                     },
                     decoration: InputDecoration(
-                      hintText: 'Search...r'.tr(),
-                      contentPadding: const EdgeInsets.only(left: 10, right: 10, top: 10),
+                      hintText: 'Search...'.tr(),
+                      contentPadding:
+                          const EdgeInsets.only(left: 10, right: 10, top: 10),
                       hintStyle: const TextStyle(color: Color(0XFF8A8989)),
                       focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.0),
-                          borderSide: BorderSide(color: Color(COLOR_PRIMARY), width: 2.0)),
+                          borderSide: BorderSide(
+                              color: Color(COLOR_PRIMARY), width: 2.0)),
                       errorBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Theme.of(context).errorColor),
+                        borderSide:
+                            BorderSide(color: Theme.of(context).errorColor),
                         borderRadius: BorderRadius.circular(10.0),
                       ),
                       focusedErrorBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Theme.of(context).errorColor),
+                        borderSide:
+                            BorderSide(color: Theme.of(context).errorColor),
                         borderRadius: BorderRadius.circular(10.0),
                       ),
                       enabledBorder: OutlineInputBorder(
@@ -101,7 +106,10 @@ class SearchScreenState extends State<SearchScreen> {
                     children: [
                       const Text(
                         "Store",
-                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 16),
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16),
                       ),
                       const SizedBox(
                         height: 10,
@@ -128,8 +136,10 @@ class SearchScreenState extends State<SearchScreen> {
                     children: [
                       Text(
                         "Item".tr(),
-                        style:
-                            const TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 16),
+                        style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16),
                       ),
                       const SizedBox(
                         height: 10,
@@ -202,7 +212,7 @@ class SearchScreenState extends State<SearchScreen> {
             CachedNetworkImage(
                 height: MediaQuery.of(context).size.height * 0.075,
                 width: MediaQuery.of(context).size.width * 0.16,
-                imageUrl: getImageValidUrl(vendorModel.photo),
+                imageUrl: getImageVAlidUrl(vendorModel.photo),
                 imageBuilder: (context, imageProvider) => Container(
                       // width: 100,
                       // height: 100,
@@ -234,25 +244,31 @@ class SearchScreenState extends State<SearchScreen> {
                       Text(vendorModel.title,
                           style: TextStyle(
                             fontSize: 16,
-                            color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff272727),
+                            color: isDarkMode(context)
+                                ? const Color(0xffFFFFFF)
+                                : const Color(0xff272727),
                             // Color(0xff272727)
                           )),
                       const SizedBox(height: 3),
-                      Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-                        const Icon(
-                          Icons.location_on_sharp,
-                          color: Color(0xff9091A4),
-                          size: 16,
-                        ),
-                        const SizedBox(width: 3),
-                        Container(
-                            constraints: const BoxConstraints(maxWidth: 200, maxHeight: 50),
-                            child: Text(
-                              vendorModel.location,
-                              maxLines: 1,
-                              style: const TextStyle(fontSize: 14, color: Color(0XFF555353)),
-                            ))
-                      ]),
+                      Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.location_on_sharp,
+                              color: Color(0xff9091A4),
+                              size: 16,
+                            ),
+                            const SizedBox(width: 3),
+                            Container(
+                                constraints: const BoxConstraints(
+                                    maxWidth: 200, maxHeight: 50),
+                                child: Text(
+                                  vendorModel.location,
+                                  maxLines: 1,
+                                  style: const TextStyle(
+                                      fontSize: 14, color: Color(0XFF555353)),
+                                ))
+                          ]),
                       const SizedBox(height: 8),
                     ],
                   ),
@@ -269,7 +285,8 @@ class SearchScreenState extends State<SearchScreen> {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () async {
-        VendorModel? vendorModel = await FireStoreUtils.getVendor(productModel.vendorID);
+        VendorModel? vendorModel =
+            await FireStoreUtils.getVendor(productModel.vendorID);
         if (vendorModel != null) {
           push(
             context,
@@ -290,7 +307,7 @@ class SearchScreenState extends State<SearchScreen> {
             CachedNetworkImage(
                 height: MediaQuery.of(context).size.height * 0.075,
                 width: MediaQuery.of(context).size.width * 0.16,
-                imageUrl: getImageValidUrl(productModel.photo),
+                imageUrl: getImageVAlidUrl(productModel.photo),
                 imageBuilder: (context, imageProvider) => Container(
                       // width: 100,
                       // height: 100,
@@ -322,13 +339,16 @@ class SearchScreenState extends State<SearchScreen> {
                       Text(productModel.name,
                           style: TextStyle(
                             fontSize: 16,
-                            color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff272727),
+                            color: isDarkMode(context)
+                                ? const Color(0xffFFFFFF)
+                                : const Color(0xff272727),
                             // Color(0xff272727)
                           )),
                       const SizedBox(height: 3),
-                      productModel.disPrice == "" || productModel.disPrice == "0"
+                      productModel.disPrice == "" ||
+                              productModel.disPrice == "0"
                           ? Text(
-                              "$symbol${double.parse(productModel.price).toStringAsFixed(decimal)}",
+                              "${amountShow(amount: productModel.price.toString())}",
                               style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   letterSpacing: 0.5,
@@ -337,7 +357,7 @@ class SearchScreenState extends State<SearchScreen> {
                           : Row(
                               children: [
                                 Text(
-                                  "$symbol${double.parse(productModel.disPrice.toString()).toStringAsFixed(decimal)}",
+                                  "${amountShow(amount: productModel.disPrice.toString())}",
                                   style: TextStyle(
                                     fontWeight: FontWeight.w600,
                                     fontSize: 14,
@@ -348,7 +368,7 @@ class SearchScreenState extends State<SearchScreen> {
                                   width: 4,
                                 ),
                                 Text(
-                                  '$symbol${double.parse(productModel.price).toStringAsFixed(decimal)}',
+                                  "${amountShow(amount: productModel.price.toString())}",
                                   style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: Colors.grey,

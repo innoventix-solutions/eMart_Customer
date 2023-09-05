@@ -95,7 +95,7 @@ class _FavouriteStoreScreenState extends State<FavouriteStoreScreen> {
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: CachedNetworkImage(
-                  imageUrl: getImageValidUrl(vendorModel.photo),
+                  imageUrl: getImageVAlidUrl(vendorModel.photo),
                   height: 100,
                   width: 100,
                   imageBuilder: (context, imageProvider) => Container(

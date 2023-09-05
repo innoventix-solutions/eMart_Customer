@@ -35,7 +35,7 @@ class _CuisinesScreenState extends State<CuisinesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: isDarkMode(context) ? Colors.black : const Color(0xffFBFBFB),
-        appBar: widget.isPageCallFromHomeScreen! ? AppGlobal.buildAppBar(context, "Categories") : null,
+        appBar: widget.isPageCallFromHomeScreen! ? AppGlobal.buildAppBar(context, "Categories".tr()) : null,
         body: FutureBuilder<List<VendorCategoryModel>>(
             future: categoriesFuture,
             initialData: const [],
@@ -70,7 +70,7 @@ class _CuisinesScreenState extends State<CuisinesScreen> {
               sp!.setString("CatLastID", cuisineModel.id.toString());
               setState(() {});
             }
-            if (serviceTypeFlag == "ecommerce-service") {
+            if (sectionConstantModel!.serviceTypeFlag == "ecommerce-service") {
               push(
                 context,
                 ViewAllCategoryProductScreen(

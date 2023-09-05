@@ -10,6 +10,7 @@ import 'package:emartconsumer/model/User.dart';
 import 'package:emartconsumer/services/FirebaseHelper.dart';
 import 'package:emartconsumer/services/helper.dart';
 import 'package:flutter/material.dart';
+import 'package:location/location.dart';
 
 class CabHomeScreen extends StatefulWidget {
   final User? user;
@@ -32,7 +33,11 @@ class _CabHomeScreenState extends State<CabHomeScreen> {
   List<BannerModel> bannerTopHome = [];
   bool isHomeBannerLoading = true;
 
+  final Location currentLocation = Location();
+
   getBanner() async {
+    LocationData location = await currentLocation.getLocation();
+
     await FireStoreUtils().getHomeTopBanner().then((value) {
       setState(() {
         bannerTopHome = value;
@@ -47,31 +52,31 @@ class _CabHomeScreenState extends State<CabHomeScreen> {
         body: Stack(
       children: [
         Image.asset('assets/images/cab_home_image.png'),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            InkWell(
-              onTap: () {
-                Scaffold.of(context).openDrawer();
-              },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 15),
-                child: Image.asset(
-                  "assets/icons/ic_side_menu.png",
-                  color: Colors.black,
+        Padding(
+          padding:  EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.04,right: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              InkWell(
+                onTap: () {
+                  Scaffold.of(context).openDrawer();
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 15),
+                  child: Image.asset(
+                    "assets/icons/ic_side_menu.png",
+                    color: Colors.black,
+                  ),
                 ),
               ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 14),
-                child: Text(
-                        "WelCome, ${MyAppState.currentUser == null ? '' : MyAppState.currentUser!.firstName ?? ''}",
-                        style: const TextStyle(fontSize: 22, color: Colors.black))
-                    .tr(),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  child: Text("WelCome".tr() +" ${MyAppState.currentUser == null ? '' : MyAppState.currentUser!.firstName ?? ''}", style: const TextStyle(fontSize: 22, color: Colors.black)).tr(),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         Padding(
           padding: const EdgeInsets.only(top: 320),
@@ -102,15 +107,14 @@ class _CabHomeScreenState extends State<CabHomeScreen> {
                                       itemCount: bannerTopHome.length,
                                       scrollDirection: Axis.horizontal,
                                       controller: _controller,
-                                      itemBuilder: (context, index) =>
-                                          buildBestDealPage(bannerTopHome[index])))),
+                                      itemBuilder: (context, index) => buildBestDealPage(bannerTopHome[index])))),
                     ),
                     const SizedBox(
                       height: 10,
                     ),
-                    const Text(
-                      "Choose Your Ride",
-                      style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w500),
+                     Text(
+                      "Choose Your Ride".tr(),
+                      style:const TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w500),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
@@ -131,8 +135,8 @@ class _CabHomeScreenState extends State<CabHomeScreen> {
                                       const SizedBox(
                                         height: 20,
                                       ),
-                                      const Text(
-                                        "Ride",
+                                       Text(
+                                        "Ride".tr(),
                                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                                       ),
                                       const SizedBox(
@@ -163,8 +167,8 @@ class _CabHomeScreenState extends State<CabHomeScreen> {
                                       const SizedBox(
                                         height: 20,
                                       ),
-                                      const Text(
-                                        "Intercity / Outstation",
+                                       Text(
+                                        "Intercity / Outstation".tr(),
                                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                                       ),
                                       const SizedBox(
@@ -282,7 +286,7 @@ class _CabHomeScreenState extends State<CabHomeScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Container(
         child: CachedNetworkImage(
-          imageUrl: getImageValidUrl(categoriesModel.photo.toString()),
+          imageUrl: getImageVAlidUrl(categoriesModel.photo.toString()),
           imageBuilder: (context, imageProvider) => Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),

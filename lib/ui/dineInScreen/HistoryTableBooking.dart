@@ -95,7 +95,7 @@ class _HistoryTableBookingState extends State<HistoryTableBooking> {
                                   child: CachedNetworkImage(
                                     height: 70,
                                     width: 70,
-                                    imageUrl: getImageValidUrl(bookTableModel.vendor.photo),
+                                    imageUrl: getImageVAlidUrl(bookTableModel.vendor.photo),
                                     imageBuilder: (context, imageProvider) => Container(
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(15),

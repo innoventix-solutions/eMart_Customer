@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:emartconsumer/model/TaxModel.dart';
 import 'package:emartconsumer/model/User.dart';
 
 class RentalOrderModel {
@@ -11,9 +12,9 @@ class RentalOrderModel {
   String? adminCommissionType;
   String? discountType;
   String? discountLabel;
-  String? tax;
-  String? taxType;
-  String? taxLabel;
+  // String? tax;
+  // String? taxType;
+  // String? taxLabel;
   String? pickupAddress;
   String? dropAddress;
   bool? bookWithDriver;
@@ -33,6 +34,8 @@ class RentalOrderModel {
   String? companyID;
   Timestamp? createdAt;
   Timestamp? trigger_delevery;
+  List<TaxModel>? taxModel;
+
 
   RentalOrderModel({
     this.id = '',
@@ -44,9 +47,9 @@ class RentalOrderModel {
     this.adminCommissionType,
     this.discountType,
     this.discountLabel,
-    this.tax,
-    this.taxType,
-    this.taxLabel,
+    // this.tax,
+    // this.taxType,
+    // this.taxLabel,
     this.pickupAddress,
     this.dropAddress,
     this.pickupDateTime,
@@ -64,10 +67,17 @@ class RentalOrderModel {
     this.bookWithDriver = false,
     this.createdAt,
     this.trigger_delevery,
-    this.sectionId ,
+    this.sectionId , this.taxModel
   });
 
   factory RentalOrderModel.fromJson(Map<String, dynamic> json) {
+    List<TaxModel>? taxList;
+    if (json['taxSetting'] != null) {
+      taxList = <TaxModel>[];
+      json['taxSetting'].forEach((v) {
+        taxList!.add(TaxModel.fromJson(v));
+      });
+    }
     return RentalOrderModel(
       id: json['id'] ?? "",
       status: json['status'] ?? "",
@@ -78,9 +88,9 @@ class RentalOrderModel {
       adminCommissionType: json['adminCommissionType'] ?? "",
       discountLabel: json['discountLabel'] ?? "",
       discountType: json['discountType'] ?? "",
-      tax: json['tax'] ?? "",
-      taxType: json['taxType'] ?? "",
-      taxLabel: json['taxLabel'] ?? "",
+      // tax: json['tax'] ?? "",
+      // taxType: json['taxType'] ?? "",
+      // taxLabel: json['taxLabel'] ?? "",
       pickupAddress: json['pickupAddress'] ?? "",
       dropAddress: json['dropAddress'] ?? "",
       bookWithDriver: json['bookWithDriver'] ?? false,
@@ -99,6 +109,7 @@ class RentalOrderModel {
       driver: json.containsKey('driver') ? User.fromJson(json['driver']) : null,
       driverID: json.containsKey('driverID') ? json['driverID'] : null,
       sectionId: json['sectionId'] ??"",
+      taxModel: taxList,
     );
   }
 
@@ -113,9 +124,9 @@ class RentalOrderModel {
       "adminCommissionType": adminCommissionType,
       "discountLabel": discountLabel,
       "discountType": discountType,
-      "tax": tax,
-      "taxType": taxType,
-      "taxLabel": taxLabel,
+      // "tax": tax,
+      // "taxType": taxType,
+      // "taxLabel": taxLabel,
       "pickupAddress": pickupAddress,
       "dropAddress": dropAddress,
       "pickupDateTime": pickupDateTime,
@@ -130,6 +141,7 @@ class RentalOrderModel {
       'createdAt': createdAt,
       'trigger_delevery': trigger_delevery,
       'sectionId': sectionId,
+      "taxSetting": taxModel != null ? taxModel!.map((v) => v.toJson()).toList() : null,
     };
     if (driver != null) {
       json.addAll({'driverID': driverID, 'driver': driver!.toJson()});

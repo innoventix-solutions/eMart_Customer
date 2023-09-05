@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:emartconsumer/model/TaxModel.dart';
 import 'package:emartconsumer/model/User.dart';
 import 'package:emartconsumer/model/VehicleType.dart';
 
@@ -38,6 +39,8 @@ class CabOrderModel {
   bool? roundTrip;
   Timestamp? scheduleDateTime;
   Timestamp? scheduleReturnDateTime;
+  List<TaxModel>? taxModel;
+
 
   CabOrderModel(
       {author,
@@ -73,6 +76,7 @@ class CabOrderModel {
       this.rideType = '',
       this.roundTrip ,
       this.sectionId ,
+      this.taxModel,
       this.rejectedByDrivers = const []})
       : author = author ?? User(),
         sourceLocation = sourceLocation ?? LocationDatas(),
@@ -91,6 +95,14 @@ class CabOrderModel {
     } else {
       discountVal = parsedJson['discount'];
     }
+    List<TaxModel>? taxList;
+    if (parsedJson['taxSetting'] != null) {
+      taxList = <TaxModel>[];
+      parsedJson['taxSetting'].forEach((v) {
+        taxList!.add(TaxModel.fromJson(v));
+      });
+    }
+
     return CabOrderModel(
       author: parsedJson.containsKey('author') ? User.fromJson(parsedJson['author']) : User(),
       authorID: parsedJson['authorID'] ?? '',
@@ -127,6 +139,8 @@ class CabOrderModel {
       scheduleReturnDateTime: parsedJson['scheduleReturnDateTime'] ?? Timestamp.now(),
       rideType: parsedJson['rideType'] ?? '',
       roundTrip: parsedJson['roundTrip'] ?? false,
+      taxModel: taxList,
+
     );
   }
 
@@ -165,6 +179,7 @@ class CabOrderModel {
       "rideType": rideType,
       "roundTrip": roundTrip,
       "sectionId": sectionId,
+      "taxSetting": taxModel != null ? taxModel!.map((v) => v.toJson()).toList() : null,
     };
     if (driver != null) {
       json.addAll({'driverID': driverID, 'driver': driver!.toJson()});
