@@ -39,7 +39,7 @@ import 'package:flutter_stripe/flutter_stripe.dart' as stripe1;
 import 'package:flutterwave_standard/flutterwave.dart';
 import 'package:http/http.dart' as http;
 import 'package:paytm_allinonesdk/paytm_allinonesdk.dart';
-import 'package:razorpay_flutter/razorpay_flutter.dart';
+//import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class CabPaymentScreen extends StatefulWidget {
   final CabOrderModel? cabOrderModel;
@@ -63,7 +63,7 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
       isTipSelected3 = false;
   final TextEditingController _textFieldController = TextEditingController();
 
-  final Razorpay _razorPay = Razorpay();
+  //final Razorpay _razorPay = Razorpay();
 
   @override
   void initState() {
@@ -107,9 +107,9 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
 
     getTexDetails();
     getPaymentSettingData();
-    _razorPay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-    _razorPay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWaller);
-    _razorPay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    //_razorPay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    //_razorPay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWaller);
+    //_razorPay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
     publicoupon = _fireStoreUtils.getOfferByCabCoupons();
     coupon = _fireStoreUtils.getCabCoupons();
     setState(() {});
@@ -1931,14 +1931,14 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
       }
     };
 
-    try {
+/*    try {
       _razorPay.open(options);
     } catch (e) {
       debugPrint('Error: $e');
-    }
+    }*/
   }
 
-  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+/*  void _handlePaymentSuccess(PaymentSuccessResponse response) {
     Navigator.pop(_globalKey.currentContext!, true);
     print(response.orderId);
     print(response.paymentId);
@@ -1976,7 +1976,7 @@ class _CabPaymentScreenState extends State<CabPaymentScreen> {
       backgroundColor: Colors.red.shade400,
       duration: const Duration(seconds: 8),
     ));
-  }
+  }*/
 
   ///Stripe payment function
 

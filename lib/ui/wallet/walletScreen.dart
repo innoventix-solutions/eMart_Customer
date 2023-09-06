@@ -34,7 +34,7 @@ import 'package:flutter_stripe/flutter_stripe.dart' as stripe1;
 import 'package:flutterwave_standard/flutterwave.dart';
 import 'package:http/http.dart' as http;
 import 'package:paytm_allinonesdk/paytm_allinonesdk.dart';
-import 'package:razorpay_flutter/razorpay_flutter.dart';
+//import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 import '../../constants.dart';
 import '../../main.dart';
@@ -62,7 +62,7 @@ class WalletScreenState extends State<WalletScreen> {
   final GlobalKey<FormState> _globalKey = GlobalKey();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  final Razorpay _razorPay = Razorpay();
+  //final Razorpay _razorPay = Razorpay();
   RazorPayModel? razorPayData;
   StripeSettingData? stripeData;
   PaytmSettingData? paytmSettingData;
@@ -120,9 +120,9 @@ class WalletScreenState extends State<WalletScreen> {
     getPaymentSettingData();
     selectedRadioTile = "Stripe";
 
-    _razorPay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-    _razorPay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWaller);
-    _razorPay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    // _razorPay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    // _razorPay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWaller);
+    // _razorPay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
 
     // TODO: implement initState
     super.initState();
@@ -191,8 +191,7 @@ class WalletScreenState extends State<WalletScreen> {
             Container(
               decoration: const BoxDecoration(
                   image: DecorationImage(
-                      fit: BoxFit.fitWidth,
-                      image: AssetImage("assets/images/wallet_background@3x.png"))),
+                      fit: BoxFit.fitWidth, image: AssetImage("assets/images/wallet_background@3x.png"))),
               //color: Colors.deepOrange,
               height: size.height * 0.25,
               width: size.width,
@@ -211,23 +210,20 @@ class WalletScreenState extends State<WalletScreen> {
                         ),
                         Text(
                           "Total Balance".tr(),
-                          style: const TextStyle(
-                              color: Colors.white, fontWeight: FontWeight.w600, fontSize: 18),
+                          style:
+                              const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 18),
                         ),
                         Padding(
                           padding: const EdgeInsets.only(top: 10.0, bottom: 20.0),
                           child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
                             stream: userQuery,
                             builder: (context,
-                                AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>>
-                                    asyncSnapshot) {
+                                AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> asyncSnapshot) {
                               if (asyncSnapshot.hasError) {
                                 return Text(
                                   "error".tr(),
                                   style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 30),
+                                      color: Colors.white, fontWeight: FontWeight.bold, fontSize: 30),
                                 );
                               }
                               if (asyncSnapshot.connectionState == ConnectionState.waiting) {
@@ -291,8 +287,7 @@ class WalletScreenState extends State<WalletScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 10),
           child: Text(
             "TOPUP WALLET".tr(),
-            style:
-                TextStyle(color: Color(COLOR_PRIMARY), fontWeight: FontWeight.w700, fontSize: 16),
+            style: TextStyle(color: Color(COLOR_PRIMARY), fontWeight: FontWeight.w700, fontSize: 16),
           ),
         ),
       ),
@@ -307,8 +302,7 @@ class WalletScreenState extends State<WalletScreen> {
           return Center(child: Text('Something went wrong'.tr()));
         }
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-              child: SizedBox(height: 35, width: 35, child: CircularProgressIndicator()));
+          return const Center(child: SizedBox(height: 35, width: 35, child: CircularProgressIndicator()));
         }
         if (snapshot.data!.docs.isEmpty) {
           return Center(
@@ -321,8 +315,7 @@ class WalletScreenState extends State<WalletScreen> {
             physics: const BouncingScrollPhysics(),
             padding: EdgeInsets.zero,
             children: snapshot.data!.docs.map((DocumentSnapshot document) {
-              final topUpData =
-                  TopupTranHistoryModel.fromJson(document.data() as Map<String, dynamic>);
+              final topUpData = TopupTranHistoryModel.fromJson(document.data() as Map<String, dynamic>);
               //Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
               return buildTransactionCard(
                 topupTranHistory: topUpData,
@@ -357,8 +350,8 @@ class WalletScreenState extends State<WalletScreen> {
                   child: Container(
                     color: Color(COLOR_PRIMARY).withOpacity(0.06),
                     child: Padding(
-                      child: Icon(Icons.account_balance_wallet_rounded,
-                          size: 28, color: Color(COLOR_PRIMARY)),
+                      child:
+                          Icon(Icons.account_balance_wallet_rounded, size: 28, color: Color(COLOR_PRIMARY)),
                       padding: const EdgeInsets.all(10.0),
                     ),
                   ),
@@ -375,9 +368,7 @@ class WalletScreenState extends State<WalletScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              topupTranHistory.isTopup
-                                  ? "Wallet Topup".tr()
-                                  : "Wallet Amount Deducted".tr(),
+                              topupTranHistory.isTopup ? "Wallet Topup".tr() : "Wallet Amount Deducted".tr(),
                               style: const TextStyle(
                                 fontWeight: FontWeight.w500,
                                 fontSize: 15,
@@ -442,12 +433,9 @@ class WalletScreenState extends State<WalletScreen> {
     await FireStoreUtils.createPaymentId().then((value) async {
       final paymentID = value;
       await FireStoreUtils.topUpWalletAmount(
-              paymentMethod: paymentMethod,
-              amount: double.parse(_amountController.text),
-              id: paymentID)
+              paymentMethod: paymentMethod, amount: double.parse(_amountController.text), id: paymentID)
           .then((value) {
-        FireStoreUtils.updateWalletAmount(amount: double.parse(_amountController.text))
-            .then((value) {
+        FireStoreUtils.updateWalletAmount(amount: double.parse(_amountController.text)).then((value) {
           FireStoreUtils.sendTopUpMail(
               paymentMethod: paymentMethod, amount: _amountController.text, tractionId: paymentID);
           ScaffoldMessenger.of(_scaffoldKey.currentContext!).showSnackBar(SnackBar(
@@ -501,8 +489,7 @@ class WalletScreenState extends State<WalletScreen> {
     return showModalBottomSheet(
         elevation: 5,
         shape: const RoundedRectangleBorder(
-            borderRadius:
-                BorderRadius.only(topLeft: Radius.circular(15), topRight: Radius.circular(15))),
+            borderRadius: BorderRadius.only(topLeft: Radius.circular(15), topRight: Radius.circular(15))),
         context: context,
         builder: (context) {
           return StatefulBuilder(builder: (context, setState) {
@@ -698,16 +685,14 @@ class WalletScreenState extends State<WalletScreen> {
                                               .doc(topupTranHistory.order_id)
                                               .get()
                                               .then((value) {
-                                            CabOrderModel orderModel =
-                                                CabOrderModel.fromJson(value.data()!);
+                                            CabOrderModel orderModel = CabOrderModel.fromJson(value.data()!);
                                             push(
                                                 context,
                                                 CabOrderDetailScreen(
                                                   orderModel: orderModel,
                                                 ));
                                           });
-                                        } else if (topupTranHistory.serviceType ==
-                                            "parcel-service") {
+                                        } else if (topupTranHistory.serviceType == "parcel-service") {
                                           FireStoreUtils.firestore
                                               .collection(PARCELORDER)
                                               .doc(topupTranHistory.order_id)
@@ -721,8 +706,7 @@ class WalletScreenState extends State<WalletScreen> {
                                                   orderModel: orderModel,
                                                 ));
                                           });
-                                        } else if (topupTranHistory.serviceType ==
-                                            "rental-service") {
+                                        } else if (topupTranHistory.serviceType == "rental-service") {
                                           FireStoreUtils.firestore
                                               .collection(RENTALORDER)
                                               .doc(topupTranHistory.order_id)
@@ -742,8 +726,7 @@ class WalletScreenState extends State<WalletScreen> {
                                               .doc(topupTranHistory.order_id)
                                               .get()
                                               .then((value) {
-                                            OrderModel orderModel =
-                                                OrderModel.fromJson(value.data()!);
+                                            OrderModel orderModel = OrderModel.fromJson(value.data()!);
                                             push(
                                                 context,
                                                 OrderDetailsScreen(
@@ -774,8 +757,7 @@ class WalletScreenState extends State<WalletScreen> {
                             Row(
                               children: [
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 25.0, vertical: 8),
+                                  padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 8),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
@@ -825,8 +807,7 @@ class WalletScreenState extends State<WalletScreen> {
         useRootNavigator: true,
         isScrollControlled: true,
         shape: const RoundedRectangleBorder(
-            borderRadius:
-                BorderRadius.only(topLeft: Radius.circular(15), topRight: Radius.circular(15))),
+            borderRadius: BorderRadius.only(topLeft: Radius.circular(15), topRight: Radius.circular(15))),
         context: context,
         builder: (context) {
           return FractionallySizedBox(
@@ -905,8 +886,7 @@ class WalletScreenState extends State<WalletScreen> {
                                 keyboardType: TextInputType.number,
                                 decoration: InputDecoration(
                                   prefix: Padding(
-                                    padding:
-                                        const EdgeInsets.symmetric(horizontal: 12.0, vertical: 2),
+                                    padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 2),
                                     child: Text(
                                       currencyData!.symbol.toString(),
                                       style: TextStyle(
@@ -984,8 +964,7 @@ class WalletScreenState extends State<WalletScreen> {
                                           borderRadius: BorderRadius.circular(8),
                                         ),
                                         child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 4.0, horizontal: 10),
+                                          padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 10),
                                           child: SizedBox(
                                             width: 80,
                                             height: 35,
@@ -1021,8 +1000,7 @@ class WalletScreenState extends State<WalletScreen> {
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                     side: BorderSide(
-                                        color:
-                                            payStack ? Color(COLOR_PRIMARY) : Colors.transparent)),
+                                        color: payStack ? Color(COLOR_PRIMARY) : Colors.transparent)),
                                 controlAffinity: ListTileControlAffinity.trailing,
                                 value: "PayStack",
                                 groupValue: selectedRadioTile,
@@ -1054,8 +1032,7 @@ class WalletScreenState extends State<WalletScreen> {
                                           borderRadius: BorderRadius.circular(8),
                                         ),
                                         child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 4.0, horizontal: 10),
+                                          padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 10),
                                           child: SizedBox(
                                             width: 80,
                                             height: 35,
@@ -1091,9 +1068,7 @@ class WalletScreenState extends State<WalletScreen> {
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                     side: BorderSide(
-                                        color: flutterWave
-                                            ? Color(COLOR_PRIMARY)
-                                            : Colors.transparent)),
+                                        color: flutterWave ? Color(COLOR_PRIMARY) : Colors.transparent)),
                                 controlAffinity: ListTileControlAffinity.trailing,
                                 value: "FlutterWave",
                                 groupValue: selectedRadioTile,
@@ -1124,8 +1099,7 @@ class WalletScreenState extends State<WalletScreen> {
                                           borderRadius: BorderRadius.circular(8),
                                         ),
                                         child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 4.0, horizontal: 10),
+                                          padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 10),
                                           child: SizedBox(
                                             width: 80,
                                             height: 35,
@@ -1162,8 +1136,7 @@ class WalletScreenState extends State<WalletScreen> {
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                     side: BorderSide(
-                                        color:
-                                            razorPay ? Color(COLOR_PRIMARY) : Colors.transparent)),
+                                        color: razorPay ? Color(COLOR_PRIMARY) : Colors.transparent)),
                                 contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 6,
                                 ),
@@ -1195,8 +1168,7 @@ class WalletScreenState extends State<WalletScreen> {
                                           borderRadius: BorderRadius.circular(8),
                                         ),
                                         child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 3.0, horizontal: 10),
+                                          padding: const EdgeInsets.symmetric(vertical: 3.0, horizontal: 10),
                                           child: SizedBox(
                                               width: 80,
                                               height: 35,
@@ -1226,8 +1198,7 @@ class WalletScreenState extends State<WalletScreen> {
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                     side: BorderSide(
-                                        color:
-                                            payFast ? Color(COLOR_PRIMARY) : Colors.transparent)),
+                                        color: payFast ? Color(COLOR_PRIMARY) : Colors.transparent)),
                                 controlAffinity: ListTileControlAffinity.trailing,
                                 value: "payFast",
                                 groupValue: selectedRadioTile,
@@ -1259,8 +1230,7 @@ class WalletScreenState extends State<WalletScreen> {
                                           borderRadius: BorderRadius.circular(8),
                                         ),
                                         child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 4.0, horizontal: 10),
+                                          padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 10),
                                           child: SizedBox(
                                             width: 80,
                                             height: 35,
@@ -1295,8 +1265,8 @@ class WalletScreenState extends State<WalletScreen> {
                               child: RadioListTile(
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
-                                    side: BorderSide(
-                                        color: payTm ? Color(COLOR_PRIMARY) : Colors.transparent)),
+                                    side:
+                                        BorderSide(color: payTm ? Color(COLOR_PRIMARY) : Colors.transparent)),
                                 contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 6,
                                 ),
@@ -1328,8 +1298,7 @@ class WalletScreenState extends State<WalletScreen> {
                                           borderRadius: BorderRadius.circular(8),
                                         ),
                                         child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 3.0, horizontal: 10),
+                                          padding: const EdgeInsets.symmetric(vertical: 3.0, horizontal: 10),
                                           child: SizedBox(
                                               width: 80,
                                               height: 35,
@@ -1364,9 +1333,7 @@ class WalletScreenState extends State<WalletScreen> {
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                     side: BorderSide(
-                                        color: mercadoPago
-                                            ? Color(COLOR_PRIMARY)
-                                            : Colors.transparent)),
+                                        color: mercadoPago ? Color(COLOR_PRIMARY) : Colors.transparent)),
                                 controlAffinity: ListTileControlAffinity.trailing,
                                 value: "MercadoPago",
                                 groupValue: selectedRadioTile,
@@ -1398,8 +1365,7 @@ class WalletScreenState extends State<WalletScreen> {
                                           borderRadius: BorderRadius.circular(8),
                                         ),
                                         child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 4.0, horizontal: 10),
+                                          padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 10),
                                           child: SizedBox(
                                             width: 80,
                                             height: 35,
@@ -1467,8 +1433,7 @@ class WalletScreenState extends State<WalletScreen> {
                                           borderRadius: BorderRadius.circular(8),
                                         ),
                                         child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 3.0, horizontal: 10),
+                                          padding: const EdgeInsets.symmetric(vertical: 3.0, horizontal: 10),
                                           child: SizedBox(
                                               width: 80,
                                               height: 35,
@@ -1551,16 +1516,14 @@ class WalletScreenState extends State<WalletScreen> {
                                   } else {
                                     Navigator.pop(context);
                                     showAlert(_globalKey.currentContext!,
-                                        response:
-                                            "Something went wrong, please contact admin.".tr(),
+                                        response: "Something went wrong, please contact admin.".tr(),
                                         colors: Colors.red);
                                   }
                                 });
                               } else if (selectedRadioTile == "PayTm") {
                                 Navigator.pop(context);
                                 showLoadingAlert();
-                                getPaytmCheckSum(context,
-                                    amount: double.parse(_amountController.text));
+                                getPaytmCheckSum(context, amount: double.parse(_amountController.text));
                               } else if (selectedRadioTile == "PayPal") {
                                 Navigator.pop(context);
                                 showLoadingAlert();
@@ -1631,14 +1594,14 @@ class WalletScreenState extends State<WalletScreen> {
       }
     };
 
-    try {
+    /* try {
       _razorPay.open(options);
     } catch (e) {
       debugPrint('error'.tr() + ': $e');
-    }
+    }*/
   }
 
-  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+/*  void _handlePaymentSuccess(PaymentSuccessResponse response) {
     paymentCompleted(paymentMethod: "RazorPay");
   }
 
@@ -1662,7 +1625,7 @@ class WalletScreenState extends State<WalletScreen> {
       backgroundColor: Colors.red.shade400,
       duration: const Duration(seconds: 8),
     ));
-  }
+  }*/
 
   /// PayPal Payment Gateway
   /*paypalPaymentSheet() {
@@ -1767,8 +1730,7 @@ class WalletScreenState extends State<WalletScreen> {
         'payment_method_types[0]': 'card',
         // 'payment_method_types[1]': 'ideal',
         "description": "${MyAppState.currentUser?.userID} Wallet Topup",
-        "shipping[name]":
-            "${MyAppState.currentUser?.firstName} ${MyAppState.currentUser?.lastName}",
+        "shipping[name]": "${MyAppState.currentUser?.firstName} ${MyAppState.currentUser?.lastName}",
         "shipping[address][line1]": "510 Townsend St",
         "shipping[address][postal_code]": "98140",
         "shipping[address][city]": "San Francisco",
@@ -1776,8 +1738,8 @@ class WalletScreenState extends State<WalletScreen> {
         "shipping[address][country]": "US",
       };
       print(body);
-      var response = await http
-          .post(Uri.parse('https://api.stripe.com/v1/payment_intents'), body: body, headers: {
+      var response =
+          await http.post(Uri.parse('https://api.stripe.com/v1/payment_intents'), body: body, headers: {
         'Authorization': 'Bearer ${stripeData?.stripeSecret}',
         //$_paymentIntentClientSecret',
         'Content-Type': 'application/x-www-form-urlencoded'
@@ -1827,8 +1789,7 @@ class WalletScreenState extends State<WalletScreen> {
         GetPaymentTxtTokenModel result = value;
         String callback = "";
         if (paytmSettingData!.isSandboxEnabled) {
-          callback =
-              callback + "https://securegw-stage.paytm.in/theia/paytmCallback?ORDER_ID=$orderId";
+          callback = callback + "https://securegw-stage.paytm.in/theia/paytmCallback?ORDER_ID=$orderId";
         } else {
           callback = callback + "https://securegw.paytm.in/theia/paytmCallback?ORDER_ID=$orderId";
         }
@@ -1843,8 +1804,7 @@ class WalletScreenState extends State<WalletScreen> {
     });
   }
 
-  Future verifyCheckSum(
-      {required String checkSum, required double amount, required orderId}) async {
+  Future verifyCheckSum({required String checkSum, required double amount, required orderId}) async {
     String getChecksum = "${GlobalURL}payments/validatechecksum";
     final response = await http.post(
         Uri.parse(
@@ -1926,8 +1886,7 @@ class WalletScreenState extends State<WalletScreen> {
         if (onError is PlatformException) {
           Navigator.pop(_scaffoldKey.currentContext!);
           result = onError.message.toString() + " \n  " + onError.code.toString();
-          showAlert(_scaffoldKey.currentContext!,
-              response: onError.message.toString(), colors: Colors.red);
+          showAlert(_scaffoldKey.currentContext!, response: onError.message.toString(), colors: Colors.red);
         } else {
           result = onError.toString();
           Navigator.pop(_scaffoldKey.currentContext!);

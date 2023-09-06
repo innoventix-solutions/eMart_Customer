@@ -32,7 +32,7 @@ import 'package:flutterwave_standard/flutterwave.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:paytm_allinonesdk/paytm_allinonesdk.dart';
-import 'package:razorpay_flutter/razorpay_flutter.dart';
+//import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../model/MercadoPagoSettingsModel.dart';
@@ -100,7 +100,7 @@ class PaymentScreenState extends State<PaymentScreen> {
   String paymentOption = 'Pay Via Wallet'.tr();
   RazorPayModel? razorPayData = UserPreference.getRazorPayData();
 
-  final Razorpay _razorPay = Razorpay();
+  //final Razorpay _razorPay = Razorpay();
   StripeSettingData? stripeData;
   PaytmSettingData? paytmSettingData;
   PaypalSettingData? paypalSettingData;
@@ -204,9 +204,9 @@ class PaymentScreenState extends State<PaymentScreen> {
     getPaymentSettingData();
     FireStoreUtils.createOrder();
     futurecod = fireStoreUtils.getCod();
-    _razorPay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-    _razorPay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWaller);
-    _razorPay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    // _razorPay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    // _razorPay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWaller);
+    // _razorPay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
     print("delvery charge ${widget.deliveryCharge}");
     getAdminCommision();
 
@@ -881,14 +881,14 @@ class PaymentScreenState extends State<PaymentScreen> {
       }
     };
 
-    try {
+  /*  try {
       _razorPay.open(options);
     } catch (e) {
       debugPrint('Error: $e');
-    }
+    }*/
   }
 
-  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+/*  void _handlePaymentSuccess(PaymentSuccessResponse response) {
     Navigator.pop(_scaffoldKey.currentContext!);
     print(response.orderId);
     print(response.paymentId);
@@ -930,7 +930,7 @@ class PaymentScreenState extends State<PaymentScreen> {
       backgroundColor: Colors.red.shade400,
       duration: const Duration(seconds: 8),
     ));
-  }
+  }*/
 
   ///Stripe payment function
   Map<String, dynamic>? paymentIntentData;

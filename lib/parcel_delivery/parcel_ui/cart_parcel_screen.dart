@@ -41,7 +41,7 @@ import 'package:flutterwave_standard/flutterwave.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:paytm_allinonesdk/paytm_allinonesdk.dart';
-import 'package:razorpay_flutter/razorpay_flutter.dart';
+//import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class CartParcelScreen extends StatefulWidget {
   ParcelOrderModel parcelOrder;
@@ -68,9 +68,9 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
     super.initState();
     getTexDetails();
     getPaymentSettingData();
-    _razorPay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-    _razorPay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWaller);
-    _razorPay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    // _razorPay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    // _razorPay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWaller);
+    // _razorPay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
 
     publiccoupon = _fireStoreUtils.getOfferByParcelID(widget.parcelOrder.parcelCategoryID);
     coupon = _fireStoreUtils.getParcelCoupan();
@@ -146,10 +146,8 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
     parcelOrderModel.createdAt = Timestamp.now();
     parcelOrderModel.author = MyAppState.currentUser;
     parcelOrderModel.authorID = MyAppState.currentUser!.userID;
-    parcelOrderModel.paymentMethod =
-        paymentCollectByReceiverString == "Receiver" ? "cod".tr() : paymentType;
-    parcelOrderModel.paymentCollectByReceiver =
-        paymentCollectByReceiverString == "Receiver" ? true : false;
+    parcelOrderModel.paymentMethod = paymentCollectByReceiverString == "Receiver" ? "cod".tr() : paymentType;
+    parcelOrderModel.paymentCollectByReceiver = paymentCollectByReceiverString == "Receiver" ? true : false;
 
     print("----------->${parcelOrderModel.toJson()}");
     await FireStoreUtils().parcelOrderPlace(parcelOrderModel, getTotalAmount());
@@ -171,8 +169,8 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
     double taxAmount = 0.0;
     if (taxList != null) {
       for (var element in taxList!) {
-        taxAmount = taxAmount +
-            getTaxValue(amount: (subTotal - discountAmount).toString(), taxModel: element);
+        taxAmount =
+            taxAmount + getTaxValue(amount: (subTotal - discountAmount).toString(), taxModel: element);
       }
     }
     return subTotal - discountAmount + taxAmount;
@@ -192,8 +190,8 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
       appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          leading: GestureDetector(
-              onTap: () => Navigator.pop(context), child: const Icon(Icons.arrow_back_ios)),
+          leading:
+              GestureDetector(onTap: () => Navigator.pop(context), child: const Icon(Icons.arrow_back_ios)),
           centerTitle: true,
           title: Text("Confirm Order".tr())),
       body: SingleChildScrollView(
@@ -206,8 +204,7 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
             buildTotalRow(),
             paymentCollectBy(),
             Visibility(
-                visible: paymentCollectByReceiverString == "Sender" ? true : false,
-                child: paymentListView()),
+                visible: paymentCollectByReceiverString == "Sender" ? true : false, child: paymentListView()),
           ],
         ),
       ),
@@ -227,14 +224,11 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
               if (razorPay) {
                 paymentType = 'razorpay';
                 showLoadingAlert();
-                RazorPayController()
-                    .createOrderRazorPay(amount: getTotalAmount().toInt())
-                    .then((value) {
+                RazorPayController().createOrderRazorPay(amount: getTotalAmount().toInt()).then((value) {
                   if (value == null) {
                     Navigator.pop(context);
                     showAlert(_globalKey.currentContext!,
-                        response: "Something went wrong, please contact admin.".tr(),
-                        colors: Colors.red);
+                        response: "Something went wrong, please contact admin.".tr(), colors: Colors.red);
                   } else {
                     CreateRazorPayOrderModel result = value;
                     openCheckout(
@@ -347,8 +341,7 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-            color:
-                isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100,
+            color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100,
             width: 1),
         color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
         boxShadow: [
@@ -377,8 +370,7 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
                       const SizedBox(
                         height: 5,
                       ),
-                      buildUsersDetails(context,
-                          isSender: false, userDetails: widget.parcelOrder.receiver!),
+                      buildUsersDetails(context, isSender: false, userDetails: widget.parcelOrder.receiver!),
                     ],
                   ),
                 ),
@@ -529,9 +521,7 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-              color: isDarkMode(context)
-                  ? const Color(DarkContainerBorderColor)
-                  : Colors.grey.shade100,
+              color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100,
               width: 1),
           color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
           boxShadow: [
@@ -555,8 +545,7 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
                     onTap: () {
                       if (couponList[index].discountTypeOffer == 'Percentage' ||
                           couponList[index].discountTypeOffer == 'Percent') {
-                        discountAmount =
-                            subTotal * double.parse(couponList[index].discountOffer!) / 100;
+                        discountAmount = subTotal * double.parse(couponList[index].discountOffer!) / 100;
                         discountType = couponList[index].discountTypeOffer.toString();
                         discountLable = couponList[index].discountOffer.toString();
                         offerCode = couponList[index].offerCode.toString();
@@ -587,9 +576,7 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-              color: isDarkMode(context)
-                  ? const Color(DarkContainerBorderColor)
-                  : Colors.grey.shade100,
+              color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100,
               width: 1),
           color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
           boxShadow: [
@@ -703,17 +690,14 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
                   Text(
                     snapshot[index].offerCode!,
                     textAlign: TextAlign.left,
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.normal, letterSpacing: 0.5),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.normal, letterSpacing: 0.5),
                   ),
                   Container(
                     margin: const EdgeInsets.only(left: 15, right: 15, top: 3),
                     width: 1,
                     color: const Color(COUPON_DASH_COLOR),
                   ),
-                  Text(
-                      "valid till ".tr() +
-                          getDate(snapshot[index].expireOfferDate!.toDate().toString())!,
+                  Text("valid till ".tr() + getDate(snapshot[index].expireOfferDate!.toDate().toString())!,
                       style: const TextStyle(letterSpacing: 0.5))
                 ],
               ),
@@ -734,11 +718,9 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
 
   sheet() {
     return Container(
-        padding:
-            EdgeInsets.only(bottom: MediaQuery.of(context).size.height / 4.3, left: 25, right: 25),
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.height / 4.3, left: 25, right: 25),
         height: MediaQuery.of(context).size.height * 0.88,
-        decoration:
-            BoxDecoration(color: Colors.transparent, border: Border.all(style: BorderStyle.none)),
+        decoration: BoxDecoration(color: Colors.transparent, border: Border.all(style: BorderStyle.none)),
         child: FutureBuilder<List<OfferModel>>(
             future: coupon,
             initialData: const [],
@@ -778,8 +760,7 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
                 ),
                 Expanded(
                     child: Container(
-                  decoration:
-                      BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.white),
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.white),
                   alignment: Alignment.center,
                   child: SingleChildScrollView(
                     child: Column(
@@ -801,8 +782,7 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
                               padding: const EdgeInsets.only(top: 10, left: 22, right: 22),
                               child: const Text(
                                 "Voucher or Coupon code",
-                                style: TextStyle(
-                                    color: Color(0XFF9091A4), letterSpacing: 0.5, height: 2),
+                                style: TextStyle(color: Color(0XFF9091A4), letterSpacing: 0.5, height: 2),
                               ).tr()),
                         ),
                         Container(
@@ -816,8 +796,8 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
                                 child: ClipRRect(
                                     borderRadius: const BorderRadius.all(Radius.circular(12)),
                                     child: Container(
-                                        padding: const EdgeInsets.only(
-                                            left: 20, right: 20, top: 20, bottom: 20),
+                                        padding:
+                                            const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 20),
                                         color: const Color(0XFFF1F4F7),
                                         // height: 120,
                                         alignment: Alignment.center,
@@ -886,8 +866,7 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
                             child: Text(
                               "REDEEM NOW".tr(),
                               style: TextStyle(
-                                  color: isDarkMode(context) ? Colors.black : Colors.white,
-                                  fontSize: 16),
+                                  color: isDarkMode(context) ? Colors.black : Colors.white, fontSize: 16),
                             ),
                           ),
                         ),
@@ -910,9 +889,7 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-                color: isDarkMode(context)
-                    ? const Color(DarkContainerBorderColor)
-                    : Colors.grey.shade100,
+                color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100,
                 width: 1),
             color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
             boxShadow: [
@@ -949,18 +926,14 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
                       Text(
                         "Subtotal".tr(),
                         style: TextStyle(
-                            color: isDarkMode(context)
-                                ? const Color(0xffFFFFFF)
-                                : const Color(0xff888888),
+                            color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff888888),
                             fontSize: 16),
                       ),
                       Text(
                         amountShow(amount: subTotal.toString()),
                         style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            color: isDarkMode(context)
-                                ? const Color(0xffFFFFFF)
-                                : const Color(0xff333333),
+                            color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333),
                             fontSize: 16),
                       ),
                     ],
@@ -976,15 +949,12 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
                       Text(
                         "Discount".tr(),
                         style: TextStyle(
-                            color: isDarkMode(context)
-                                ? const Color(0xffFFFFFF)
-                                : const Color(0xff888888),
+                            color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff888888),
                             fontSize: 16),
                       ),
                       Text(
                         "(-" + amountShow(amount: discountAmount.toString()) + ")",
-                        style:
-                            TextStyle(fontWeight: FontWeight.w600, color: Colors.red, fontSize: 16),
+                        style: TextStyle(fontWeight: FontWeight.w600, color: Colors.red, fontSize: 16),
                       ),
                     ],
                   )),
@@ -999,8 +969,8 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                       child: Text(
                         "Coupon code".tr() + " : $offerCode",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w600, color: Color(COLOR_PRIMARY), fontSize: 16),
+                        style:
+                            TextStyle(fontWeight: FontWeight.w600, color: Color(COLOR_PRIMARY), fontSize: 16),
                       ),
                     ),
                     const Divider(
@@ -1035,14 +1005,12 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
                             Text(
                               amountShow(
                                   amount: getTaxValue(
-                                          amount: (subTotal - discountAmount).toString(),
-                                          taxModel: taxModel)
+                                          amount: (subTotal - discountAmount).toString(), taxModel: taxModel)
                                       .toString()),
                               style: TextStyle(
                                   fontWeight: FontWeight.w600,
-                                  color: isDarkMode(context)
-                                      ? const Color(0xffFFFFFF)
-                                      : const Color(0xff333333),
+                                  color:
+                                      isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333),
                                   fontSize: 16),
                             ),
                           ],
@@ -1086,9 +1054,7 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
                       Text(
                         "Order Total".tr(),
                         style: TextStyle(
-                            color: isDarkMode(context)
-                                ? const Color(0xffFFFFFF)
-                                : const Color(0xff333333),
+                            color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333),
                             fontSize: 16),
                       ),
                       Text(
@@ -1096,9 +1062,7 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
                         amountShow(amount: getTotalAmount().toString()),
                         style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            color: isDarkMode(context)
-                                ? const Color(0xffFFFFFF)
-                                : const Color(0xff333333),
+                            color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333),
                             fontSize: 16),
                       ),
                     ],
@@ -1120,9 +1084,7 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-              color: isDarkMode(context)
-                  ? const Color(DarkContainerBorderColor)
-                  : Colors.grey.shade100,
+              color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100,
               width: 1),
           color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
           boxShadow: [
@@ -1298,7 +1260,7 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
   //   );
   // }
 
-  final Razorpay _razorPay = Razorpay();
+  //final Razorpay _razorPay = Razorpay();
 
   Stream<DocumentSnapshot<Map<String, dynamic>>>? userQuery;
   final fireStoreUtils = FireStoreUtils();
@@ -1421,13 +1383,12 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
               const Divider(thickness: 1),
               StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
                   stream: userQuery,
-                  builder: (context,
-                      AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> asyncSnapshot) {
+                  builder: (context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> asyncSnapshot) {
                     if (asyncSnapshot.hasError) {
                       return Text(
                         "error".tr(),
-                        style: const TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                        style:
+                            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
                       );
                     }
                     if (asyncSnapshot.connectionState == ConnectionState.waiting) {
@@ -1700,11 +1661,11 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
       }
     };
 
-    try {
+/*    try {
       _razorPay.open(options);
     } catch (e) {
       debugPrint('Error: $e');
-    }
+    }*/
   }
 
   ///Stripe payment function
@@ -1801,8 +1762,7 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
         'currency': currencyData!.code,
         'payment_method_types[]': 'card',
         "description": "${MyAppState.currentUser?.userID} Wallet Topup",
-        "shipping[name]":
-            "${MyAppState.currentUser?.firstName} ${MyAppState.currentUser?.lastName}",
+        "shipping[name]": "${MyAppState.currentUser?.firstName} ${MyAppState.currentUser?.lastName}",
         "shipping[address][line1]": "510 Townsend St",
         "shipping[address][postal_code]": "98140",
         "shipping[address][city]": "San Francisco",
@@ -1810,8 +1770,8 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
         "shipping[address][country]": "US",
       };
       print(body);
-      var response = await http
-          .post(Uri.parse('https://api.stripe.com/v1/payment_intents'), body: body, headers: {
+      var response =
+          await http.post(Uri.parse('https://api.stripe.com/v1/payment_intents'), body: body, headers: {
         'Authorization': 'Bearer ${stripeData?.stripeSecret}',
         //$_paymentIntentClientSecret',
         'Content-Type': 'application/x-www-form-urlencoded'
@@ -1968,17 +1928,13 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
         GetPaymentTxtTokenModel result = value;
         String callback = "";
         if (paytmSettingData!.isSandboxEnabled) {
-          callback =
-              callback + "https://securegw-stage.paytm.in/theia/paytmCallback?ORDER_ID=$orderId";
+          callback = callback + "https://securegw-stage.paytm.in/theia/paytmCallback?ORDER_ID=$orderId";
         } else {
           callback = callback + "https://securegw.paytm.in/theia/paytmCallback?ORDER_ID=$orderId";
         }
 
         _startTransaction(context,
-            txnTokenBy: result.body.txnToken,
-            orderId: orderId,
-            amount: amount,
-            callBackURL: callback);
+            txnTokenBy: result.body.txnToken, orderId: orderId, amount: amount, callBackURL: callback);
       });
     });
   }
@@ -2008,8 +1964,7 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
           print(amount);
           placeParcelOrder();
           showAlert(context,
-              response: "Payment Successful!!\n".tr() + "${value['RESPMSG']}",
-              colors: Colors.green);
+              response: "Payment Successful!!\n".tr() + "${value['RESPMSG']}", colors: Colors.green);
         }
       }).catchError((onError) {
         if (onError is PlatformException) {
@@ -2018,8 +1973,7 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
 
           print("Error124 : $onError");
           result = onError.message.toString() + " \n  " + onError.code.toString();
-          showAlert(_globalKey.currentContext!,
-              response: onError.message.toString(), colors: Colors.red);
+          showAlert(_globalKey.currentContext!, response: onError.message.toString(), colors: Colors.red);
         } else {
           print("======>>2");
 
@@ -2036,8 +1990,7 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
     }
   }
 
-  Future<GetPaymentTxtTokenModel> initiatePayment(
-      {required double amount, required orderId}) async {
+  Future<GetPaymentTxtTokenModel> initiatePayment({required double amount, required orderId}) async {
     String initiateURL = "${GlobalURL}payments/initiatepaytmpayment";
 
     String callback = "";
@@ -2065,8 +2018,7 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
     return GetPaymentTxtTokenModel.fromJson(data);
   }
 
-  Future verifyCheckSum(
-      {required String checkSum, required double amount, required orderId}) async {
+  Future verifyCheckSum({required String checkSum, required double amount, required orderId}) async {
     String getChecksum = "${GlobalURL}payments/validatechecksum";
     final response = await http.post(
         Uri.parse(
@@ -2083,7 +2035,7 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
     return data['status'];
   }
 
-  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+/*  void _handlePaymentSuccess(PaymentSuccessResponse response) {
     Navigator.pop(_globalKey.currentContext!);
     print(response.orderId);
     print(response.paymentId);
@@ -2121,7 +2073,7 @@ class _CartParcelScreenState extends State<CartParcelScreen> {
       backgroundColor: Colors.red.shade400,
       duration: const Duration(seconds: 8),
     ));
-  }
+  }*/
 
   ///FlutterWave Payment Method
   String? _ref;
