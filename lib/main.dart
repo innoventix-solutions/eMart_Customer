@@ -66,6 +66,7 @@ void main() async {
         )
       ],
       child: EasyLocalization(
+          startLocale: Locale.fromSubtags(languageCode: 'en'),
           supportedLocales: const [Locale('en'), Locale('ar'), Locale('nl')],
           path: 'assets/translations',
           fallbackLocale: const Locale('en'),
@@ -85,11 +86,8 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> with WidgetsBindingObserver {
-
   static User? currentUser;
   static Position selectedPosition = Position.fromMap({'latitude': 0.0, 'longitude': 0.0});
-
-
 
   //  late Stream<StripeKeyModel> futureStirpe;
   //  String? data,d;
@@ -148,7 +146,6 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
         print(value.data());
         SERVER_KEY = value.data()!['serverKey'].toString();
       });
-
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -158,7 +155,6 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-
     return ChangeNotifierProvider(
       create: (_) {
         return themeChangeProvider;
@@ -166,7 +162,7 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
       child: Consumer<DarkThemeProvider>(
         builder: (context, value, child) {
           return MaterialApp(
-              navigatorKey:notificationService.navigatorKey,
+              navigatorKey: notificationService.navigatorKey,
               localizationsDelegates: context.localizationDelegates,
               locale: context.locale,
               supportedLocales: context.supportedLocales,
@@ -190,7 +186,6 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
     super.initState();
   }
-
 
   void getCurrentAppTheme() async {
     themeChangeProvider.darkTheme = await themeChangeProvider.darkThemePreference.getTheme();
