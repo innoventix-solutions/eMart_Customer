@@ -21,7 +21,6 @@ import 'package:emartconsumer/services/localDatabase.dart';
 import 'package:emartconsumer/services/paystack_url_genrater.dart';
 import 'package:emartconsumer/services/rozorpayConroller.dart';
 import 'package:emartconsumer/ui/checkoutScreen/CheckoutScreen.dart';
-import 'package:emartconsumer/ui/wallet/MercadoPagoScreen.dart';
 import 'package:emartconsumer/ui/wallet/PayFastScreen.dart';
 import 'package:emartconsumer/ui/wallet/payStackScreen.dart';
 import 'package:emartconsumer/userPrefrence.dart';
@@ -32,9 +31,8 @@ import 'package:flutter_stripe/flutter_stripe.dart' as stripe1;
 import 'package:flutterwave_standard/flutterwave.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
-import 'package:mercadopago_sdk/mercadopago_sdk.dart';
 import 'package:paytm_allinonesdk/paytm_allinonesdk.dart';
-import 'package:razorpay_flutter/razorpay_flutter.dart';
+//import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../model/MercadoPagoSettingsModel.dart';
@@ -102,7 +100,7 @@ class PaymentScreenState extends State<PaymentScreen> {
   String paymentOption = 'Pay Via Wallet'.tr();
   RazorPayModel? razorPayData = UserPreference.getRazorPayData();
 
-  final Razorpay _razorPay = Razorpay();
+  //final Razorpay _razorPay = Razorpay();
   StripeSettingData? stripeData;
   PaytmSettingData? paytmSettingData;
   PaypalSettingData? paypalSettingData;
@@ -114,8 +112,7 @@ class PaymentScreenState extends State<PaymentScreen> {
   bool walletBalanceError = false;
 
   bool isStaging = true;
-  String callbackUrl =
-      "http://162.241.125.167/~foodie/payments/paytmpaymentcallback?ORDER_ID=";
+  String callbackUrl = "http://162.241.125.167/~foodie/payments/paytmpaymentcallback?ORDER_ID=";
   bool restrictAppInvoke = false;
   bool enableAssist = true;
   String result = "";
@@ -127,10 +124,7 @@ class PaymentScreenState extends State<PaymentScreen> {
   //final _flutterPaypalNativePlugin = FlutterPaypalNative.instance;
 
   getPaymentSettingData() async {
-    userQuery = fireStore
-        .collection(USERS)
-        .doc(MyAppState.currentUser!.userID)
-        .snapshots();
+    userQuery = fireStore.collection(USERS).doc(MyAppState.currentUser!.userID).snapshots();
     await UserPreference.getStripeData().then((value) async {
       stripeData = value;
       stripe1.Stripe.publishableKey = stripeData!.clientpublishableKey;
@@ -210,9 +204,9 @@ class PaymentScreenState extends State<PaymentScreen> {
     getPaymentSettingData();
     FireStoreUtils.createOrder();
     futurecod = fireStoreUtils.getCod();
-    _razorPay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-    _razorPay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWaller);
-    _razorPay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    // _razorPay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    // _razorPay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWaller);
+    // _razorPay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
     print("delvery charge ${widget.deliveryCharge}");
     getAdminCommision();
 
@@ -225,8 +219,7 @@ class PaymentScreenState extends State<PaymentScreen> {
         setState(() {
           adminCommission = value;
           adminCommissionValue = adminCommission!["adminCommission"].toString();
-          addminCommissionType =
-              adminCommission!["adminCommissionType"].toString();
+          addminCommissionType = adminCommission!["adminCommissionType"].toString();
           isEnableAdminCommission = adminCommission!["isAdminCommission"];
           print(adminCommission!["adminCommission"].toString() + "===____");
           print(adminCommission!["isAdminCommission"].toString() +
@@ -256,19 +249,15 @@ class PaymentScreenState extends State<PaymentScreen> {
                 StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
                     stream: userQuery,
                     builder: (context,
-                        AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>>
-                            asyncSnapshot) {
+                        AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> asyncSnapshot) {
                       if (asyncSnapshot.hasError) {
                         return Text(
                           "error".tr(),
                           style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16),
+                              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
                         );
                       }
-                      if (asyncSnapshot.connectionState ==
-                          ConnectionState.waiting) {
+                      if (asyncSnapshot.connectionState == ConnectionState.waiting) {
                         return const Center(
                             child: SizedBox(
                                 height: 20,
@@ -282,11 +271,9 @@ class PaymentScreenState extends State<PaymentScreen> {
                       if (asyncSnapshot.data == null) {
                         return Container();
                       }
-                      User userData =
-                          User.fromJson(asyncSnapshot.data!.data()!);
+                      User userData = User.fromJson(asyncSnapshot.data!.data()!);
 
-                      walletBalanceError =
-                          userData.wallet_amount < widget.total ? true : false;
+                      walletBalanceError = userData.wallet_amount < widget.total ? true : false;
                       return Column(
                         children: [
                           CheckboxListTile(
@@ -321,14 +308,10 @@ class PaymentScreenState extends State<PaymentScreen> {
                                 Column(
                                   children: [
                                     Text(
-                                      amountShow(
-                                          amount: userData.wallet_amount
-                                              .toString()),
+                                      amountShow(amount: userData.wallet_amount.toString()),
                                       //   currencyData!.symbol + double.parse(userData.wallet_amount.toString()).toStringAsFixed(decimal),
                                       style: TextStyle(
-                                          color: walletBalanceError
-                                              ? Colors.red
-                                              : Colors.green,
+                                          color: walletBalanceError ? Colors.red : Colors.green,
                                           fontWeight: FontWeight.w600,
                                           fontSize: 18),
                                     ),
@@ -345,16 +328,12 @@ class PaymentScreenState extends State<PaymentScreen> {
                                   padding: const EdgeInsets.only(right: 0.0),
                                   child: walletBalanceError
                                       ? Text(
-                                          "Your wallet doesn't have sufficient balance"
-                                              .tr(),
-                                          style: const TextStyle(
-                                              fontSize: 14, color: Colors.red),
+                                          "Your wallet doesn't have sufficient balance".tr(),
+                                          style: const TextStyle(fontSize: 14, color: Colors.red),
                                         )
                                       : Text(
                                           'Sufficient Balance'.tr(),
-                                          style: const TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.green),
+                                          style: const TextStyle(fontSize: 14, color: Colors.green),
                                         ),
                                 ),
                               ),
@@ -377,8 +356,7 @@ class PaymentScreenState extends State<PaymentScreen> {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return Center(
                           child: CircularProgressIndicator.adaptive(
-                            valueColor:
-                                AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
+                            valueColor: AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
                           ),
                         );
                       }
@@ -404,8 +382,7 @@ class PaymentScreenState extends State<PaymentScreen> {
                                 },
                                 value: codPay,
                                 contentPadding: const EdgeInsets.all(0),
-                                secondary: const FaIcon(
-                                    FontAwesomeIcons.handHoldingUsd),
+                                secondary: const FaIcon(FontAwesomeIcons.handHoldingUsd),
                                 title: Text('Cash on Delivery'.tr()),
                               )
                             : const Center();
@@ -478,9 +455,7 @@ class PaymentScreenState extends State<PaymentScreen> {
             ),
           ),
           Visibility(
-            visible: (paytmSettingData == null)
-                ? false
-                : paytmSettingData!.isEnabled,
+            visible: (paytmSettingData == null) ? false : paytmSettingData!.isEnabled,
             child: Column(
               children: [
                 const Divider(),
@@ -511,9 +486,7 @@ class PaymentScreenState extends State<PaymentScreen> {
             ),
           ),
           Visibility(
-            visible: (paypalSettingData == null)
-                ? false
-                : paypalSettingData!.isEnabled,
+            visible: (paypalSettingData == null) ? false : paypalSettingData!.isEnabled,
             child: Column(
               children: [
                 const Divider(),
@@ -575,9 +548,7 @@ class PaymentScreenState extends State<PaymentScreen> {
             ),
           ),
           Visibility(
-            visible: (payFastSettingData == null)
-                ? false
-                : payFastSettingData!.isEnable,
+            visible: (payFastSettingData == null) ? false : payFastSettingData!.isEnable,
             child: Column(
               children: [
                 const Divider(),
@@ -612,9 +583,7 @@ class PaymentScreenState extends State<PaymentScreen> {
             ),
           ),
           Visibility(
-            visible: (payStackSettingData == null)
-                ? false
-                : payStackSettingData!.isEnabled,
+            visible: (payStackSettingData == null) ? false : payStackSettingData!.isEnabled,
             child: Column(
               children: [
                 const Divider(),
@@ -649,9 +618,7 @@ class PaymentScreenState extends State<PaymentScreen> {
             ),
           ),
           Visibility(
-            visible: (flutterWaveSettingData == null)
-                ? false
-                : flutterWaveSettingData!.isEnable,
+            visible: (flutterWaveSettingData == null) ? false : flutterWaveSettingData!.isEnable,
             child: Column(
               children: [
                 const Divider(),
@@ -682,9 +649,7 @@ class PaymentScreenState extends State<PaymentScreen> {
             ),
           ),
           Visibility(
-            visible: (mercadoPagoSettingData == null)
-                ? false
-                : mercadoPagoSettingData!.isEnabled,
+            visible: (mercadoPagoSettingData == null) ? false : mercadoPagoSettingData!.isEnabled,
             child: Column(
               children: [
                 const Divider(),
@@ -725,7 +690,7 @@ class PaymentScreenState extends State<PaymentScreen> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.all(20),
-              primary: Color(COLOR_PRIMARY),
+              backgroundColor: Color(COLOR_PRIMARY),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -742,8 +707,7 @@ class PaymentScreenState extends State<PaymentScreen> {
                   if (value == null) {
                     Navigator.pop(context);
                     showAlert(_scaffoldKey.currentContext!,
-                        response:
-                            "Something went wrong, please contact admin.".tr(),
+                        response: "Something went wrong, please contact admin.".tr(),
                         colors: Colors.red);
                   } else {
                     CreateRazorPayOrderModel result = value;
@@ -757,15 +721,13 @@ class PaymentScreenState extends State<PaymentScreen> {
                 paymentType = 'payfast';
                 showLoadingAlert();
                 PayStackURLGen.getPayHTML(
-                        payFastSettingData: payFastSettingData!,
-                        amount: widget.total.toString())
+                        payFastSettingData: payFastSettingData!, amount: widget.total.toString())
                     .then((value) async {
-                  bool isDone =
-                      await Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => PayFastScreen(
-                                htmlData: value,
-                                payFastSettingData: payFastSettingData!,
-                              )));
+                  bool isDone = await Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => PayFastScreen(
+                            htmlData: value,
+                            payFastSettingData: payFastSettingData!,
+                          )));
 
                   print(isDone);
                   if (isDone) {
@@ -812,10 +774,12 @@ class PaymentScreenState extends State<PaymentScreen> {
                 paymentType = 'paystack';
                 showLoadingAlert();
                 payStackPayment(context);
-              } else if (mercadoPago) {
-                paymentType = 'mercadoPago';
-                mercadoPagoMakePayment();
-              } else if (flutterWave) {
+              }
+              // else if (mercadoPago) {
+              //   paymentType = 'mercadoPago';
+              //   mercadoPagoMakePayment();
+              // }
+              else if (flutterWave) {
                 paymentType = 'flutterwave';
                 _flutterWaveInitiatePayment(context);
               } else if (paypal) {
@@ -838,8 +802,7 @@ class PaymentScreenState extends State<PaymentScreen> {
                           amount: widget.total,
                           id: paymentID)
                       .then((value) {
-                    FireStoreUtils.updateWalletAmount(amount: -widget.total)
-                        .then((value) {
+                    FireStoreUtils.updateWalletAmount(amount: -widget.total).then((value) {
                       if (widget.take_away!) {
                         placeOrder(_scaffoldKey.currentContext!, oid: orderId);
                       } else {
@@ -848,8 +811,7 @@ class PaymentScreenState extends State<PaymentScreen> {
                       }
                     }).whenComplete(() {
                       showAlert(_scaffoldKey.currentContext!,
-                          response:
-                              "Payment Successful Via".tr() + " " "Wallet".tr(),
+                          response: "Payment Successful Via".tr() + " " "Wallet".tr(),
                           colors: Colors.green);
                     });
                   });
@@ -919,14 +881,14 @@ class PaymentScreenState extends State<PaymentScreen> {
       }
     };
 
-    try {
+  /*  try {
       _razorPay.open(options);
     } catch (e) {
       debugPrint('Error: $e');
-    }
+    }*/
   }
 
-  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+/*  void _handlePaymentSuccess(PaymentSuccessResponse response) {
     Navigator.pop(_scaffoldKey.currentContext!);
     print(response.orderId);
     print(response.paymentId);
@@ -968,7 +930,7 @@ class PaymentScreenState extends State<PaymentScreen> {
       backgroundColor: Colors.red.shade400,
       duration: const Duration(seconds: 8),
     ));
-  }
+  }*/
 
   ///Stripe payment function
   Map<String, dynamic>? paymentIntentData;
@@ -979,8 +941,7 @@ class PaymentScreenState extends State<PaymentScreen> {
       if (paymentIntentData!.containsKey("error")) {
         Navigator.pop(context);
         showAlert(_scaffoldKey.currentContext!,
-            response: "Something went wrong, please contact admin.".tr(),
-            colors: Colors.red);
+            response: "Something went wrong, please contact admin.".tr(), colors: Colors.red);
       } else {
         await stripe1.Stripe.instance
             .initPaymentSheet(
@@ -1023,8 +984,7 @@ class PaymentScreenState extends State<PaymentScreen> {
           toCheckOutScreen(true, _scaffoldKey.currentContext!);
         }
 
-        ScaffoldMessenger.of(_scaffoldKey.currentContext!)
-            .showSnackBar(SnackBar(
+        ScaffoldMessenger.of(_scaffoldKey.currentContext!).showSnackBar(SnackBar(
           content: Text("Payment Successful!!".tr()),
           duration: const Duration(seconds: 8),
           backgroundColor: Colors.green,
@@ -1081,14 +1041,12 @@ class PaymentScreenState extends State<PaymentScreen> {
         "shipping[address][country]": "US",
       };
       print(body);
-      var response = await http.post(
-          Uri.parse('https://api.stripe.com/v1/payment_intents'),
-          body: body,
-          headers: {
-            'Authorization': 'Bearer ${stripeData?.stripeSecret}',
-            //$_paymentIntentClientSecret',
-            'Content-Type': 'application/x-www-form-urlencoded'
-          });
+      var response = await http
+          .post(Uri.parse('https://api.stripe.com/v1/payment_intents'), body: body, headers: {
+        'Authorization': 'Bearer ${stripeData?.stripeSecret}',
+        //$_paymentIntentClientSecret',
+        'Content-Type': 'application/x-www-form-urlencoded'
+      });
       print('Create Intent response ===> ${response.body.toString()}');
 
       return jsonDecode(response.body);
@@ -1271,24 +1229,20 @@ class PaymentScreenState extends State<PaymentScreen> {
 
     final data = jsonDecode(response.body);
     print(data);
-    await verifyCheckSum(
-            checkSum: data["code"], amount: amount, orderId: orderId)
-        .then((value) {
+    await verifyCheckSum(checkSum: data["code"], amount: amount, orderId: orderId).then((value) {
       initiatePayment(amount: amount, orderId: orderId).then((value) {
         String callback = "";
         if (paytmSettingData!.isSandboxEnabled) {
-          callback = callback +
-              "https://securegw-stage.paytm.in/theia/paytmCallback?ORDER_ID=$orderId";
+          callback =
+              callback + "https://securegw-stage.paytm.in/theia/paytmCallback?ORDER_ID=$orderId";
         } else {
-          callback = callback +
-              "https://securegw.paytm.in/theia/paytmCallback?ORDER_ID=$orderId";
+          callback = callback + "https://securegw.paytm.in/theia/paytmCallback?ORDER_ID=$orderId";
         }
 
         if (value == null) {
           Navigator.pop(_scaffoldKey.currentContext!);
           showAlert(_scaffoldKey.currentContext!,
-              response: "something went wrong, please contact admin.".tr(),
-              colors: Colors.red);
+              response: "something went wrong, please contact admin.".tr(), colors: Colors.red);
         } else {
           GetPaymentTxtTokenModel result = value;
           _startTransaction(context,
@@ -1341,8 +1295,7 @@ class PaymentScreenState extends State<PaymentScreen> {
           Navigator.pop(_scaffoldKey.currentContext!);
 
           print("Error124 : $onError");
-          result =
-              onError.message.toString() + " \n  " + onError.code.toString();
+          result = onError.message.toString() + " \n  " + onError.code.toString();
           showAlert(_scaffoldKey.currentContext!,
               response: onError.message.toString(), colors: Colors.red);
         } else {
@@ -1350,23 +1303,19 @@ class PaymentScreenState extends State<PaymentScreen> {
 
           result = onError.toString();
           Navigator.pop(_scaffoldKey.currentContext!);
-          showAlert(_scaffoldKey.currentContext!,
-              response: result, colors: Colors.red);
+          showAlert(_scaffoldKey.currentContext!, response: result, colors: Colors.red);
         }
       });
     } catch (err) {
       print("======>>3");
       result = err.toString();
       Navigator.pop(_scaffoldKey.currentContext!);
-      showAlert(_scaffoldKey.currentContext!,
-          response: result, colors: Colors.red);
+      showAlert(_scaffoldKey.currentContext!, response: result, colors: Colors.red);
     }
   }
 
   Future verifyCheckSum(
-      {required String checkSum,
-      required double amount,
-      required orderId}) async {
+      {required String checkSum, required double amount, required orderId}) async {
     String getChecksum = "${GlobalURL}payments/validatechecksum";
     final response = await http.post(
         Uri.parse(
@@ -1393,14 +1342,11 @@ class PaymentScreenState extends State<PaymentScreen> {
     print('payment initiated now!@!');
     String callback = "";
     if (paytmSettingData!.isSandboxEnabled) {
-      callback = callback +
-          "https://securegw-stage.paytm.in/theia/paytmCallback?ORDER_ID=$orderId";
+      callback = callback + "https://securegw-stage.paytm.in/theia/paytmCallback?ORDER_ID=$orderId";
     } else {
-      callback = callback +
-          "https://securegw.paytm.in/theia/paytmCallback?ORDER_ID=$orderId";
+      callback = callback + "https://securegw.paytm.in/theia/paytmCallback?ORDER_ID=$orderId";
     }
-    final response =
-        await http.post(Uri.parse(initiateURL), headers: {}, body: {
+    final response = await http.post(Uri.parse(initiateURL), headers: {}, body: {
       "mid": paytmSettingData?.PaytmMID,
       "order_id": orderId,
       "key_secret": paytmSettingData?.PAYTM_MERCHANT_KEY.toString(),
@@ -1413,12 +1359,10 @@ class PaymentScreenState extends State<PaymentScreen> {
     print(response.body);
     final data = jsonDecode(response.body);
     print(data);
-    if (data["body"]["txnToken"] == null ||
-        data["body"]["txnToken"].toString().isEmpty) {
+    if (data["body"]["txnToken"] == null || data["body"]["txnToken"].toString().isEmpty) {
       Navigator.pop(_scaffoldKey.currentContext!);
       showAlert(_scaffoldKey.currentContext!,
-          response: "something went wrong, please contact admin.".tr(),
-          colors: Colors.red);
+          response: "something went wrong, please contact admin.".tr(), colors: Colors.red);
     }
     return GetPaymentTxtTokenModel.fromJson(data);
   }
@@ -1448,15 +1392,13 @@ class PaymentScreenState extends State<PaymentScreen> {
           } else {
             toCheckOutScreen(true, _scaffoldKey.currentContext!);
           }
-          ScaffoldMessenger.of(_scaffoldKey.currentContext!)
-              .showSnackBar(SnackBar(
+          ScaffoldMessenger.of(_scaffoldKey.currentContext!).showSnackBar(SnackBar(
             content: Text("Payment Successful!!".tr() + "\n"),
             backgroundColor: Colors.green,
           ));
         } else {
           Navigator.pop(_scaffoldKey.currentContext!);
-          ScaffoldMessenger.of(_scaffoldKey.currentContext!)
-              .showSnackBar(SnackBar(
+          ScaffoldMessenger.of(_scaffoldKey.currentContext!).showSnackBar(SnackBar(
             content: Text("Payment UnSuccessful!!".tr() + "\n"),
             backgroundColor: Colors.red,
           ));
@@ -1464,85 +1406,81 @@ class PaymentScreenState extends State<PaymentScreen> {
       } else {
         Navigator.pop(_scaffoldKey.currentContext!);
         showAlert(_scaffoldKey.currentContext!,
-            response: "something went wrong, please contact admin.".tr(),
-            colors: Colors.red);
+            response: "something went wrong, please contact admin.".tr(), colors: Colors.red);
       }
     });
   }
 
-  ///MercadoPago Payment Method
+  // ///MercadoPago Payment Method
 
-  mercadoPagoMakePayment() {
-    makePreference().then((result) async {
-      if (result.isNotEmpty) {
-        var client_id = result['response']['client_id'];
-        var preferenceId = result['response']['id'];
-        print("uday");
-        print(result);
-        print(result['response']['init_point']);
+  // mercadoPagoMakePayment() {
+  //   makePreference().then((result) async {
+  //     if (result.isNotEmpty) {
+  //       var client_id = result['response']['client_id'];
+  //       var preferenceId = result['response']['id'];
+  //       print("uday");
+  //       print(result);
+  //       print(result['response']['init_point']);
 
-        final bool isDone = await Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => MercadoPagoScreen(
-                    initialURl: result['response']['init_point'])));
-        print(isDone);
-        print(result.toString());
-        print(preferenceId);
+  //       final bool isDone = await Navigator.push(
+  //           context,
+  //           MaterialPageRoute(
+  //               builder: (context) =>
+  //                   MercadoPagoScreen(initialURl: result['response']['init_point'])));
+  //       print(isDone);
+  //       print(result.toString());
+  //       print(preferenceId);
 
-        if (isDone) {
-          if (widget.take_away!) {
-            placeOrder(_scaffoldKey.currentContext!);
-          } else {
-            toCheckOutScreen(true, _scaffoldKey.currentContext!);
-          }
-          ScaffoldMessenger.of(_scaffoldKey.currentContext!)
-              .showSnackBar(SnackBar(
-            content: Text("Payment Successful!!".tr() + "\n"),
-            backgroundColor: Colors.green,
-          ));
-        } else {
-          Navigator.pop(_scaffoldKey.currentContext!);
-          ScaffoldMessenger.of(_scaffoldKey.currentContext!)
-              .showSnackBar(SnackBar(
-            content: Text("Payment UnSuccessful!!".tr() + "\n"),
-            backgroundColor: Colors.red,
-          ));
-        }
-      } else {
-        hideProgress();
-        ScaffoldMessenger.of(_scaffoldKey.currentContext!)
-            .showSnackBar(SnackBar(
-          content: Text("Error while transaction!".tr() + "\n"),
-          backgroundColor: Colors.red,
-        ));
-      }
-    });
-  }
+  //       if (isDone) {
+  //         if (widget.take_away!) {
+  //           placeOrder(_scaffoldKey.currentContext!);
+  //         } else {
+  //           toCheckOutScreen(true, _scaffoldKey.currentContext!);
+  //         }
+  //         ScaffoldMessenger.of(_scaffoldKey.currentContext!).showSnackBar(SnackBar(
+  //           content: Text("Payment Successful!!".tr() + "\n"),
+  //           backgroundColor: Colors.green,
+  //         ));
+  //       } else {
+  //         Navigator.pop(_scaffoldKey.currentContext!);
+  //         ScaffoldMessenger.of(_scaffoldKey.currentContext!).showSnackBar(SnackBar(
+  //           content: Text("Payment UnSuccessful!!".tr() + "\n"),
+  //           backgroundColor: Colors.red,
+  //         ));
+  //       }
+  //     } else {
+  //       hideProgress();
+  //       ScaffoldMessenger.of(_scaffoldKey.currentContext!).showSnackBar(SnackBar(
+  //         content: Text("Error while transaction!".tr() + "\n"),
+  //         backgroundColor: Colors.red,
+  //       ));
+  //     }
+  //   });
+  // }
 
-  Future<Map<String, dynamic>> makePreference() async {
-    final mp = MP.fromAccessToken(mercadoPagoSettingData!.accessToken);
-    var pref = {
-      "items": [
-        {
-          "title": "Wallet TopUp",
-          "quantity": 1,
-          "unit_price": double.parse(widget.total.toString().trim())
-        }
-      ],
-      "auto_return": "all",
-      "back_urls": {
-        "failure": "${GlobalURL}payment/failure",
-        "pending": "${GlobalURL}payment/pending",
-        "success": "${GlobalURL}payment/success"
-      },
-    };
+  // Future<Map<String, dynamic>> makePreference() async {
+  //   final mp = MP.fromAccessToken(mercadoPagoSettingData!.accessToken);
+  //   var pref = {
+  //     "items": [
+  //       {
+  //         "title": "Wallet TopUp",
+  //         "quantity": 1,
+  //         "unit_price": double.parse(widget.total.toString().trim())
+  //       }
+  //     ],
+  //     "auto_return": "all",
+  //     "back_urls": {
+  //       "failure": "${GlobalURL}payment/failure",
+  //       "pending": "${GlobalURL}payment/pending",
+  //       "success": "${GlobalURL}payment/success"
+  //     },
+  //   };
 
-    var result = await mp.createPreference(pref);
-    return result;
-  }
+  //   var result = await mp.createPreference(pref);
+  //   return result;
+  // }
 
-  ///FlutterWave Payment Method
+  // ///FlutterWave Payment Method
   String? _ref;
 
   setRef() {
@@ -1579,8 +1517,7 @@ class PaymentScreenState extends State<PaymentScreen> {
         color: Color(COLOR_PRIMARY),
         fontSize: 18,
       ),
-      mainTextStyle:
-          const TextStyle(color: Colors.black, fontSize: 19, letterSpacing: 2),
+      mainTextStyle: const TextStyle(color: Colors.black, fontSize: 19, letterSpacing: 2),
       dialogBackgroundColor: Colors.white,
       appBarTitleTextStyle: const TextStyle(
         color: Colors.white,
@@ -1620,8 +1557,7 @@ class PaymentScreenState extends State<PaymentScreen> {
     print("${response.toJson()}");
   }
 
-  Future<void> showLoading(
-      {required String message, Color txtColor = Colors.black}) {
+  Future<void> showLoading({required String message, Color txtColor = Colors.black}) {
     return showDialog(
       context: context,
       barrierDismissible: false,
@@ -1691,36 +1627,27 @@ class PaymentScreenState extends State<PaymentScreen> {
       orderModel.id = oid;
     }
     print("222222");
-    OrderModel placedOrder =
-        await fireStoreUtils.placeOrderWithTakeAWay(orderModel);
+    OrderModel placedOrder = await fireStoreUtils.placeOrderWithTakeAWay(orderModel);
     print("||||{}" + orderModel.toJson().toString());
 
     for (int i = 0; i < tempProduc.length; i++) {
-      await FireStoreUtils()
-          .getProductByID(tempProduc[i].id.split('~').first)
-          .then((value) async {
+      await FireStoreUtils().getProductByID(tempProduc[i].id.split('~').first).then((value) async {
         ProductModel? productModel = value;
         if (tempProduc[i].variant_info != null) {
-          for (int j = 0;
-              j < productModel.itemAttributes!.variants!.length;
-              j++) {
+          for (int j = 0; j < productModel.itemAttributes!.variants!.length; j++) {
             if (productModel.itemAttributes!.variants![j].variant_id ==
                 tempProduc[i].id.split('~').last) {
-              if (productModel.itemAttributes!.variants![j].variant_quantity !=
-                  "-1") {
-                productModel.itemAttributes!.variants![j].variant_quantity =
-                    (int.parse(productModel
-                                .itemAttributes!.variants![j].variant_quantity
-                                .toString()) -
-                            tempProduc[i].quantity)
-                        .toString();
+              if (productModel.itemAttributes!.variants![j].variant_quantity != "-1") {
+                productModel.itemAttributes!.variants![j].variant_quantity = (int.parse(
+                            productModel.itemAttributes!.variants![j].variant_quantity.toString()) -
+                        tempProduc[i].quantity)
+                    .toString();
               }
             }
           }
         } else {
           if (productModel.quantity != -1) {
-            productModel.quantity =
-                productModel.quantity - tempProduc[i].quantity;
+            productModel.quantity = productModel.quantity - tempProduc[i].quantity;
           }
         }
 

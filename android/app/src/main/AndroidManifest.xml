@@ -145,14 +145,14 @@
             tools:replace="android:exported"
             android:exported="true" />
 
-        <receiver
+        <!-- <receiver
             android:name="com.razorpay.RzpTokenReceiver"
             android:exported="false"
             tools:replace="android:exported">
             <intent-filter>
                 <action android:name="rzp.device_token.share" />
             </intent-filter>
-        </receiver>
+        </receiver> -->
 
 
         <provider

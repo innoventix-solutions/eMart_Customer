@@ -125,7 +125,7 @@ const FavouriteItem = "favorite_item";
 const COD = 'CODSettings';
 const TermsAndConditions = 'terms_and_condition';
 
-const GlobalURL = "Replace with your Website";
+const GlobalURL = "https://emartadmin.siswebapp.com/";
 
 const Currency = 'currencies';
 double radiusValue = 0.0;
@@ -195,9 +195,7 @@ double getTaxValue({String? amount, TaxModel? taxModel}) {
     if (taxModel.type == "fix") {
       taxVal = double.parse(taxModel.tax.toString());
     } else {
-      taxVal = (double.parse(amount.toString()) *
-              double.parse(taxModel.tax!.toString())) /
-          100;
+      taxVal = (double.parse(amount.toString()) * double.parse(taxModel.tax!.toString())) / 100;
     }
   }
   return taxVal;
@@ -206,8 +204,7 @@ double getTaxValue({String? amount, TaxModel? taxModel}) {
 Uri createCoordinatesUrl(double latitude, double longitude, [String? label]) {
   var uri;
   if (kIsWeb) {
-    uri = Uri.https('www.google.com', '/maps/search/',
-        {'api': '1', 'query': '$latitude,$longitude'});
+    uri = Uri.https('www.google.com', '/maps/search/', {'api': '1', 'query': '$latitude,$longitude'});
   } else if (Platform.isAndroid) {
     var query = '$latitude,$longitude';
     if (label != null) query += '($label)';
@@ -217,8 +214,7 @@ Uri createCoordinatesUrl(double latitude, double longitude, [String? label]) {
     if (label != null) params['q'] = label;
     uri = Uri.https('maps.apple.com', '/', params);
   } else {
-    uri = Uri.https('www.google.com', '/maps/search/',
-        {'api': '1', 'query': '$latitude,$longitude'});
+    uri = Uri.https('www.google.com', '/maps/search/', {'api': '1', 'query': '$latitude,$longitude'});
   }
 
   return uri;
@@ -233,8 +229,8 @@ String amountShow({required String? amount}) {
 }
 
 String getKm(Position pos1, Position pos2) {
-  double distanceInMeters = Geolocator.distanceBetween(
-      pos1.latitude, pos1.longitude, pos2.latitude, pos2.longitude);
+  double distanceInMeters =
+      Geolocator.distanceBetween(pos1.latitude, pos1.longitude, pos2.latitude, pos2.longitude);
   double kilometer = distanceInMeters / 1000;
   return kilometer.toStringAsFixed(currencyData!.decimal).toString();
 }
@@ -257,18 +253,13 @@ final smtpServer = SmtpServer(mailSettings!.host.toString(),
     ssl: true,
     allowInsecure: true);
 
-sendMail(
-    {String? subject,
-    String? body,
-    bool? isAdmin = false,
-    List<dynamic>? recipients}) async {
+sendMail({String? subject, String? body, bool? isAdmin = false, List<dynamic>? recipients}) async {
   // Create our message.
   if (isAdmin == true) {
     recipients!.add(mailSettings!.userName.toString());
   }
   final message = Message()
-    ..from = Address(
-        mailSettings!.userName.toString(), mailSettings!.fromName.toString())
+    ..from = Address(mailSettings!.userName.toString(), mailSettings!.fromName.toString())
     ..recipients = recipients!
     ..subject = subject
     ..text = body
