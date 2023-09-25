@@ -125,7 +125,8 @@ const FavouriteItem = "favorite_item";
 const COD = 'CODSettings';
 const TermsAndConditions = 'terms_and_condition';
 
-const GlobalURL = "https://emartadmin.siswebapp.com/";
+/// old url const GlobalURL = "https://emartadmin.siswebapp.com/";
+const GlobalURL = "https://emartadmin.epatientvault.com/";
 
 const Currency = 'currencies';
 double radiusValue = 0.0;
